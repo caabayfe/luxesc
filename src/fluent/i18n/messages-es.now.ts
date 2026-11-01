@@ -21,6 +21,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-40d45a3a8517'],
+    table: 'sys_ui_message',
+    data: { key: "All your open requests are in your briefing above.", message: "Todas sus solicitudes abiertas están en el resumen de arriba.", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-5782ca61c395'],
     table: 'sys_ui_message',
     data: { key: "An AI agent is turning these steps into a knowledge article so colleagues can fix this themselves.", message: "Un agente de IA está convirtiendo estos pasos en un artículo de conocimiento para que sus compañeros puedan resolverlo por sí mismos.", language: 'es' },
@@ -90,6 +96,12 @@ Record({
     $id: Now.ID['luxesc-es-0a0292d0097f'],
     table: 'sys_ui_message',
     data: { key: "Brief me", message: "Ponerme al día", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-59fb06366caa'],
+    table: 'sys_ui_message',
+    data: { key: "Briefing groups", message: "Grupos del resumen", language: 'es' },
 })
 
 Record({
@@ -279,6 +291,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-f8c24833126b'],
+    table: 'sys_ui_message',
+    data: { key: "Hide details", message: "Ocultar detalles", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-e6e43f624a2a'],
     table: 'sys_ui_message',
     data: { key: "High: my whole team is blocked", message: "Alto: todo mi equipo está bloqueado", language: 'es' },
@@ -405,6 +423,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-baa6826b2233'],
+    table: 'sys_ui_message',
+    data: { key: "Need you ({0})", message: "Requieren su atención ({0})", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-06b8c728d6df'],
     table: 'sys_ui_message',
     data: { key: "Needs your action", message: "Requiere su acción", language: 'es' },
@@ -429,6 +453,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-b914ad56a34a'],
+    table: 'sys_ui_message',
+    data: { key: "No recent update ({0})", message: "Sin novedades recientes ({0})", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-0d8fb35ec479'],
     table: 'sys_ui_message',
     data: { key: "No services available", message: "No hay servicios disponibles", language: 'es' },
@@ -444,6 +474,18 @@ Record({
     $id: Now.ID['luxesc-es-3a4694be22a9'],
     table: 'sys_ui_message',
     data: { key: "Notes from the planner", message: "Notas del planificador", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-fe3735743864'],
+    table: 'sys_ui_message',
+    data: { key: "Nothing needs you right now.", message: "Ahora mismo nada requiere su atención.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-4e0efbe7620b'],
+    table: 'sys_ui_message',
+    data: { key: "On track ({0})", message: "En curso ({0})", language: 'es' },
 })
 
 Record({
@@ -555,6 +597,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-afc6dba4f740'],
+    table: 'sys_ui_message',
+    data: { key: "Refreshing your briefing…", message: "Actualizando su resumen…", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-6557047df5bd'],
     table: 'sys_ui_message',
     data: { key: "Rejected.", message: "Rechazada.", language: 'es' },
@@ -600,6 +648,12 @@ Record({
     $id: Now.ID['luxesc-es-0d6764493ac2'],
     table: 'sys_ui_message',
     data: { key: "Sent back to the service desk with your comment.", message: "Devuelto al service desk con su comentario.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-42c9c9254f7c'],
+    table: 'sys_ui_message',
+    data: { key: "Show details", message: "Mostrar detalles", language: 'es' },
 })
 
 Record({

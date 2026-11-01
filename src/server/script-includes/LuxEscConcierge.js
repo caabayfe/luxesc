@@ -165,7 +165,7 @@ LuxEscConcierge.prototype = {
             throw new Error('The briefing must be {"headline": "...", "items": [...]}');
         }
         var clean = {
-            headline: briefing.headline.substring(0, 300),
+            headline: briefing.headline.substring(0, 160),
             items: briefing.items.slice(0, LuxEscConcierge.MAX_ITEMS).map(function (item) {
                 return {
                     kind: String(item.kind || 'info').substring(0, 20),
@@ -173,8 +173,8 @@ LuxEscConcierge.prototype = {
                     sysId: /^[0-9a-f]{32}$/.test(item.sysId) ? item.sysId : '',
                     approvalId: /^[0-9a-f]{32}$/.test(item.approvalId) ? item.approvalId : '',
                     draft: String(item.draft || '').substring(0, 500),
-                    title: String(item.title || '').substring(0, 200),
-                    detail: String(item.detail || '').substring(0, 600),
+                    title: String(item.title || '').substring(0, 100),
+                    detail: String(item.detail || '').substring(0, 300),
                     question: String(item.question || '').substring(0, 300),
                 };
             }),

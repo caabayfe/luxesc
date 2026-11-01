@@ -606,9 +606,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'c0a58ee5aaf8486b83a218058fdc45b4'
                     }
+                    'luxesc-es-40d45a3a8517': {
+                        table: 'sys_ui_message'
+                        id: 'a80878c49c0c41aab984e163667c7c2e'
+                    }
                     'luxesc-es-416e449df56e': {
                         table: 'sys_ui_message'
                         id: '7c2fce3b116247ed8e650374fb30a1b9'
+                    }
+                    'luxesc-es-42c9c9254f7c': {
+                        table: 'sys_ui_message'
+                        id: '795da635401f49aca13ca2d24d8ed051'
                     }
                     'luxesc-es-435e423ae5d9': {
                         table: 'sys_ui_message'
@@ -638,6 +646,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'd85e922a4e0f466aaff28e30418e2a10'
                     }
+                    'luxesc-es-4e0efbe7620b': {
+                        table: 'sys_ui_message'
+                        id: 'a54887d55ed64f99a72d64424e634ad4'
+                    }
                     'luxesc-es-4f2ef8052a94': {
                         table: 'sys_ui_message'
                         id: '85418ad452d249bc8b08505ba3f281fc'
@@ -665,6 +677,10 @@ declare global {
                     'luxesc-es-5899c6a0e942': {
                         table: 'sys_ui_message'
                         id: '63a18b7a1b7747daac17be422e336faf'
+                    }
+                    'luxesc-es-59fb06366caa': {
+                        table: 'sys_ui_message'
+                        id: '195ad156934745e4ae45874270dd6989'
                     }
                     'luxesc-es-5de77552730c': {
                         table: 'sys_ui_message'
@@ -938,6 +954,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '80b009f94daf49e29b74da8e01472d43'
                     }
+                    'luxesc-es-afc6dba4f740': {
+                        table: 'sys_ui_message'
+                        id: '6c8d8e54a6b64e15b7eb9df1a2280a4d'
+                    }
                     'luxesc-es-b080b8c8dc1d': {
                         table: 'sys_ui_message'
                         id: 'c62fd7e2b65c4ab5a31dec89e7b1680c'
@@ -977,6 +997,14 @@ declare global {
                     'luxesc-es-b6f7a73fd1b7': {
                         table: 'sys_ui_message'
                         id: '0b3318307b6649e09f50892772a9cb55'
+                    }
+                    'luxesc-es-b914ad56a34a': {
+                        table: 'sys_ui_message'
+                        id: '95a8a354eec34636a8d7310395647e37'
+                    }
+                    'luxesc-es-baa6826b2233': {
+                        table: 'sys_ui_message'
+                        id: 'cdad67549391479fb1aa72c38a2d3db0'
                     }
                     'luxesc-es-bba0686f8a64': {
                         table: 'sys_ui_message'
@@ -1122,6 +1150,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '3453dfa54db84194ba5c0340b3a0788a'
                     }
+                    'luxesc-es-f8c24833126b': {
+                        table: 'sys_ui_message'
+                        id: 'dd9b8654aa7e4ef98e6d085acf52e62f'
+                    }
                     'luxesc-es-fc282f63f06a': {
                         table: 'sys_ui_message'
                         id: 'f1467ec63018482e8218e79db7289cea'
@@ -1129,6 +1161,10 @@ declare global {
                     'luxesc-es-fe2a73c98eb2': {
                         table: 'sys_ui_message'
                         id: '8cec850cf75d4e21adf0a20cec3d9f8a'
+                    }
+                    'luxesc-es-fe3735743864': {
+                        table: 'sys_ui_message'
+                        id: '318f3b0896ff4bcca628c840f67a4c00'
                     }
                     'luxesc-es-ff231b5724d2': {
                         table: 'sys_ui_message'

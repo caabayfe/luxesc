@@ -1,5 +1,5 @@
 import {html, css, nothing, isServer} from 'lit';
-import {customElement} from 'lit/decorators.js';
+import {customElement, state} from 'lit/decorators.js';
 import {
   AIUXElement,
   decorators,
@@ -36,6 +36,9 @@ const MY_OPEN_REQUESTS =
 @acl([{securityAttribute: 'user_is_authenticated'}])
 export default class HomePage extends withWidgetContext(AIUXElement) {
   static contexts = [userContext, chatContext];
+
+  // Records the concierge briefing already shows, left out of My open requests
+  @state() _briefed = [];
 
   static aiContext = {
     description: "Employee Center home: the employee's open requests and incidents, catalog categories and featured services",
@@ -246,7 +249,18 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     </section>`;
   }
 
+  _onBriefing(e) {
+    this._briefed = e.detail?.sysIds || [];
+  }
+
   _renderMyRequests() {
+    const briefed = this._briefed;
+    const openRequests = this.loaderData?.openRequests || [];
+    // The loader reads up to 10; when the briefing covers all of them there is nothing left to list
+    const allBriefed =
+      briefed.length > 0 &&
+      openRequests.length < 10 &&
+      openRequests.every(request => briefed.includes(request.sys_id.value));
     return html`<section class="flex flex-col gap-3" aria-labelledby="requests-title">
       <div class="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="requests-title" class="text-xl font-semibold">
@@ -256,11 +270,13 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
           ${i18n.getMessage('View all requests')}
         </a>
       </div>
-      <div class="aiux-card border border-base-300 bg-base-100">
+      ${allBriefed
+        ? html`<p class="text-sm text-text-secondary">${i18n.getMessage('All your open requests are in your briefing above.')}</p>`
+        : html`<div class="aiux-card border border-base-300 bg-base-100">
         <aiux-list-connected
           table="task"
-          columns="number,short_description,state,sys_updated_on"
-          .query=${MY_OPEN_REQUESTS}
+          columns="number,short_description,state"
+          .query=${briefed.length ? MY_OPEN_REQUESTS.replace('^ORDERBY', `^sys_idNOT IN${briefed.join(',')}^ORDERBY`) : MY_OPEN_REQUESTS}
           .pageSize=${5}
           .listOptions=${{
             heading: i18n.getMessage('Recently updated'),
@@ -275,7 +291,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
           }}
           @aiux-list-connected:reference-link-clicked=${this._openRequest}
         ></aiux-list-connected>
-      </div>
+      </div>`}
     </section>`;
   }
 
@@ -284,12 +300,12 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-8 p-4 lg:p-8">
       ${this._renderHero()}
       <luxesc-known-issues></luxesc-known-issues>
+      <luxesc-concierge .basePath=${this._basePath} @luxesc-concierge:briefing=${this._onBriefing}></luxesc-concierge>
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <luxesc-intake></luxesc-intake>
-        <luxesc-concierge .basePath=${this._basePath}></luxesc-concierge>
+        ${this._renderMyRequests()}
       </div>
-      ${this._renderCategories(categories)}
-      ${this._renderFeatured(items)} ${this._renderMyRequests()}
+      ${this._renderCategories(categories)} ${this._renderFeatured(items)}
     </div>`;
   }
 }
