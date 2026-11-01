@@ -187,8 +187,8 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
     return html`<header class="flex flex-col gap-3">
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
-          <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
-          <li><a href="${basePath}/requests">${i18n.getMessage('My requests')}</a></li>
+          <li><a href="${basePath}/start">${i18n.getMessage('For you')}</a></li>
+          <li><a href="${basePath}/requests">${i18n.getMessage('My stuff')}</a></li>
           <li aria-current="page">${summary.number?.display_value}</li>
         </ul>
       </nav>

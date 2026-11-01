@@ -35,6 +35,8 @@ const clean = text => text.replace(/[\^=]/g, ' ').trim();
 export class CommandBox extends AIUXElement {
   @property({type: String}) basePath = '';
   @property({type: Array}) suggestions = [];
+  // Inside the command palette: no card or heading of its own, the input takes focus
+  @property({type: Boolean}) bare = false;
 
   @state() _text = '';
   @state() _results = null;
@@ -184,35 +186,49 @@ export class CommandBox extends AIUXElement {
     </div>`;
   }
 
+  focus() {
+    this.updateComplete.then(() => this.renderRoot.querySelector('input')?.focus());
+  }
+
+  _renderContent() {
+    return this._mode
+      ? this._renderAgent()
+      : html`<form class="flex flex-col gap-3" role="search" aria-labelledby="command-title" @submit=${this._onSubmit}>
+          <label class="aiux-input aiux-input-lg w-full">
+            ${icon({name: 'magnifying-glass', size: 'sm'})}
+            <span class="sr-only">${i18n.getMessage('What do you need?')}</span>
+            <input
+              type="search"
+              autocomplete="off"
+              .value=${this._text}
+              placeholder=${i18n.getMessage('Describe a problem, ask for something, or ask a question')}
+              @input=${this._onInput}
+            />
+          </label>
+          ${this._results ? this._renderResults() : nothing}
+          ${this._text.trim()
+            ? this._renderActions()
+            : html`<div class="flex flex-wrap gap-2">
+                ${this.suggestions.map(
+                  s => html`<button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline" @click=${() => this._useSuggestion(s.question)}>
+                    ${s.label}
+                  </button>`
+                )}
+              </div>`}
+        </form>`;
+  }
+
   render() {
+    if (this.bare) {
+      return html`<div class="flex flex-col gap-4">
+        <h2 id="command-title" class="sr-only">${i18n.getMessage('What do you need?')}</h2>
+        ${this._renderContent()}
+      </div>`;
+    }
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="command-title">
       <div class="aiux-card-body gap-4">
         <h2 id="command-title" class="text-xl font-semibold">${i18n.getMessage('What do you need?')}</h2>
-        ${this._mode
-          ? this._renderAgent()
-          : html`<form class="flex flex-col gap-3" role="search" aria-labelledby="command-title" @submit=${this._onSubmit}>
-              <label class="aiux-input aiux-input-lg w-full">
-                ${icon({name: 'magnifying-glass', size: 'sm'})}
-                <span class="sr-only">${i18n.getMessage('What do you need?')}</span>
-                <input
-                  type="search"
-                  autocomplete="off"
-                  .value=${this._text}
-                  placeholder=${i18n.getMessage('Describe a problem, ask for something, or ask a question')}
-                  @input=${this._onInput}
-                />
-              </label>
-              ${this._results ? this._renderResults() : nothing}
-              ${this._text.trim()
-                ? this._renderActions()
-                : html`<div class="flex flex-wrap gap-2">
-                    ${this.suggestions.map(
-                      s => html`<button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline" @click=${() => this._useSuggestion(s.question)}>
-                        ${s.label}
-                      </button>`
-                    )}
-                  </div>`}
-            </form>`}
+        ${this._renderContent()}
       </div>
     </section>`;
   }

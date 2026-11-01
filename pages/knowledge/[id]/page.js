@@ -6,6 +6,7 @@ import '@servicenow/aiux/aiux-components-empty-state-content';
 import {fetchRecord} from '../../../utils/api.js';
 import {callConcierge} from '../../../utils/agent-runs.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
+import {exploreHref} from '../../../utils/explore.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import '../../../components/luxesc-ask.js';
 import '../../../components/luxesc-rich-text.js';
@@ -82,8 +83,8 @@ export default class KnowledgePage extends withWidgetContext(AIUXElement) {
     return html`<article class="mx-auto flex max-w-3xl flex-col gap-6 p-4 lg:p-8">
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
-          <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
-          <li><a href="${basePath}/knowledge">${i18n.getMessage('Knowledge')}</a></li>
+          <li><a href="${basePath}/start">${i18n.getMessage('For you')}</a></li>
+          <li><a href=${exploreHref(basePath, {tab: 'answers'})}>${i18n.getMessage('Explore')}</a></li>
           <li aria-current="page">${number}</li>
         </ul>
       </nav>

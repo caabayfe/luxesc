@@ -2,40 +2,58 @@ import {navLayoutContext} from '@servicenow/aiux/aiux-components-nav';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {AppTheme} from './theme.js';
 
+// ⌘K / Ctrl+K opens the one box from any page; the palette loads on first use
+function installCommandPalette(basePath) {
+  if (typeof window === 'undefined' || window.__luxescPalette) return;
+  window.__luxescPalette = true;
+  window.addEventListener('keydown', async e => {
+    if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'k') return;
+    e.preventDefault();
+    await import('./components/luxesc-command-palette.js');
+    let palette = document.querySelector('luxesc-command-palette');
+    if (!palette) {
+      palette = document.createElement('luxesc-command-palette');
+      palette.basePath = basePath;
+      document.body.append(palette);
+    }
+    palette.show();
+  });
+}
+
+// Catalog items and articles open from Explore and keep it highlighted
+const EXPLORE_SECTIONS = ['/explore', '/catalog', '/knowledge'];
+
+// Three destinations named after what people want, not after the tables behind
+// them. The nav highlights the item whose activePath prefixes the URL, so
+// Explore's follows the section the employee is in.
+function navItems(path) {
+  return [
+    {
+      icon: 'home',
+      title: i18n.getMessage('For you'),
+      action: {type: 'navigate', path: '/start'}
+    },
+    {
+      icon: 'inbox',
+      title: i18n.getMessage('My stuff'),
+      action: {type: 'navigate', path: '/requests'}
+    },
+    {
+      icon: 'compass',
+      title: i18n.getMessage('Explore'),
+      action: {type: 'navigate', path: '/explore'},
+      activePath: EXPLORE_SECTIONS.find(section => path === section || path.startsWith(`${section}/`)) || '/explore'
+    }
+  ];
+}
+
 export default {
   appTheme: AppTheme,
   applicationLayout: 'aiux-nav-layout',
 
   setup(ctx) {
-    const items = [
-      {
-        icon: 'home',
-        title: i18n.getMessage('Home'),
-        action: {type: 'navigate', path: '/start'}
-      },
-      {
-        icon: 'shopping-cart',
-        title: i18n.getMessage('Request something'),
-        action: {type: 'navigate', path: '/catalog'}
-      },
-      {
-        icon: 'list',
-        title: i18n.getMessage('My requests'),
-        action: {type: 'navigate', path: '/requests'}
-      },
-      {
-        icon: 'lightbulb',
-        title: i18n.getMessage('Knowledge'),
-        action: {type: 'navigate', path: '/knowledge'}
-      }
-    ];
-
-    // Child routes (/catalog/<item>, /requests/<id>, /knowledge/<id>) keep their section highlighted
+    installCommandPalette(ctx.basePath || '/aiux/luxesc');
     const activeRoute = ctx.app?.routes?.find(r => r.active)?.route || '';
-    const itemsWithActive = items.map(item => ({
-      ...item,
-      ...(activeRoute.startsWith(item.action.path) && {active: true})
-    }));
 
     const current = navLayoutContext.get();
     navLayoutContext.set({
@@ -55,10 +73,15 @@ export default {
         // Virtual Agent / Now Assist, when the instance has a chat deployment
         chat: ctx.chat?.enabled === true
       },
-      items: itemsWithActive,
+      items: navItems(activeRoute),
       defaultLogoFull: 'servicenow',
       defaultLogoIcon: 'servicenow'
     });
+  },
+
+  // Before each navigation: keep Explore highlighted on catalog items and articles
+  navigate({toAppPath}) {
+    navLayoutContext.set({...navLayoutContext.get(), items: navItems((toAppPath || '').split('?')[0])});
   },
 
   teardown() {

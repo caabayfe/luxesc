@@ -26,6 +26,7 @@ import {
 import {applyAiValues, describeFields, freeTextField} from '../../../utils/ai-form.js';
 import {takePrefill} from '../../../utils/ai-handoff.js';
 import {RECORD_PRODUCER_CLASS} from '../../../constants/catalog.js';
+import {exploreHref} from '../../../utils/explore.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import './components/luxesc-variable-form.js';
@@ -284,11 +285,11 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
     return html`<header class="flex flex-col gap-4">
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
-          <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
-          <li><a href="${basePath}/catalog">${i18n.getMessage('Request something')}</a></li>
+          <li><a href="${basePath}/start">${i18n.getMessage('For you')}</a></li>
+          <li><a href=${exploreHref(basePath, {tab: 'services'})}>${i18n.getMessage('Explore')}</a></li>
           ${item.category?.title
             ? html`<li>
-                <a href="${basePath}/catalog?category=${item.category.sys_id}">
+                <a href=${exploreHref(basePath, {tab: 'services', categoryId: item.category.sys_id})}>
                   ${item.category.title}
                 </a>
               </li>`

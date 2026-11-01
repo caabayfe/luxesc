@@ -19,6 +19,7 @@ import '../../components/luxesc-concierge.js';
 import '../../components/luxesc-known-issues.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
 import {callConcierge} from '../../utils/agent-runs.js';
+import {exploreHref} from '../../utils/explore.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-home');
@@ -179,12 +180,12 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
       <div class="aiux-card-body gap-3">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="services-title" class="aiux-card-title text-lg">${i18n.getMessage('Browse services')}</h2>
-          <a class="aiux-link aiux-link-primary text-sm" href="${base}/catalog">${i18n.getMessage('Full catalog')}</a>
+          <a class="aiux-link aiux-link-primary text-sm" href=${exploreHref(base, {tab: 'services'})}>${i18n.getMessage('Full catalog')}</a>
         </div>
         <ul class="flex flex-wrap gap-2">
           ${categories.slice(0, CATEGORY_COUNT).map(
             c => html`<li>
-              <a class="aiux-btn aiux-btn-sm aiux-btn-outline h-auto min-h-8 max-w-full whitespace-normal py-1 text-start" href="${base}/catalog?category=${c.sys_id}">
+              <a class="aiux-btn aiux-btn-sm aiux-btn-outline h-auto min-h-8 max-w-full whitespace-normal py-1 text-start" href=${exploreHref(base, {tab: 'services', categoryId: c.sys_id})}>
                 ${c.title}
               </a>
             </li>`
@@ -217,7 +218,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
                   ? i18n.getMessage('1 view this month')
                   : i18n.getMessage('{0} views this month', a.recentViews)
             })),
-            more: {href: `${base}/knowledge`, label: i18n.getMessage('All answers')}
+            more: {href: exploreHref(base, {tab: 'answers'}), label: i18n.getMessage('All answers')}
           })}
           ${this._renderServices(categories)}
         </div>

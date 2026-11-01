@@ -258,8 +258,8 @@ export class Planner extends AIUXElement {
   _renderCart() {
     if (this._order) {
       return html`<div class="aiux-alert aiux-alert-success aiux-alert-soft text-sm" role="status">
-        <span>${i18n.getMessage('Order {0} submitted. You can follow each item in My requests.', this._order.request_number)}</span>
-        <button type="button" class="aiux-btn aiux-btn-sm" @click=${() => navigate('/requests')}>${i18n.getMessage('My requests')}</button>
+        <span>${i18n.getMessage('Order {0} submitted. You can follow each item in My stuff.', this._order.request_number)}</span>
+        <button type="button" class="aiux-btn aiux-btn-sm" @click=${() => navigate('/requests')}>${i18n.getMessage('My stuff')}</button>
       </div>`;
     }
     const cart = this._cart;
