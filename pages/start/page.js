@@ -1,5 +1,5 @@
 import {html, css, nothing, isServer} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {customElement} from 'lit/decorators.js';
 import {
   AIUXElement,
   decorators,
@@ -9,10 +9,8 @@ import {
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
-import '@servicenow/aiux/aiux-components-carousel';
-import '@servicenow/aiux/aiux-components-list';
 import '@servicenow/aiux/aiux-components-empty-state-content';
-import {fetchCategories, fetchItems, fetchRecords, imageUrl} from '../../utils/api.js';
+import {fetchCategories, fetchItems, fetchRecords} from '../../utils/api.js';
 import {SERVICE_CATALOG_ID} from '../../constants/catalog.js';
 import {setDocumentTitle} from '../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../utils/chat.js';
@@ -27,6 +25,8 @@ const {acl, title} = decorators;
 const log = getLogger('luxesc-home');
 
 const FEATURED_COUNT = 6;
+// Categories listed next to the intake; the rest are one click away in the catalog
+const CATEGORY_COUNT = 8;
 const REQUEST_FIELDS = 'sys_id,number,short_description,state,sys_class_name,sys_updated_on';
 const MY_OPEN_REQUESTS =
   'active=true^opened_by=javascript:gs.getUserID()^sys_class_nameINsc_req_item,incident^ORDERBYDESCsys_updated_on';
@@ -36,9 +36,6 @@ const MY_OPEN_REQUESTS =
 @acl([{securityAttribute: 'user_is_authenticated'}])
 export default class HomePage extends withWidgetContext(AIUXElement) {
   static contexts = [userContext, chatContext];
-
-  // Records the concierge briefing already shows, left out of My open requests
-  @state() _briefed = [];
 
   static aiContext = {
     description: "Employee Center home: the employee's open requests and incidents, catalog categories and featured services",
@@ -125,10 +122,6 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     navigate('/catalog', {query: text ? {q: text} : {}});
   }
 
-  _openRequest(e) {
-    const sysId = e.detail?.referenceSysId || e.detail?.metadata?.listSysId;
-    if (sysId) navigate(`/requests/${sysId}`);
-  }
 
   // Landing on /start rather than /home: the shell treats /home as a page that
   // embeds its own chat, so the shared assistant would not open from here
@@ -183,47 +176,30 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     </section>`;
   }
 
-  _renderCategory(category, index) {
-    return html`<a
-      slot="item-${index}"
-      href="${this._basePath}/catalog?category=${category.sys_id}"
-      class="aiux-card h-full w-72 max-w-full bg-base-100 shadow-sm hover:shadow-md motion-reduce:transition-none"
-    >
-      <div class="aiux-card-body gap-2">
-        ${category.homepage_image || category.header_image
-          ? html`<img
-              src=${imageUrl(category.homepage_image || category.header_image)}
-              alt=""
-              width="48"
-              height="48"
-              loading="lazy"
-              class="h-12 w-12 object-contain"
-            />`
-          : nothing}
-        <h3 class="aiux-card-title max-w-full break-words text-base">
-          ${category.title}
-        </h3>
-        <p class="line-clamp-2 max-w-full break-words text-sm text-text-secondary">
-          ${category.description || ''}
-        </p>
-      </div>
-    </a>`;
-  }
-
   _renderCategories(categories) {
     if (!categories.length) return nothing;
-    return html`<section class="flex flex-col gap-3" aria-labelledby="categories-title">
-      <h2 id="categories-title" class="text-xl font-semibold">
-        ${i18n.getMessage('Browse by category')}
-      </h2>
-      <aiux-carousel-slider
-        label=${i18n.getMessage('Catalog categories')}
-        alignment="start"
-        .items=${categories.map(category => ({type: 'custom', alt: category.title}))}
-        .showIndicators=${false}
-      >
-        ${categories.map((category, index) => this._renderCategory(category, index))}
-      </aiux-carousel-slider>
+    return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="categories-title">
+      <div class="aiux-card-body gap-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="categories-title" class="aiux-card-title text-xl">${i18n.getMessage('Browse by category')}</h2>
+          <a class="aiux-link aiux-link-primary text-sm" href="${this._basePath}/catalog">
+            ${i18n.getMessage('View the full catalog')}
+          </a>
+        </div>
+        <ul class="grid grid-cols-1 gap-1 sm:grid-cols-2">
+          ${categories.slice(0, CATEGORY_COUNT).map(
+            category => html`<li class="min-w-0">
+              <a
+                class="aiux-btn aiux-btn-ghost aiux-btn-sm w-full justify-start truncate"
+                href="${this._basePath}/catalog?category=${category.sys_id}"
+                title=${category.title}
+              >
+                ${category.title}
+              </a>
+            </li>`
+          )}
+        </ul>
+      </div>
     </section>`;
   }
 
@@ -249,63 +225,17 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     </section>`;
   }
 
-  _onBriefing(e) {
-    this._briefed = e.detail?.sysIds || [];
-  }
-
-  _renderMyRequests() {
-    const briefed = this._briefed;
-    const openRequests = this.loaderData?.openRequests || [];
-    // The loader reads up to 10; when the briefing covers all of them there is nothing left to list
-    const allBriefed =
-      briefed.length > 0 &&
-      openRequests.length < 10 &&
-      openRequests.every(request => briefed.includes(request.sys_id.value));
-    return html`<section class="flex flex-col gap-3" aria-labelledby="requests-title">
-      <div class="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="requests-title" class="text-xl font-semibold">
-          ${i18n.getMessage('My open requests')}
-        </h2>
-        <a class="aiux-link aiux-link-primary text-sm" href="${this._basePath}/requests">
-          ${i18n.getMessage('View all requests')}
-        </a>
-      </div>
-      ${allBriefed
-        ? html`<p class="text-sm text-text-secondary">${i18n.getMessage('All your open requests are in your briefing above.')}</p>`
-        : html`<div class="aiux-card border border-base-300 bg-base-100">
-        <aiux-list-connected
-          table="task"
-          columns="number,short_description,state"
-          .query=${briefed.length ? MY_OPEN_REQUESTS.replace('^ORDERBY', `^sys_idNOT IN${briefed.join(',')}^ORDERBY`) : MY_OPEN_REQUESTS}
-          .pageSize=${5}
-          .listOptions=${{
-            heading: i18n.getMessage('Recently updated'),
-            selectionEnabled: false,
-            selectAllEnabled: false,
-            showCount: true,
-            showConditionBuilderButton: false,
-            showEditColumnsButton: false,
-            showZingSearch: false,
-            showCopyURLButton: false,
-            showEditRowAction: false
-          }}
-          @aiux-list-connected:reference-link-clicked=${this._openRequest}
-        ></aiux-list-connected>
-      </div>`}
-    </section>`;
-  }
-
   render() {
     const {categories = [], items = null} = this.loaderData || {};
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-8 p-4 lg:p-8">
       ${this._renderHero()}
       <luxesc-known-issues></luxesc-known-issues>
-      <luxesc-concierge .basePath=${this._basePath} @luxesc-concierge:briefing=${this._onBriefing}></luxesc-concierge>
+      <luxesc-concierge .basePath=${this._basePath}></luxesc-concierge>
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <luxesc-intake></luxesc-intake>
-        ${this._renderMyRequests()}
+        ${this._renderCategories(categories)}
       </div>
-      ${this._renderCategories(categories)} ${this._renderFeatured(items)}
+      ${this._renderFeatured(items)}
     </div>`;
   }
 }

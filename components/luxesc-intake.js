@@ -375,7 +375,7 @@ export class Intake extends AIUXElement {
   render() {
     const run = this._run;
     const running = run?.state === 'running';
-    return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="intake-title">
+    return html`<section class="aiux-card h-full border border-base-300 bg-base-100 shadow-sm" aria-labelledby="intake-title">
       <div class="aiux-card-body gap-4">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="flex min-w-0 flex-col gap-1">

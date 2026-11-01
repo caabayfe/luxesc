@@ -555,6 +555,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-5ef5732fb5c5'],
+    table: 'sys_ui_message',
+    data: { key: "Preparing your briefing…", message: "Preparando su resumen…", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-1e5ff9e500c2'],
     table: 'sys_ui_message',
     data: { key: "Qty", message: "Cant.", language: 'es' },

@@ -100,9 +100,6 @@ const itemKey = item => item.approvalId || item.sysId || item.title;
  * employee's requests and approvals and shows the briefing as tabs (Need you,
  * No recent update, On track) of one-line items with their main action; the
  * detail, other actions and a question for the assistant open on demand.
- *
- * @fires luxesc-concierge:briefing - With {sysIds} of the records in the
- *   briefing, so the page does not list them twice.
  */
 @customElement('luxesc-concierge')
 export class Concierge extends AIUXElement {
@@ -149,14 +146,6 @@ export class Concierge extends AIUXElement {
     } finally {
       this._loading = false;
     }
-  }
-
-  updated(changed) {
-    super.updated?.(changed);
-    const briefing = this._run?.briefing;
-    if (!changed.has('_run') || !briefing || briefing === changed.get('_run')?.briefing) return;
-    const sysIds = (briefing.items || []).map(item => item.sysId).filter(Boolean);
-    this.dispatchEvent(new CustomEvent('luxesc-concierge:briefing', {detail: {sysIds}, bubbles: true, composed: true}));
   }
 
   async _start() {
@@ -409,35 +398,48 @@ export class Concierge extends AIUXElement {
                 : i18n.getMessage('An AI agent reviews your requests and approvals and tells you what needs you.')}
             </p>
           </div>
-          <button
-            type="button"
-            class="aiux-btn aiux-btn-sm ${run ? 'aiux-btn-outline' : 'aiux-btn-primary'}"
-            ?disabled=${this._loading || running}
-            @click=${this._start}
-          >
-            ${running || this._loading
-              ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
-              : nothing}
-            ${run ? i18n.getMessage('Refresh my briefing') : i18n.getMessage('Brief me')}
-          </button>
+          <div class="flex flex-wrap items-center gap-3">
+            <a class="aiux-link aiux-link-primary text-sm" href="${this.basePath}/requests">
+              ${i18n.getMessage('View all requests')}
+            </a>
+            <button
+              type="button"
+              class="aiux-btn aiux-btn-sm ${run ? 'aiux-btn-outline' : 'aiux-btn-primary'}"
+              ?disabled=${this._loading || running}
+              @click=${this._start}
+            >
+              ${running || this._loading
+                ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
+                : nothing}
+              ${run ? i18n.getMessage('Refresh my briefing') : i18n.getMessage('Brief me')}
+            </button>
+          </div>
         </div>
         <div role="status" aria-live="polite" class="flex flex-col gap-3">
           ${this._error
             ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>`
             : nothing}
-          ${running && this._previous
+          ${running
             ? html`<details class="text-sm">
-                <summary class="cursor-pointer">${i18n.getMessage('Refreshing your briefing…')}</summary>
-                <luxesc-agent-steps
-                  .steps=${run.steps || []}
-                  running
-                  label=${i18n.getMessage('What the concierge is doing')}
-                ></luxesc-agent-steps>
-              </details>`
-            : run && (running || !run.briefing)
+                  <summary class="cursor-pointer">
+                    ${this._previous ? i18n.getMessage('Refreshing your briefing…') : i18n.getMessage('Preparing your briefing…')}
+                  </summary>
+                  <luxesc-agent-steps
+                    .steps=${run.steps || []}
+                    running
+                    label=${i18n.getMessage('What the concierge is doing')}
+                  ></luxesc-agent-steps>
+                </details>
+                ${this._previous
+                  ? nothing
+                  : html`<div class="flex flex-col gap-2" aria-hidden="true">
+                      <div class="aiux-skeleton h-5 w-3/4"></div>
+                      <div class="aiux-skeleton h-10 w-full"></div>
+                      <div class="aiux-skeleton h-10 w-full"></div>
+                    </div>`}`
+            : run && !run.briefing
               ? html`<luxesc-agent-steps
                   .steps=${run.steps || []}
-                  ?running=${running}
                   label=${i18n.getMessage('What the concierge is doing')}
                 ></luxesc-agent-steps>`
               : nothing}

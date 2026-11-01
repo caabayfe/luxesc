@@ -686,6 +686,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'a7ff25e4a3ae44d4ba759d3214189c7f'
                     }
+                    'luxesc-es-5ef5732fb5c5': {
+                        table: 'sys_ui_message'
+                        id: '48a65d31f5ce467bae2b86941755d13d'
+                    }
                     'luxesc-es-5f0500ccf919': {
                         table: 'sys_ui_message'
                         id: '0d68e4652ae24f76ab0e11980c6743d6'
