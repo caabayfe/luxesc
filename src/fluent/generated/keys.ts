@@ -306,16 +306,81 @@ declare global {
                         table: 'sys_module'
                         id: 'ddce630627624da395aa549152ec092c'
                     }
+                    'concierge-api': {
+                        table: 'sys_ws_definition'
+                        id: '0edc9578931343e89f8a19b0d98d5115'
+                    }
+                    'concierge-api-acl': {
+                        table: 'sys_security_acl'
+                        id: 'ef2df0dd73d948acb2c104e076a4577d'
+                    }
+                    'concierge-api-latest': {
+                        table: 'sys_ws_operation'
+                        id: 'e8c520a5a7d6401e94a3aa853748e8f1'
+                    }
+                    'concierge-api-start': {
+                        table: 'sys_ws_operation'
+                        id: '4173ce8e7bba40ea999bb0ace5371403'
+                    }
+                    'concierge-api-trace': {
+                        table: 'sys_ws_operation'
+                        id: '5c2fefb4e62a45e99476e9da9a8898c5'
+                    }
+                    'concierge-api-v1': {
+                        table: 'sys_ws_version'
+                        id: '5052a559e8fc4b049018d94c4dad8cf0'
+                    }
+                    employee_concierge_agent: {
+                        table: 'sn_aia_agent'
+                        id: '3780b12426954c8f8d21c23671523963'
+                    }
+                    employee_concierge_agent_acl: {
+                        table: 'sys_security_acl'
+                        id: '1a6d02e9286644e3bdd7800dbd19b04d'
+                    }
                     'luxesc-chat-deployment-channel': {
                         table: 'sys_aix_experience_properties'
                         id: '618bcdbb0a6041fa9a1dea85666ec2c7'
+                    }
+                    'luxesc-concierge-si': {
+                        table: 'sys_script_include'
+                        id: 'e0c1ab8f88784a1cb96cae722072753b'
                     }
                     package_json: {
                         table: 'sys_module'
                         id: 'd8fb701e0f3541edacf6885ba5463327'
                     }
+                    'src_server_script-includes_LuxEscConcierge_js': {
+                        table: 'sys_module'
+                        id: '7a0d5f52a17747c9ab4762559298e0f8'
+                    }
                 }
                 composite: [
+                    {
+                        table: 'sys_dictionary'
+                        id: '0978ebe52e7b4437a1dd7c407c2543f7'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '0a4645bd664e40c59009883c13a32bde'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'conversation'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '10517f46823d4bffabb9d4aff8bcf7d6'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'execution_ms'
+                        }
+                    },
                     {
                         table: 'sys_security_acl_role'
                         id: '111a8f1a93a444b1853d7cc5c5234570'
@@ -327,6 +392,47 @@ declare global {
                                     name: 'snc_internal'
                                 }
                             }
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_config'
+                        id: '12a47c9b156f49c889e20cb89caff36a'
+                        key: {
+                            agent: '3780b12426954c8f8d21c23671523963'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: '1702d74a23814804a66c43ff6a7b3595'
+                        key: {
+                            agent: '3780b12426954c8f8d21c23671523963'
+                            tool: 'ac381a922d1c41e6aba924d0719d160b'
+                            name: 'Save briefing'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '19efe9fa4ec541a9905eb8799d076ab7'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '216fe0ebbfc2427b9b55116793ea8f42'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'user'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: '270490ec29284057b8985f2a8af52679'
+                        key: {
+                            name: 'Get my pending approvals'
                         }
                     },
                     {
@@ -358,6 +464,14 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_dictionary'
+                        id: '3e5a1dfe70ef47a78269b10e059b4f3e'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'NULL'
+                        }
+                    },
+                    {
                         table: 'sys_security_acl_role'
                         id: '41ddd264ff8a4b4c971bbe4cc2829e4f'
                         key: {
@@ -368,6 +482,153 @@ declare global {
                                     name: 'snc_internal'
                                 }
                             }
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: '4668a14946374d108f1488e9bdd35dee'
+                        key: {
+                            name: 'Get my open requests'
+                        }
+                    },
+                    {
+                        table: 'sys_agent_access_role_configuration'
+                        id: '469531a15f6742ff9beb48824d5251f4'
+                        key: {
+                            agent: '3780b12426954c8f8d21c23671523963'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '486d70b1826e4f7aba529f1ecfdb16d0'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'finished_on'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '4af9405d5b1942b18ac39d12733c4f62'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'briefing'
+                        }
+                    },
+                    {
+                        table: 'sys_agent_access_role_mapping'
+                        id: '5000792a61ec417db9c0b52037284731'
+                        key: {
+                            agent_access_config: {
+                                id: '469531a15f6742ff9beb48824d5251f4'
+                                key: {
+                                    agent: '3780b12426954c8f8d21c23671523963'
+                                }
+                            }
+                            role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '55631cbdd456464a8aff172840fcb48c'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'briefing'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '59a436dc93c54d118b6f6c11b9e616b9'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'error'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '5a5d55a7b80e4baeaa5fb11d7f723bf6'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'error'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: '6bf7c54039d143598a6b5781e1c15f8c'
+                        key: {
+                            agent: '3780b12426954c8f8d21c23671523963'
+                            tool: '4668a14946374d108f1488e9bdd35dee'
+                            name: 'Get my open requests'
+                        }
+                    },
+                    {
+                        table: 'sys_choice'
+                        id: '70b4633abcfd477a854d8f4e9ac0412e'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                            value: 'running'
+                            language: 'en'
+                            dependent_value: 'NULL'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '7536d0c9729f4c2b99dddd373d121d74'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'execution_plan'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '782a4deb45cc456a8afd130e2c46aaab'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'finished_on'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'ua_table_licensing_config'
+                        id: '7961f2f08590461083d56c6a6e8205c0'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '881067388d254bebbf463ae0ed27e7f9'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'conversation'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: '98185b5865a240c3978dab1cd89b2c30'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'plan_state'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_choice'
+                        id: '9988ab9d929b4690b9b380579970d68b'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                            value: 'completed'
+                            language: 'en'
+                            dependent_value: 'NULL'
                         }
                     },
                     {
@@ -384,6 +645,40 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_choice_set'
+                        id: 'a3714be39e664c60a0ef0a70864383ef'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                        }
+                    },
+                    {
+                        table: 'sys_choice'
+                        id: 'a75334e37b3a47f4ad1e53e9bfde1f02'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'state'
+                            value: 'failed'
+                            language: 'en'
+                            dependent_value: 'NULL'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_version'
+                        id: 'abfa7419f39a4feaa02b17ddc8ce46c7'
+                        key: {
+                            target_id: '3780b12426954c8f8d21c23671523963'
+                            version_name: 'V1'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: 'ac381a922d1c41e6aba924d0719d160b'
+                        key: {
+                            name: 'Save briefing'
+                        }
+                    },
+                    {
                         table: 'sys_security_acl_role'
                         id: 'b22939bcc6df4161b3d0212cf66502ea'
                         key: {
@@ -397,6 +692,30 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_dictionary'
+                        id: 'b717c4ac3f50471a9f80b84938dcbb33'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'plan_state'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: 'c0ad1eda763b40438a8b1581517756ce'
+                        key: {
+                            agent: '3780b12426954c8f8d21c23671523963'
+                            tool: '270490ec29284057b8985f2a8af52679'
+                            name: 'Get my pending approvals'
+                        }
+                    },
+                    {
+                        table: 'sys_db_object'
+                        id: 'cb06f42be59f4edeabb0d387a57724a5'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                        }
+                    },
+                    {
                         table: 'sys_security_acl_role'
                         id: 'd8d0b706d6cb45d5a7136dfb036dac72'
                         key: {
@@ -407,6 +726,70 @@ declare global {
                                     name: 'snc_internal'
                                 }
                             }
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: 'da9050f3d72c4a5ead8219291c36143a'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'NULL'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: 'e259f6e97e9243889f3d7ddef6ba7aa6'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'output'
+                            language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_security_acl_role'
+                        id: 'e62f106153fa4d44abddcf64b7717ff3'
+                        key: {
+                            sys_security_acl: 'ef2df0dd73d948acb2c104e076a4577d'
+                            sys_user_role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: 'ea69f6c37d1f4f8d9f10e8bafd947b5b'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'output'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: 'ec570e0d9fce43f6948a7dd9f031ebbc'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'user'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: 'ef815b8d4d47441297ba460090d061eb'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'execution_plan'
+                        }
+                    },
+                    {
+                        table: 'sys_documentation'
+                        id: 'f94f25f54ee942858d2059051eb7e989'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'execution_ms'
+                            language: 'en'
                         }
                     },
                 ]
