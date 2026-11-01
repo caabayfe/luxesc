@@ -1,0 +1,210 @@
+// Knowledge drafts: when a fix is confirmed (the employee says self-help fixed it, or an incident
+// is resolved with useful close notes), the Knowledge Drafter agent writes the article and sends
+// it to the knowledge team as a knowledge submission, unless an existing article already covers
+// it. Submissions are the platform's route for people who cannot contribute to a knowledge base:
+// the team reviews them and turns them into articles (Create Article), so nothing publishes itself.
+// Classic script, like LuxEscConcierge, because the sn_aia runtime rejects module code.
+var LuxEscKnowledge = Class.create();
+
+LuxEscKnowledge.RUN = 'x_everi_luxesc_concierge_run';
+LuxEscKnowledge.INCIDENTS_PROPERTY = 'x_everi_luxesc.kb_drafts.from_incidents';
+// Close notes shorter than this ("Fixed", "Done") hold no reusable fix
+LuxEscKnowledge.MIN_NOTES = 60;
+LuxEscKnowledge.STATES = 'published,draft,review';
+LuxEscKnowledge.HEADINGS = {
+    en: { symptoms: 'Symptoms', cause: 'Cause', steps: 'Steps', appliesTo: 'Applies to' },
+    es: { symptoms: 'Síntoma', cause: 'Causa', steps: 'Pasos', appliesTo: 'Aplica a' },
+};
+
+LuxEscKnowledge.prototype = {
+    initialize: function () {},
+
+    // ---- Triggers -------------------------------------------------------------------------
+
+    // The employee confirmed the intake's self-help fixed the problem
+    fromIntake: function (intakeRunId) {
+        var intake = new GlideRecord(LuxEscKnowledge.RUN);
+        if (!intake.get(intakeRunId) || intake.getValue('user') !== gs.getUserID() || intake.getValue('kind') !== 'intake') {
+            return null;
+        }
+        var triage = this._parse(intake.getValue('briefing'));
+        if (!triage || !triage.selfHelp) throw new Error('There were no self-help steps to confirm');
+        if (triage.fixed && triage.articleRun) return this._concierge().trace(triage.articleRun);
+        var run = this._start('intake:' + intakeRunId);
+        triage.fixed = true;
+        triage.articleRun = run.id;
+        intake.setValue('briefing', JSON.stringify(triage));
+        intake.update();
+        return run;
+    },
+
+    // An incident was resolved (business rule); skipped when off, when the notes are too thin,
+    // when the resolver asked for the platform's own knowledge article, or when already drafted
+    fromIncident: function (incidentId) {
+        if (gs.getProperty(LuxEscKnowledge.INCIDENTS_PROPERTY, 'true') !== 'true') return null;
+        var incident = new GlideRecord('incident');
+        if (!incident.get(incidentId)) return null;
+        if (String(incident.getValue('close_notes') || '').trim().length < LuxEscKnowledge.MIN_NOTES) return null;
+        if (incident.getValue('knowledge') === '1') return null;
+        var source = 'incident:' + incidentId;
+        var earlier = new GlideRecord(LuxEscKnowledge.RUN);
+        earlier.addQuery('kind', 'article');
+        earlier.addQuery('prompt', source);
+        earlier.setLimit(1);
+        earlier.query();
+        if (earlier.hasNext()) return null;
+        return this._start(source);
+    },
+
+    // ---- Agent tools ----------------------------------------------------------------------
+
+    // The problem and the fix that worked, without names: the article is for everyone
+    readFix: function (runId) {
+        var run = this._run(runId);
+        if (!run) return { error: 'Unknown article run' };
+        var source = this._source(run);
+        if (source.type === 'intake') {
+            var intake = new GlideRecord(LuxEscKnowledge.RUN);
+            var triage = intake.get(source.id) ? this._parse(intake.getValue('briefing')) : null;
+            if (!triage || !triage.selfHelp) return { error: 'The confirmed fix is no longer available' };
+            return {
+                confirmedBy: 'The employee confirmed that these steps fixed the problem',
+                problem: intake.getValue('prompt'),
+                summary: triage.summary,
+                steps: triage.selfHelp.steps,
+                basedOnArticles: triage.selfHelp.articles,
+                basedOnFixedIncidents: triage.selfHelp.fixedIncidents || 0,
+            };
+        }
+        var incident = new GlideRecord('incident');
+        if (source.type !== 'incident' || !incident.get(source.id)) return { error: 'The resolved incident is not available' };
+        return {
+            confirmedBy: 'The service desk resolved this incident with the fix below',
+            problem: incident.getValue('short_description'),
+            details: String(incident.getValue('description') || '').substring(0, 1500),
+            fix: String(incident.getValue('close_notes') || '').substring(0, 2000),
+            category: incident.getDisplayValue('category'),
+            service: incident.getDisplayValue('business_service') || incident.getDisplayValue('cmdb_ci'),
+        };
+    },
+
+    // Published articles and the ones still being written, so one fix is not drafted twice
+    searchArticles: function (runId, query) {
+        if (!this._run(runId)) return { error: 'Unknown article run' };
+        var intake = new x_everi_luxesc.LuxEscIntake();
+        var articles = intake._search(query, function (words) {
+            var article = new GlideRecord('kb_knowledge');
+            article.addQuery('workflow_state', 'IN', LuxEscKnowledge.STATES);
+            article.addActiveQuery();
+            article.addQuery('123TEXTQUERY321', words);
+            return article;
+        }, function (article) {
+            return {
+                sysId: article.getUniqueValue(),
+                number: article.getValue('number'),
+                state: article.getValue('workflow_state'),
+                title: intake._plain(article.getValue('short_description')),
+                excerpt: intake._plain(article.getValue('text')).substring(0, 1200),
+            };
+        });
+        return { articles: articles };
+    },
+
+    // {duplicateOf} when an article already covers the fix, otherwise the draft's content
+    saveDraft: function (runId, draftJson) {
+        var run = this._run(runId);
+        if (!run) throw new Error('Unknown article run ' + runId);
+        var draft = typeof draftJson === 'string' ? JSON.parse(draftJson) : draftJson;
+        if (!draft) throw new Error('The draft must be a JSON object');
+        if (draft.duplicateOf) {
+            var existing = new GlideRecord('kb_knowledge');
+            if (!/^[0-9a-f]{32}$/.test(draft.duplicateOf) || !existing.get(draft.duplicateOf)) {
+                throw new Error('duplicateOf must be a sysId returned by the Search existing articles tool');
+            }
+            return this._save(run, {
+                duplicateOf: {
+                    sysId: existing.getUniqueValue(),
+                    number: existing.getValue('number'),
+                    title: existing.getValue('short_description'),
+                    state: existing.getValue('workflow_state'),
+                },
+                reason: String(draft.reason || '').substring(0, 300),
+            }, 'Already covered by ' + existing.getValue('number') + '; no draft created');
+        }
+        if (typeof draft.title !== 'string' || !draft.title.trim() || !(draft.steps instanceof Array) || !draft.steps.length) {
+            throw new Error('The draft must have a title and steps');
+        }
+        var language = draft.language === 'es' ? 'es' : 'en';
+        var source = this._source(run);
+        var submission = new GlideRecord('kb_submission');
+        submission.initialize();
+        submission.setValue('short_description', draft.title.trim().substring(0, 160));
+        submission.setValue('text', this._html(draft, LuxEscKnowledge.HEADINGS[language]));
+        submission.setValue('description', 'Drafted by the Knowledge Drafter AI agent from ' +
+            (source.type === 'incident' ? 'a resolved incident' : 'self-help an employee confirmed fixed their problem') +
+            '. Keywords: ' + String(draft.keywords || '').substring(0, 400));
+        submission.setValue('submitted_by', run.getValue('user'));
+        submission.setValue('status', 'submitted');
+        if (source.type === 'incident') submission.setValue('parent', source.id);
+        if (!submission.insert()) throw new Error('The article could not be submitted');
+        return this._save(run, {
+            submission: { sysId: submission.getUniqueValue(), number: submission.getValue('number'), title: submission.getValue('short_description') },
+        }, 'Article submitted for review as ' + submission.getValue('number'));
+    },
+
+    // ---- Internals ------------------------------------------------------------------------
+
+    _concierge: function () {
+        return new x_everi_luxesc.LuxEscConcierge();
+    },
+
+    _start: function (source) {
+        return this._concierge().start('article', source);
+    },
+
+    _run: function (runId) {
+        var run = new GlideRecord(LuxEscKnowledge.RUN);
+        return run.get(runId) && run.getValue('kind') === 'article' ? run : null;
+    },
+
+    // The run's prompt names its source: "intake:<run sys_id>" or "incident:<sys_id>"
+    _source: function (run) {
+        var parts = String(run.getValue('prompt') || '').split(':');
+        return { type: parts[0], id: /^[0-9a-f]{32}$/.test(parts[1]) ? parts[1] : '' };
+    },
+
+    _save: function (run, result, message) {
+        run.setValue('briefing', JSON.stringify(result));
+        run.update();
+        return message;
+    },
+
+    _html: function (draft, headings) {
+        var escape = function (text) {
+            return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        };
+        var section = function (heading, body) {
+            return body ? '<h3>' + heading + '</h3>' + body : '';
+        };
+        var paragraph = function (text) {
+            return text ? '<p>' + escape(String(text).substring(0, 1500)) + '</p>' : '';
+        };
+        var steps = '<ol>' + draft.steps.slice(0, 10).map(function (step) {
+            return '<li>' + escape(String(step).substring(0, 500)) + '</li>';
+        }).join('') + '</ol>';
+        return section(headings.symptoms, paragraph(draft.symptoms)) +
+            section(headings.cause, paragraph(draft.cause)) +
+            section(headings.steps, steps) +
+            section(headings.appliesTo, paragraph(draft.appliesTo));
+    },
+
+    _parse: function (text) {
+        try {
+            return JSON.parse(text || '');
+        } catch (e) {
+            return null;
+        }
+    },
+
+    type: 'LuxEscKnowledge',
+};

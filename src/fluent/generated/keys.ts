@@ -354,9 +354,21 @@ declare global {
                         table: 'sys_security_acl'
                         id: 'ef2df0dd73d948acb2c104e076a4577d'
                     }
+                    'concierge-api-fixed': {
+                        table: 'sys_ws_operation'
+                        id: '3a095839a98b4e4599d688a66e445833'
+                    }
+                    'concierge-api-follow': {
+                        table: 'sys_ws_operation'
+                        id: 'a1d55c51d75c422ba92c0058550476e0'
+                    }
                     'concierge-api-intake': {
                         table: 'sys_ws_operation'
                         id: 'de93038ddc3c45eea9d5ef012dc7bb69'
+                    }
+                    'concierge-api-known-issues': {
+                        table: 'sys_ws_operation'
+                        id: '27720df8c8ea4a64a513dcdaeadad800'
                     }
                     'concierge-api-latest': {
                         table: 'sys_ws_operation'
@@ -398,6 +410,31 @@ declare global {
                         table: 'sys_security_acl'
                         id: '35274e5f3c0c4ba9aa00d31008e78796'
                     }
+                    'kb-draft-on-resolve': {
+                        table: 'sys_script'
+                        id: 'db49ea6fd0cb41f29806c30c9e46d9ed'
+                    }
+                    'kb-drafts-from-incidents': {
+                        table: 'sys_properties'
+                        id: '2b54e6e5b50c4292acfe6c1809d788f3'
+                    }
+                    'kb-drafts-knowledge-base': {
+                        table: 'sys_properties'
+                        id: '1b7d4572b6694523b857a4988f9e4294'
+                        deleted: true
+                    }
+                    knowledge_drafter_agent: {
+                        table: 'sn_aia_agent'
+                        id: '1cfc1562dc9c4e29bcf918f36014bb74'
+                    }
+                    knowledge_drafter_agent_acl: {
+                        table: 'sys_security_acl'
+                        id: '995ded8e8c0e4c9e83d687cf93dfbc87'
+                    }
+                    'known-issues-max-age': {
+                        table: 'sys_properties'
+                        id: 'e11fa5723e9440069ffc98403dfd98dc'
+                    }
                     'luxesc-chat-deployment-channel': {
                         table: 'sys_aix_experience_properties'
                         id: '618bcdbb0a6041fa9a1dea85666ec2c7'
@@ -406,9 +443,21 @@ declare global {
                         table: 'sys_script_include'
                         id: 'e0c1ab8f88784a1cb96cae722072753b'
                     }
+                    'luxesc-experience-acl': {
+                        table: 'sys_security_acl'
+                        id: '7b8f4034f01e47ebb0aaa51fc6913b6d'
+                    }
                     'luxesc-intake-si': {
                         table: 'sys_script_include'
                         id: '6af0ead2b4c74c229abb0deccb44da99'
+                    }
+                    'luxesc-knowledge-si': {
+                        table: 'sys_script_include'
+                        id: 'b1f64466d9f6424dabdeb3ed44b5a1ae'
+                    }
+                    'luxesc-outages-si': {
+                        table: 'sys_script_include'
+                        id: '62eac2ef3668444fa2fb1f7252163d33'
                     }
                     'luxesc-planner-si': {
                         table: 'sys_script_include'
@@ -433,6 +482,14 @@ declare global {
                     'src_server_script-includes_LuxEscIntake_js': {
                         table: 'sys_module'
                         id: 'b214be9a63734091b91b962c8168f2d8'
+                    }
+                    'src_server_script-includes_LuxEscKnowledge_js': {
+                        table: 'sys_module'
+                        id: '04e36f4c083a476c9dd7b92e60c58dd9'
+                    }
+                    'src_server_script-includes_LuxEscOutages_js': {
+                        table: 'sys_module'
+                        id: '33a2c22e1fa348d9a8e668048195eace'
                     }
                     'src_server_script-includes_LuxEscPlanner_js': {
                         table: 'sys_module'
@@ -477,6 +534,14 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_version'
+                        id: '0f8d2fa61aaa4528b7b72e062e281edb'
+                        key: {
+                            target_id: '1cfc1562dc9c4e29bcf918f36014bb74'
+                            version_name: 'V1'
+                        }
+                    },
+                    {
                         table: 'sn_aia_agent_tool_m2m'
                         id: '0fd90d4905d64865a74d0012531b9ae5'
                         key: {
@@ -498,6 +563,19 @@ declare global {
                         id: '111a8f1a93a444b1853d7cc5c5234570'
                         key: {
                             sys_security_acl: '154fbde66a8143139e43093d1692bdf5'
+                            sys_user_role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        table: 'sys_security_acl_role'
+                        id: '11aa44b68ae44b8fb2b9dc4ef0b104f6'
+                        key: {
+                            sys_security_acl: '7b8f4034f01e47ebb0aaa51fc6913b6d'
                             sys_user_role: {
                                 id: '52aca163b1ad45a0909d246eafc036da'
                                 key: {
@@ -566,6 +644,15 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: '2a4d20e3b04942e5b56ed41a0153d3da'
+                        key: {
+                            agent: '1cfc1562dc9c4e29bcf918f36014bb74'
+                            tool: 'ae91ac25473c48fbb503170310f91c7d'
+                            name: 'Save article draft'
+                        }
+                    },
+                    {
                         table: 'sn_aia_tool'
                         id: '2be2500a85e84e2389a9bf13a3bd67fc'
                         key: {
@@ -601,11 +688,43 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_agent_access_role_mapping'
+                        id: '2f0700d98e0440a8b5093718e5a547df'
+                        key: {
+                            agent_access_config: {
+                                id: 'b5d53d4ed36841d6acd287601b1973b9'
+                                key: {
+                                    agent: '1cfc1562dc9c4e29bcf918f36014bb74'
+                                }
+                            }
+                            role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: '30a012da117f4d9eb8696362c559be0e'
+                        key: {
+                            name: 'Read the confirmed fix'
+                        }
+                    },
+                    {
                         table: 'sn_aia_version'
                         id: '30cfac94ddc0417e81b6347f9e398197'
                         key: {
                             target_id: '6074037cbc8f4a66bcd639e6d2681530'
                             version_name: 'V1'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_config'
+                        id: '3704d28e5b2f49459248a45a01390625'
+                        key: {
+                            agent: '1cfc1562dc9c4e29bcf918f36014bb74'
                         }
                     },
                     {
@@ -822,6 +941,13 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_tool'
+                        id: '8a22906bc59c409b83574dc881af3a7c'
+                        key: {
+                            name: 'Check known issues'
+                        }
+                    },
+                    {
                         table: 'sys_documentation'
                         id: '98185b5865a240c3978dab1cd89b2c30'
                         key: {
@@ -944,6 +1070,13 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_tool'
+                        id: 'ae91ac25473c48fbb503170310f91c7d'
+                        key: {
+                            name: 'Save article draft'
+                        }
+                    },
+                    {
                         table: 'sys_security_acl_role'
                         id: 'b22939bcc6df4161b3d0212cf66502ea'
                         key: {
@@ -954,6 +1087,13 @@ declare global {
                                     name: 'snc_internal'
                                 }
                             }
+                        }
+                    },
+                    {
+                        table: 'sys_agent_access_role_configuration'
+                        id: 'b5d53d4ed36841d6acd287601b1973b9'
+                        key: {
+                            agent: '1cfc1562dc9c4e29bcf918f36014bb74'
                         }
                     },
                     {
@@ -984,6 +1124,13 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_tool'
+                        id: 'bdb8ab98fd334c36a81750630afce5a9'
+                        key: {
+                            name: 'Search existing articles'
+                        }
+                    },
+                    {
                         table: 'sn_aia_agent_tool_m2m'
                         id: 'c0ad1eda763b40438a8b1581517756ce'
                         key: {
@@ -1011,6 +1158,15 @@ declare global {
                         id: 'cb06f42be59f4edeabb0d387a57724a5'
                         key: {
                             name: 'x_everi_luxesc_concierge_run'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: 'cd3f0072aab74d19a023b3d4608922f4'
+                        key: {
+                            agent: '1cfc1562dc9c4e29bcf918f36014bb74'
+                            tool: '30a012da117f4d9eb8696362c559be0e'
+                            name: 'Read the confirmed fix'
                         }
                     },
                     {
@@ -1095,6 +1251,15 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: 'e3506b7310984778abcb6780f12c926a'
+                        key: {
+                            agent: '5a0ab0bdc3824a20bd9f374cda865286'
+                            tool: '8a22906bc59c409b83574dc881af3a7c'
+                            name: 'Check known issues'
+                        }
+                    },
+                    {
                         table: 'sys_security_acl_role'
                         id: 'e62f106153fa4d44abddcf64b7717ff3'
                         key: {
@@ -1145,6 +1310,15 @@ declare global {
                             name: 'x_everi_luxesc_concierge_run'
                             element: 'kind'
                             language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: 'f4eb71ce356f4c70bd294ca476a1dfc0'
+                        key: {
+                            agent: '1cfc1562dc9c4e29bcf918f36014bb74'
+                            tool: 'bdb8ab98fd334c36a81750630afce5a9'
+                            name: 'Search existing articles'
                         }
                     },
                     {

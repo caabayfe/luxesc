@@ -9,7 +9,12 @@ export const POLL_MS = 2500;
 // An agent run that is still going after this long is reported as stuck
 export const GIVE_UP_MS = 4 * 60 * 1000;
 
-export async function callRuns(path, {method = 'GET', body} = {}) {
+export async function callRuns(path, options) {
+  return (await callConcierge(path, options))?.run || null;
+}
+
+// Any route of the API (known issues return {issues} or {incident}, not a run)
+export async function callConcierge(path, {method = 'GET', body} = {}) {
   const response = await aiuxFetch(`${RUNS_API}${path}`, {
     method,
     headers: {Accept: 'application/json', 'Content-Type': 'application/json'},
@@ -17,5 +22,5 @@ export async function callRuns(path, {method = 'GET', body} = {}) {
   });
   const json = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(json.error?.message || `HTTP error ${response.status}`);
-  return json.result?.run || null;
+  return json.result || null;
 }

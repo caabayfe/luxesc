@@ -7,8 +7,9 @@ var LuxEscIntake = Class.create();
 LuxEscIntake.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscIntake.LIMIT = 5;
 LuxEscIntake.TYPES = ['incident', 'catalog', 'none'];
-// The request planner shares the catalog search
-LuxEscIntake.KINDS = ['intake', 'plan'];
+// The request planner shares the catalog search, the knowledge drafter the knowledge search
+LuxEscIntake.KINDS = ['intake', 'plan', 'article'];
+LuxEscIntake.MAX_OTHERS = 50;
 // Items that go in the cart (no record producers, order guides or content items)
 LuxEscIntake.ORDERABLE = 'sc_cat_item,pc_hardware_cat_item,pc_software_cat_item,sc_cat_item_service';
 LuxEscIntake.URGENCIES = ['1', '2', '3'];
@@ -105,6 +106,10 @@ LuxEscIntake.prototype = {
                 reason: String(recommendation.reason || '').substring(0, 400),
             },
         };
+        // Only an issue that is still current, described by the platform rather than the agent
+        var knownIssue = triage.knownIssue && new x_everi_luxesc.LuxEscOutages().find(triage.knownIssue.sysId);
+        if (knownIssue) clean.knownIssue = knownIssue;
+        clean.othersReporting = Math.min(LuxEscIntake.MAX_OTHERS, Math.max(0, parseInt(triage.othersReporting, 10) || 0));
         if (type === 'catalog') {
             var item = recommendation.catalogItem || {};
             if (!/^[0-9a-f]{32}$/.test(item.sysId) || !new GlideRecord('sc_cat_item').get(item.sysId)) {

@@ -27,3 +27,21 @@ export const LuxEscPlanner = ScriptInclude({
     script: Now.include('../../server/script-includes/LuxEscPlanner.js'),
     description: 'Tools of the Request Planner agent: catalog search, item questions, and saving a plan with resolved values.',
 })
+
+export const LuxEscOutages = ScriptInclude({
+    $id: Now.ID['luxesc-outages-si'],
+    name: 'LuxEscOutages',
+    apiName: 'x_everi_luxesc.LuxEscOutages',
+    accessibleFrom: 'package_private',
+    script: Now.include('../../server/script-includes/LuxEscOutages.js'),
+    description: 'Known issues: active major incidents, recent outages and colleagues reporting the same problem; follow a major incident.',
+})
+
+export const LuxEscKnowledge = ScriptInclude({
+    $id: Now.ID['luxesc-knowledge-si'],
+    name: 'LuxEscKnowledge',
+    apiName: 'x_everi_luxesc.LuxEscKnowledge',
+    accessibleFrom: 'package_private',
+    script: Now.include('../../server/script-includes/LuxEscKnowledge.js'),
+    description: 'Starts the Knowledge Drafter agent on confirmed fixes and serves its tools: read the fix, search articles, save the draft.',
+})

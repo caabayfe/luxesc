@@ -29,6 +29,15 @@ const searchCatalogScript = `(function(inputs) {
     }
 })(inputs);`
 
+const knownIssuesScript = `(function(inputs) {
+    try {
+        return new x_everi_luxesc.LuxEscOutages().knownIssues(inputs.run_id, inputs.query);
+    } catch (e) {
+        gs.error('Employee Intake could not check known issues: ' + e.message);
+        return { error: 'Known issues could not be checked' };
+    }
+})(inputs);`
+
 const saveTriageScript = `(function(inputs) {
     try {
         return { status: 'success', message: new x_everi_luxesc.LuxEscIntake().saveTriage(inputs.run_id, inputs.triage) };
@@ -48,7 +57,7 @@ export const employeeIntake = AiAgent({
     $id: Now.ID['employee_intake_agent'],
     name: 'Employee Intake',
     description:
-        "Turns an employee's description of a problem or need into self-help from the knowledge base and similar fixed incidents, and drafts the incident or catalog request to raise if self-help is not enough.",
+        "Turns an employee's description of a problem or need into self-help from the knowledge base and similar fixed incidents, spots known issues, and drafts the incident or catalog request to raise if self-help is not enough.",
     agentRole: 'You are a helpful service desk analyst who solves problems at first contact and writes clear tickets.',
     agentDescriptor: 'created_by_build_agent',
     recordType: 'custom',
@@ -67,10 +76,12 @@ export const employeeIntake = AiAgent({
 - Decide whether it is a problem (something broken or not working) or a need (hardware, software, access, information).
 
 Step 2: Research. Always pass the run id.
+- For a problem, first use the Check known issues tool with 2 to 5 keywords. If one of the issues clearly matches (the same service, application or symptom), it is a known issue. othersReporting is how many colleagues reported something similar in the last hours.
 - Use the Search knowledge tool with 2 to 5 keywords. The knowledge base has English and Spanish articles: if nothing relevant comes back, try once more in the other language.
 - For a problem, use the Find similar fixed incidents tool with the same keywords.
 - For a need, or a problem that needs new equipment or access, use the Search catalog tool.
 - If a tool returns an error, continue without it.
+- For a known issue, still search knowledge for a workaround, but keep it short.
 
 Step 3: Decide.
 - selfHelp: only if an article or a fixed incident clearly applies, up to 6 short steps the employee can follow, grounded in that content. List the articles you used and give fixedIncidents, how many of the similar fixed incidents the steps rely on (0 if none). Otherwise null.
@@ -78,10 +89,12 @@ Step 3: Decide.
   - "catalog" when the employee needs something from the catalog and an item from the Search catalog tool fits.
   - "incident" when something is broken, even if there is self-help (it is raised only if self-help does not work).
   - "none" only for a how-to question fully answered by selfHelp.
+- knownIssue: the matching issue from Check known issues, or null. With a known issue, recommendation.type is "incident" and the incident describes how it affects this employee.
+- othersReporting: the number from Check known issues (0 if not checked).
 - For "incident", write the ticket as the employee: shortDescription (max 100 characters, specific), description (what happens, since when, impact, what they tried, in the employee's language), category (one of: software, hardware, network, database, password_reset, inquiry), urgency ("1" whole team blocked, "2" employee blocked, "3" otherwise).
 
 Step 4: Use the Save triage tool with the run id and triage as JSON:
-{"summary": "<one sentence restating the problem>", "selfHelp": {"title": "<short>", "steps": ["..."], "articles": [{"sysId": "<from Search knowledge>", "number": "<KB number>", "title": "<title>"}], "fixedIncidents": 0} or null, "recommendation": {"type": "incident|catalog|none", "reason": "<one sentence for the employee>", "incident": {"shortDescription": "...", "description": "...", "category": "...", "urgency": "3"}, "catalogItem": {"sysId": "<from Search catalog>", "name": "<name>"}, "details": "<for catalog: what the employee asked for, to pre-fill the form>"}}
+{"summary": "<one sentence restating the problem>", "selfHelp": {"title": "<short>", "steps": ["..."], "articles": [{"sysId": "<from Search knowledge>", "number": "<KB number>", "title": "<title>"}], "fixedIncidents": 0} or null, "recommendation": {"type": "incident|catalog|none", "reason": "<one sentence for the employee>", "incident": {"shortDescription": "...", "description": "...", "category": "...", "urgency": "3"}, "catalogItem": {"sysId": "<from Search catalog>", "name": "<name>"}, "details": "<for catalog: what the employee asked for, to pre-fill the form>"}, "knownIssue": {"sysId": "<from Check known issues>", "number": "...", "title": "..."} or null, "othersReporting": 0}
 - Include only the field for the chosen type (incident or catalogItem and details).
 - Never invent article or catalog sysIds. Never include other people's incident numbers or names.
 - If the save fails, fix the JSON and try once more.
@@ -90,6 +103,18 @@ Step 5: Reply with one sentence saying the options are ready.`,
         },
     ],
     tools: [
+        {
+            name: 'Check known issues',
+            description: 'Lists current known issues (major incidents and outages) and how many colleagues reported something similar lately, for an intake run (run_id) and keywords (query).',
+            type: 'script',
+            recordType: 'custom',
+            executionMode: 'autopilot',
+            outputTransformationStrategy: 'none',
+            preMessage: 'Checking known issues...',
+            postMessage: 'Known issues checked.',
+            inputs: [runIdInput, queryInput],
+            script: knownIssuesScript,
+        },
         {
             name: 'Search knowledge',
             description: 'Searches published knowledge articles for an intake run (run_id) by keywords (query). Returns sysId, number, title and an excerpt.',

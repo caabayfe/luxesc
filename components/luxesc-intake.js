@@ -4,7 +4,7 @@ import {AIUXElement, getLogger} from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
 import {getUser} from '@servicenow/aiux/aiux-utils';
-import {GIVE_UP_MS, POLL_MS, callRuns} from '../utils/agent-runs.js';
+import {GIVE_UP_MS, POLL_MS, callConcierge, callRuns} from '../utils/agent-runs.js';
 import {createRecord} from '../utils/api.js';
 import {stashPrefill} from '../utils/ai-handoff.js';
 import './luxesc-agent-steps.js';
@@ -36,8 +36,11 @@ export class Intake extends AIUXElement {
   @state() _draft = null;
   @state() _creating = false;
   @state() _created = null;
+  // The Knowledge Drafter run started when self-help fixed the problem
+  @state() _article = null;
 
   _timer = null;
+  _articleTimer = null;
   _startedAt = 0;
 
   static styles = css`
@@ -49,6 +52,7 @@ export class Intake extends AIUXElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     clearTimeout(this._timer);
+    clearTimeout(this._articleTimer);
   }
 
   async _start(e) {
@@ -56,7 +60,8 @@ export class Intake extends AIUXElement {
     const text = this._text.trim();
     if (!text || isServer) return;
     clearTimeout(this._timer);
-    Object.assign(this, {_error: '', _starting: true, _stage: 'help', _draft: null, _created: null});
+    clearTimeout(this._articleTimer);
+    Object.assign(this, {_error: '', _starting: true, _stage: 'help', _draft: null, _created: null, _article: null});
     try {
       this._run = await callRuns('/intake', {method: 'POST', body: {text}});
       this._startedAt = Date.now();
@@ -88,13 +93,40 @@ export class Intake extends AIUXElement {
   _onFinished() {
     const triage = this._run?.briefing;
     this._draft = triage?.recommendation?.incident ? {...triage.recommendation.incident} : null;
+    // Joining a known issue needs an incident even when the agent drafted none
+    if (!this._draft && triage?.knownIssue?.linkable) {
+      this._draft = {shortDescription: triage.knownIssue.title, description: this._run.prompt, urgency: '3'};
+    }
     // Without self-help there is nothing to try first
     this._stage = triage?.selfHelp ? 'help' : 'escalate';
   }
 
   _reset() {
     clearTimeout(this._timer);
-    Object.assign(this, {_run: null, _text: '', _error: '', _draft: null, _created: null, _stage: 'help'});
+    clearTimeout(this._articleTimer);
+    Object.assign(this, {_run: null, _text: '', _error: '', _draft: null, _created: null, _stage: 'help', _article: null});
+  }
+
+  // Self-help worked: the Knowledge Drafter turns it into a draft article for colleagues
+  async _confirmFixed() {
+    this._stage = 'fixed';
+    try {
+      this._article = await callRuns(`/runs/${this._run.id}/fixed`, {method: 'POST'});
+      if (this._article?.state === 'running') this._pollArticle(Date.now());
+    } catch (error) {
+      log.warn({error: error.message}, 'Article draft not started');
+    }
+  }
+
+  _pollArticle(startedAt) {
+    this._articleTimer = setTimeout(async () => {
+      try {
+        this._article = await callRuns(`/runs/${this._article.id}`);
+      } catch (error) {
+        log.warn({error: error.message}, 'Article draft progress unavailable');
+      }
+      if (this._article?.state === 'running' && Date.now() - startedAt < GIVE_UP_MS) this._pollArticle(startedAt);
+    }, POLL_MS);
   }
 
   _onDraftInput(name, e) {
@@ -107,7 +139,17 @@ export class Intake extends AIUXElement {
     if (!draft?.shortDescription?.trim()) return;
     this._creating = true;
     this._error = '';
+    const issue = this._run.briefing.knownIssue;
     try {
+      if (issue?.linkable) {
+        // Raised under the major incident, so it is updated and closed with it
+        const {incident} = await callConcierge(`/known-issues/${issue.sysId}/follow`, {
+          method: 'POST',
+          body: {shortDescription: draft.shortDescription.trim(), description: draft.description}
+        });
+        this._created = {sys_id: incident.sysId, number: incident.number, linked: true};
+        return;
+      }
       this._created = await createRecord('incident', {
         caller_id: getUser()?.userId,
         short_description: draft.shortDescription.trim(),
@@ -179,7 +221,7 @@ export class Intake extends AIUXElement {
           : nothing}
         ${this._stage === 'help'
           ? html`<div class="flex flex-wrap gap-2">
-              <button type="button" class="aiux-btn aiux-btn-sm aiux-btn-success" @click=${() => (this._stage = 'fixed')}>
+              <button type="button" class="aiux-btn aiux-btn-sm aiux-btn-success" @click=${this._confirmFixed}>
                 ${i18n.getMessage('That fixed it')}
               </button>
               <button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline" @click=${() => (this._stage = 'escalate')}>
@@ -194,7 +236,11 @@ export class Intake extends AIUXElement {
   _renderIncidentDraft(recommendation) {
     if (this._created) {
       return html`<div class="aiux-alert aiux-alert-success aiux-alert-soft text-sm" role="status">
-        <span>${i18n.getMessage('Incident {0} raised. The service desk will be in touch.', this._created.number)}</span>
+        <span>
+          ${this._created.linked
+            ? i18n.getMessage('Incident {0} raised and linked to the known issue. You will be updated when it is fixed.', this._created.number)
+            : i18n.getMessage('Incident {0} raised. The service desk will be in touch.', this._created.number)}
+        </span>
         <button type="button" class="aiux-btn aiux-btn-sm" @click=${() => navigate(`/requests/${this._created.sys_id}`)}>
           ${i18n.getMessage('Open')}
         </button>
@@ -235,7 +281,9 @@ export class Intake extends AIUXElement {
         <div class="flex flex-wrap justify-end gap-2">
           <button type="submit" class="aiux-btn aiux-btn-primary" ?disabled=${this._creating || !draft.shortDescription.trim()}>
             ${this._creating ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>` : nothing}
-            ${i18n.getMessage('Raise incident')}
+            ${this._run.briefing.knownIssue?.linkable
+              ? i18n.getMessage('Raise and link to {0}', this._run.briefing.knownIssue.number)
+              : i18n.getMessage('Raise incident')}
           </button>
         </div>
       </div>
@@ -256,22 +304,66 @@ export class Intake extends AIUXElement {
     </section>`;
   }
 
+  _renderKnownIssue(issue) {
+    return html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft flex flex-col items-start gap-1 text-sm">
+      <span class="font-semibold">${i18n.getMessage('This looks like a known issue: {0}', issue.title)}</span>
+      <span>${i18n.getMessage('Our team has been working on it since {0}.', issue.since)}</span>
+      ${issue.update ? html`<span class="break-words">${i18n.getMessage('Latest update: {0}', issue.update)}</span>` : nothing}
+      ${issue.linkable && !this._created && this._stage !== 'escalate'
+        ? html`<button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline mt-1" @click=${() => (this._stage = 'escalate')}>
+            ${i18n.getMessage('Get updates on this issue')}
+          </button>`
+        : nothing}
+    </div>`;
+  }
+
+  _renderFixed() {
+    const article = this._article;
+    const result = article?.briefing;
+    let status = nothing;
+    if (article?.state === 'running') {
+      status = html`<span class="flex items-center gap-2">
+        <span class="aiux-loading aiux-loading-spinner aiux-loading-xs" aria-hidden="true"></span>
+        ${i18n.getMessage('An AI agent is turning these steps into a knowledge article so colleagues can fix this themselves.')}
+      </span>`;
+    } else if (result?.submission) {
+      status = html`<span>${i18n.getMessage('Your fix was sent to the knowledge team as article submission {0}. Thanks for helping your colleagues.', result.submission.number)}</span>`;
+    } else if (result?.duplicateOf && result.duplicateOf.state !== 'published') {
+      status = html`<span>${i18n.getMessage('An article about this is already with the knowledge team.')}</span>`;
+    } else if (result?.duplicateOf) {
+      status = html`<span class="flex flex-wrap items-center gap-2">
+        ${i18n.getMessage('This is already covered by {0}.', result.duplicateOf.number)}
+        <button type="button" class="aiux-btn aiux-btn-xs aiux-btn-ghost" @click=${() => navigate(`/knowledge/${result.duplicateOf.sysId}`)}>
+          ${i18n.getMessage('Open article')}
+        </button>
+      </span>`;
+    }
+    return html`<div class="aiux-alert aiux-alert-success aiux-alert-soft flex flex-col items-start gap-1 text-sm" role="status">
+      <span>${i18n.getMessage('Great, glad that sorted it. No ticket needed.')}</span>
+      ${status}
+    </div>`;
+  }
+
   _renderResult(run) {
     if (run.state === 'failed' || !run.briefing) {
       return html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">
         ${i18n.getMessage('The assistant could not finish. Try again, or describe the problem differently.')}
       </div>`;
     }
-    const {summary, selfHelp, recommendation} = run.briefing;
+    const {summary, selfHelp, recommendation, knownIssue, othersReporting} = run.briefing;
     const escalating = this._stage === 'escalate';
-    return html`<p class="max-w-full break-words font-medium">${summary}</p>
-      ${selfHelp ? this._renderSelfHelp(selfHelp) : nothing}
-      ${this._stage === 'fixed'
-        ? html`<div class="aiux-alert aiux-alert-success aiux-alert-soft text-sm" role="status">
-            ${i18n.getMessage('Great, glad that sorted it. No ticket needed.')}
+    return html`${knownIssue ? this._renderKnownIssue(knownIssue) : nothing}
+      ${!knownIssue && othersReporting
+        ? html`<div class="aiux-alert aiux-alert-info aiux-alert-soft text-sm">
+            ${i18n.getMessage('{0} colleagues reported something similar in the last few hours, so the service desk is likely already on it.', othersReporting)}
           </div>`
         : nothing}
-      ${escalating && recommendation.type === 'incident' && this._draft ? this._renderIncidentDraft(recommendation) : nothing}
+      <p class="max-w-full break-words font-medium">${summary}</p>
+      ${selfHelp ? this._renderSelfHelp(selfHelp) : nothing}
+      ${this._stage === 'fixed' ? this._renderFixed() : nothing}
+      ${escalating && (recommendation.type === 'incident' || knownIssue?.linkable) && this._draft
+        ? this._renderIncidentDraft(recommendation)
+        : nothing}
       ${escalating && recommendation.type === 'catalog' ? this._renderCatalog(recommendation) : nothing}
       ${escalating && recommendation.type === 'none'
         ? html`<p class="text-sm text-text-secondary">

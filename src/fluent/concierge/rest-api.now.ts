@@ -7,7 +7,7 @@ export const conciergeApiAcl = Acl({
     name: 'Lux Employee Center Concierge API',
     operation: 'execute',
     roles: ['snc_internal'],
-    description: 'Employees can run and follow their own concierge briefing, problem intake and request plans.',
+    description: 'Employees can run and follow their own concierge briefing, problem intake and request plans, and see known issues.',
 })
 
 // Handlers only delegate: the logic lives in LuxEscConcierge, which the agent's tools share
@@ -57,6 +57,36 @@ const outcomeScript = `(function process(request, response) {
     }
 })(request, response);`
 
+const fixedScript = `(function process(request, response) {
+    try {
+        var run = new x_everi_luxesc.LuxEscKnowledge().fromIntake(request.pathParams.run);
+        if (run === null) {
+            response.setStatus(404);
+            response.setBody({ error: { message: 'Intake run not found' } });
+            return;
+        }
+        response.setBody({ run: run });
+    } catch (e) {
+        response.setStatus(400);
+        response.setBody({ error: { message: e.message } });
+    }
+})(request, response);`
+
+const knownIssuesScript = `(function process(request, response) {
+    response.setBody({ issues: new x_everi_luxesc.LuxEscOutages().current() });
+})(request, response);`
+
+const followScript = `(function process(request, response) {
+    var body = request.body && request.body.data || {};
+    try {
+        var incident = new x_everi_luxesc.LuxEscOutages().follow(request.pathParams.issue, body.shortDescription, body.description);
+        response.setBody({ incident: incident });
+    } catch (e) {
+        response.setStatus(400);
+        response.setBody({ error: { message: e.message } });
+    }
+})(request, response);`
+
 const latestScript = `(function process(request, response) {
     var run = new x_everi_luxesc.LuxEscConcierge().latest() || {};
     if (run === null) {
@@ -77,7 +107,8 @@ const traceScript = `(function process(request, response) {
     response.setBody({ run: run });
 })(request, response);`
 
-// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes, /intake, /plans
+// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes,
+// /runs/{run}/fixed, /intake, /plans, /known-issues, /known-issues/{issue}/follow
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -123,6 +154,33 @@ export const conciergeApi = RestApi({
             script: outcomeScript,
             version: 1,
             shortDescription: 'Record what the employee did on a briefing item ({key, action})',
+        },
+        {
+            $id: Now.ID['concierge-api-fixed'],
+            name: 'confirm fix',
+            method: 'POST',
+            path: '/runs/{run}/fixed',
+            script: fixedScript,
+            version: 1,
+            shortDescription: "The intake's self-help fixed the problem: draft a knowledge article from it",
+        },
+        {
+            $id: Now.ID['concierge-api-known-issues'],
+            name: 'known issues',
+            method: 'GET',
+            path: '/known-issues',
+            script: knownIssuesScript,
+            version: 1,
+            shortDescription: 'Current major incidents and outages, and whether the employee follows each',
+        },
+        {
+            $id: Now.ID['concierge-api-follow'],
+            name: 'follow known issue',
+            method: 'POST',
+            path: '/known-issues/{issue}/follow',
+            script: followScript,
+            version: 1,
+            shortDescription: "Raise the employee's incident under a major incident ({shortDescription, description})",
         },
         {
             $id: Now.ID['concierge-api-latest'],
