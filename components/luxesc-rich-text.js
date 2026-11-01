@@ -20,6 +20,8 @@ export class RichText extends AIUXElement {
   @property({type: String}) name = 'rich_text';
   @property({type: String}) label = '';
   @property({type: String}) value = '';
+  // The control scrolls past 200px; full shows long content (articles) in the page flow
+  @property({type: Boolean}) full = false;
 
   static styles = css`
     :host {
@@ -36,7 +38,8 @@ export class RichText extends AIUXElement {
       displayValue: this.value,
       visible: true,
       readonly: true,
-      mandatory: false
+      mandatory: false,
+      ...(this.full ? {controlStyles: 'max-height: none'} : {})
     };
     return html`${createFormControl(field, FIELD_LAYOUT, noop, undefined, {
       editMode: FormFieldEditMode.DISPLAY_ONLY

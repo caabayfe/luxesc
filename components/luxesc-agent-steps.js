@@ -26,10 +26,10 @@ export class AgentSteps extends AIUXElement {
     const steps = this.steps.filter(step => step.thought || step.actions?.length || step.type !== 'gen_ai');
     return html`<ol class="flex flex-col gap-2" aria-label=${this.label || i18n.getMessage('What the agent is doing')}>
       ${steps.map(
-        step => html`<li class="flex gap-2 text-sm">
+        step => html`<li class="flex flex-col items-start gap-1 text-sm">
           <span
             class=${classMap({
-              'aiux-badge aiux-badge-sm aiux-badge-soft shrink-0': true,
+              'aiux-badge aiux-badge-sm aiux-badge-soft h-auto max-w-full text-left': true,
               'aiux-badge-success': DONE.includes(step.status),
               'aiux-badge-info': !DONE.includes(step.status)
             })}

@@ -99,7 +99,7 @@ export default class KnowledgePage extends withWidgetContext(AIUXElement) {
         : nothing}
       <section class="aiux-card bg-base-100 shadow-sm">
         <div class="aiux-card-body">
-          <luxesc-rich-text name="text" .label=${i18n.getMessage('Article')} .value=${article.text.value || ''}></luxesc-rich-text>
+          <luxesc-rich-text name="text" full .label=${i18n.getMessage('Article')} .value=${article.text.value || ''}></luxesc-rich-text>
         </div>
       </section>
     </article>`;

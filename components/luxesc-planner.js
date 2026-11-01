@@ -91,6 +91,8 @@ export class Planner extends AIUXElement {
   _onFinished() {
     const steps = this._run?.briefing?.steps || [];
     this._steps = steps.map(step => ({include: ready(step), quantity: step.quantity, status: 'idle', message: ''}));
+    // Items already in the cart are ordered together with the plan, so show them now
+    if (steps.length) this._loadCart();
   }
 
   _reset() {
@@ -259,7 +261,9 @@ export class Planner extends AIUXElement {
     }
     const cart = this._cart;
     if (!cart) return nothing;
-    const items = cart.items || [];
+    // Items are grouped by billing frequency ("none" for one-off prices)
+    const items = Object.values(cart).flatMap(group => group?.items || []);
+    if (!items.length && !this._steps.some(step => step.status === 'added')) return nothing;
     return html`<section class="flex flex-col gap-3 rounded-box border border-base-300 p-4" aria-labelledby="plan-cart">
       <h3 id="plan-cart" class="font-semibold">${i18n.getMessage('Your cart')}</h3>
       ${items.length
@@ -268,7 +272,7 @@ export class Planner extends AIUXElement {
               item => html`<li class="flex flex-wrap items-center justify-between gap-2 py-2">
                 <span class="min-w-0 break-words">${item.quantity} × ${item.item_name}</span>
                 <span class="flex items-center gap-2">
-                  ${item.price ? html`<span class="text-text-secondary">${item.price}</span>` : nothing}
+                  ${item.subtotal_price ? html`<span class="text-text-secondary">${item.subtotal_price}</span>` : nothing}
                   <button type="button" class="aiux-btn aiux-btn-xs aiux-btn-ghost" @click=${() => this._remove(item.cart_item_id)}>
                     ${i18n.getMessage('Remove')}
                   </button>
@@ -276,7 +280,7 @@ export class Planner extends AIUXElement {
               </li>`
             )}
           </ul>
-          ${cart.subtotal ? html`<p class="text-sm font-medium">${i18n.getMessage('Subtotal: {0}', cart.subtotal)}</p>` : nothing}
+          ${cart.subtotal_price ? html`<p class="text-sm font-medium">${i18n.getMessage('Subtotal: {0}', cart.subtotal_price)}</p>` : nothing}
           ${this._confirming
             ? html`<div class="flex flex-wrap items-center justify-end gap-2">
                 <span class="text-sm">${i18n.getMessage('Submit {0} items as one order?', items.length)}</span>

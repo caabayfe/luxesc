@@ -204,7 +204,7 @@ export class Concierge extends AIUXElement {
     const pending = this._pending;
     const action = ACTIONS[pending.action];
     const needsText = action.commentRequired || pending.action === 'approve';
-    return html`<div class="flex flex-col gap-2 rounded-box border border-base-300 p-3">
+    return html`<div class="flex w-full flex-col gap-2 rounded-box border border-base-300 p-3">
       ${needsText
         ? html`<label class="aiux-fieldset">
             <span class="aiux-fieldset-legend text-sm">
@@ -250,7 +250,7 @@ export class Concierge extends AIUXElement {
     if (this._pending?.key === key) return this._renderConfirm(item);
     const actions = actionsFor(item);
     return actions.length
-      ? html`<div class="flex flex-wrap gap-2">
+      ? html`<div class="contents">
           ${actions.map(
             action => html`<button
               type="button"
@@ -275,13 +275,15 @@ export class Concierge extends AIUXElement {
         </div>
         <h3 class="max-w-full break-words font-semibold">${item.title}</h3>
         <p class="max-w-full break-words text-sm text-text-secondary">${item.detail}</p>
-        ${this._renderActions(item)}
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          ${this._renderActions(item)}
           ${item.sysId
             ? html`<button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline" @click=${() => this._open(item)}>
                 ${i18n.getMessage('Open')}
               </button>`
             : nothing}
+        </div>
+        <div>
           ${item.question
             ? html`<button
                 type="button"
