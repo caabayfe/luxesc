@@ -103,6 +103,22 @@ export function addComment(table, sysId, text) {
   });
 }
 
+// New record as the employee; the Table API applies the table's create ACLs
+export function createRecord(table, body, fields = 'sys_id,number') {
+  return request(`${TABLE_API}/${table}?${query({sysparm_fields: fields})}`, {
+    method: 'POST',
+    body
+  });
+}
+
+// Field changes as the employee (an approval decision, closing their own incident)
+export function updateRecord(table, sysId, body) {
+  return request(`${TABLE_API}/${table}/${sysId}?${query({sysparm_fields: 'sys_id'})}`, {
+    method: 'PATCH',
+    body
+  });
+}
+
 export function imageUrl(path) {
   if (!path) return '';
   return path.startsWith('/') || path.startsWith('http') ? path : `/${path}`;

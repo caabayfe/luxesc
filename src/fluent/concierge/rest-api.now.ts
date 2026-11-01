@@ -7,7 +7,7 @@ export const conciergeApiAcl = Acl({
     name: 'Lux Employee Center Concierge API',
     operation: 'execute',
     roles: ['snc_internal'],
-    description: 'Employees can run and follow their own concierge briefing.',
+    description: 'Employees can run and follow their own concierge briefing and problem intake.',
 })
 
 // Handlers only delegate: the logic lives in LuxEscConcierge, which the agent's tools share
@@ -19,6 +19,16 @@ const startScript = `(function process(request, response) {
         return;
     }
     response.setBody({ run: run });
+})(request, response);`
+
+const intakeScript = `(function process(request, response) {
+    var body = request.body && request.body.data || {};
+    try {
+        response.setBody({ run: new x_everi_luxesc.LuxEscConcierge().start('intake', body.text) });
+    } catch (e) {
+        response.setStatus(400);
+        response.setBody({ error: { message: e.message } });
+    }
 })(request, response);`
 
 const latestScript = `(function process(request, response) {
@@ -41,7 +51,7 @@ const traceScript = `(function process(request, response) {
     response.setBody({ run: run });
 })(request, response);`
 
-// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}
+// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /intake
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -60,6 +70,15 @@ export const conciergeApi = RestApi({
             script: startScript,
             version: 1,
             shortDescription: 'Start a concierge briefing for the signed-in employee',
+        },
+        {
+            $id: Now.ID['concierge-api-intake'],
+            name: 'start intake',
+            method: 'POST',
+            path: '/intake',
+            script: intakeScript,
+            version: 1,
+            shortDescription: "Start the intake agent on the employee's description of a problem ({text})",
         },
         {
             $id: Now.ID['concierge-api-latest'],

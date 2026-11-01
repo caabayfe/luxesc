@@ -1,9 +1,10 @@
-// Employee Concierge: starts the concierge AI agent for the signed-in employee, serves its
-// tools (the employee's requests and approvals, saving the briefing) and reports progress.
+// Employee Concierge: starts the portal's AI agents for the signed-in employee (the concierge
+// briefing, or the problem intake served by LuxEscIntake), serves the concierge's tools (the
+// employee's requests and approvals, saving the briefing) and reports progress.
 // Classic script on purpose: the sn_aia runtime rejects calls made from module code.
 var LuxEscConcierge = Class.create();
 
-LuxEscConcierge.AGENT = 'Employee Concierge';
+LuxEscConcierge.AGENTS = { concierge: 'Employee Concierge', intake: 'Employee Intake' };
 LuxEscConcierge.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscConcierge.REQUEST_CLASSES = 'sc_req_item,incident';
 // Execution plan states after which the agent writes no more steps
@@ -15,20 +16,32 @@ LuxEscConcierge.prototype = {
 
     // ---- REST: start, latest, trace -------------------------------------------------------
 
-    start: function () {
+    // kind: 'concierge' (default) or 'intake', which needs the employee's own words in text
+    start: function (kind, text) {
+        kind = kind === 'intake' ? 'intake' : 'concierge';
+        text = String(text || '').trim().substring(0, 2000);
+        if (kind === 'intake' && !text) throw new Error('Describe the problem first');
+
         var run = new GlideRecord(LuxEscConcierge.RUN);
         run.initialize();
         run.setValue('user', gs.getUserID());
+        run.setValue('kind', kind);
+        run.setValue('prompt', text);
         run.setValue('state', 'running');
         var runId = run.insert();
 
         try {
-            var agentId = this._agentId();
-            if (!agentId) throw new Error('The ' + LuxEscConcierge.AGENT + ' agent is not installed');
+            var agent = LuxEscConcierge.AGENTS[kind];
+            var agentId = this._agentId(agent);
+            if (!agentId) throw new Error('The ' + agent + ' agent is not installed');
+            var objective = kind === 'intake'
+                ? 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId +
+                    '. The employee wrote:  + text + '
+                : 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId;
             var result = new sn_aia.AiAgentRuntimeUtil().startAiAgentConversation({
                 agentId: agentId,
-                objective: 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId,
-                conversationLabel: 'Lux Employee Center concierge',
+                objective: objective,
+                conversationLabel: 'Lux Employee Center ' + kind,
                 // Unattended: the agent must finish without asking the employee anything
                 canInteractWithUser: false,
             });
@@ -52,6 +65,7 @@ LuxEscConcierge.prototype = {
     latest: function () {
         var run = new GlideRecord(LuxEscConcierge.RUN);
         run.addQuery('user', gs.getUserID());
+        run.addQuery('kind', 'concierge').addOrCondition('kind', '');
         run.addQuery('sys_created_on', '>=', gs.beginningOfToday());
         run.orderByDesc('sys_created_on');
         run.setLimit(1);
@@ -116,9 +130,14 @@ LuxEscConcierge.prototype = {
         var approvals = [];
         while (approval.next()) {
             var created = new GlideDateTime(approval.getValue('sys_created_on'));
+            var target = approval.sysapproval.getRefRecord();
+            var found = target && target.isValidRecord();
             approvals.push({
                 approvalSysId: approval.getUniqueValue(),
                 forRecord: approval.getDisplayValue('sysapproval') || approval.getDisplayValue('document_id'),
+                summary: found ? target.getValue('short_description') : '',
+                requestedBy: found ? target.getDisplayValue('opened_by') : '',
+                price: found && target.isValidField('price') ? target.getDisplayValue('price') : '',
                 daysWaiting: Math.floor(GlideDateTime.subtract(created, now).getNumericValue() / 86400000),
             });
         }
@@ -139,6 +158,8 @@ LuxEscConcierge.prototype = {
                     kind: String(item.kind || 'info').substring(0, 20),
                     number: String(item.number || '').substring(0, 40),
                     sysId: /^[0-9a-f]{32}$/.test(item.sysId) ? item.sysId : '',
+                    approvalId: /^[0-9a-f]{32}$/.test(item.approvalId) ? item.approvalId : '',
+                    draft: String(item.draft || '').substring(0, 500),
                     title: String(item.title || '').substring(0, 200),
                     detail: String(item.detail || '').substring(0, 600),
                     question: String(item.question || '').substring(0, 300),
@@ -152,9 +173,9 @@ LuxEscConcierge.prototype = {
 
     // ---- Internals ------------------------------------------------------------------------
 
-    _agentId: function () {
+    _agentId: function (name) {
         var agent = new GlideRecord('sn_aia_agent');
-        return agent.get('name', LuxEscConcierge.AGENT) ? agent.getUniqueValue() : '';
+        return agent.get('name', name) ? agent.getUniqueValue() : '';
     },
 
     _runUser: function (runId) {
@@ -194,6 +215,8 @@ LuxEscConcierge.prototype = {
         }
         return {
             id: run.getUniqueValue(),
+            kind: run.getValue('kind') || 'concierge',
+            prompt: run.getValue('prompt') || '',
             state: run.getValue('state'),
             startedOn: run.getDisplayValue('sys_created_on'),
             finishedOn: run.getDisplayValue('finished_on'),
@@ -215,10 +238,11 @@ LuxEscConcierge.prototype = {
         if (LuxEscConcierge.DONE_STATES.indexOf(planState) >= 0) {
             var output = this._finalAnswer(plan.getUniqueValue());
             var saved = !!run.getValue('briefing');
+            var noun = run.getValue('kind') === 'intake' ? 'triage' : 'briefing';
             run.setValue('state', planState === 'completed' && saved ? 'completed' : 'failed');
             run.setValue('output', output.substring(0, 4000));
             if (!saved || planState !== 'completed') {
-                run.setValue('error', ('The concierge ' + (saved ? 'stopped' : 'finished without a briefing') +
+                run.setValue('error', ('The agent ' + (saved ? 'stopped' : 'finished without a ' + noun) +
                     ' (' + planState + (plan.getValue('state_reason') ? ': ' + plan.getValue('state_reason') : '') + ')').substring(0, 1000));
             }
             run.setValue('finished_on', new GlideDateTime());

@@ -52,7 +52,8 @@ Step 2: Decide what deserves attention, most urgent first, at most 6 items:
 If there is nothing open, save a single "progress" item saying everything is up to date.
 
 Step 3: Use the Save briefing tool with the run id and briefing as JSON:
-{"headline": "<one friendly sentence summarising the day>", "items": [{"kind": "approval|action|stale|progress|done", "number": "<record number>", "sysId": "<sysId from the tool output, empty for approvals>", "title": "<max 80 characters>", "detail": "<one or two sentences grounded in the tool output: state, days, last comment>", "question": "<a question the employee could ask the assistant next, e.g. Chase up RITM0010054 for me>"}]}
+{"headline": "<one friendly sentence summarising the day>", "items": [{"kind": "approval|action|stale|progress|done", "number": "<record number>", "sysId": "<sysId from the tool output, empty for approvals>", "approvalId": "<approvalSysId, approvals only>", "title": "<max 80 characters>", "detail": "<one or two sentences grounded in the tool output: state, days, last comment; for approvals what is requested, by whom and the price if any>", "draft": "<stale and action only: a short, polite comment the employee could post, written as the employee, e.g. asking for an update or answering the question>", "question": "<a question the employee could ask the assistant next, e.g. What happens after I approve this?>"}]}
+- The employee acts on the items in the portal (approve or reject, post the draft, confirm a fix), so never say you did it.
 - Use only facts from the tool outputs. Never invent numbers, dates or people.
 - If the save fails, fix the JSON and try once more.
 

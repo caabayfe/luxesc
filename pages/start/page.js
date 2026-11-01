@@ -19,6 +19,7 @@ import {chatContext, isChatEnabled} from '../../utils/chat.js';
 import '../../components/luxesc-item-gallery.js';
 import '../../components/luxesc-ask.js';
 import '../../components/luxesc-concierge.js';
+import '../../components/luxesc-intake.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
 
 const {acl, title} = decorators;
@@ -281,7 +282,10 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     const {categories = [], items = null} = this.loaderData || {};
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-8 p-4 lg:p-8">
       ${this._renderHero()}
-      <luxesc-concierge .basePath=${this._basePath}></luxesc-concierge>
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <luxesc-intake></luxesc-intake>
+        <luxesc-concierge .basePath=${this._basePath}></luxesc-concierge>
+      </div>
       ${this._renderCategories(categories)}
       ${this._renderFeatured(items)} ${this._renderMyRequests()}
     </div>`;
