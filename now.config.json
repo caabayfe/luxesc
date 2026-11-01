@@ -1,0 +1,15 @@
+{
+  "scope": "x_everi_luxesc",
+  "scopeId": "0ebeeaa08ff847c6a116bb7729a79a87",
+  "name": "Lux Employee Center",
+  "metadataDir": "src/plugin-xmls",
+  "appOutputDir": "dist-metadata/app",
+  "packageSourceCodeOnInstance": true,
+  "staticContent": {
+    "assets": {
+      "./public/**": {
+        "publicPath": "[$config.aiux.basename]/public"
+      }
+    }
+  }
+}

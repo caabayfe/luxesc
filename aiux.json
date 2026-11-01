@@ -1,0 +1,11 @@
+{
+  "name": "Lux Employee Center",
+  "basename": "luxesc",
+  "landing": "/home",
+  "development": {
+    "token": ""
+  },
+  "build": {
+    "exclude": ["**/*.test.js", "**/test/**"]
+  }
+}
