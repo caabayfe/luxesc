@@ -1,7 +1,7 @@
 import '@servicenow/sdk/global'
 import { ChoiceColumn, DateTimeColumn, IntegerColumn, ReferenceColumn, StringColumn, Table } from '@servicenow/sdk/core'
 
-// One row per agent run an employee starts (a concierge briefing or a problem intake): links it
+// One row per agent run an employee starts (a concierge briefing, a problem intake or a request plan): links it
 // to the agent execution plan and holds the result the agent saved
 export const x_everi_luxesc_concierge_run = Table({
     name: 'x_everi_luxesc_concierge_run',
@@ -16,6 +16,7 @@ export const x_everi_luxesc_concierge_run = Table({
             choices: {
                 concierge: { label: 'Concierge briefing' },
                 intake: { label: 'Problem intake' },
+                plan: { label: 'Request plan' },
             },
         }),
         prompt: StringColumn({ label: 'What the employee asked', maxLength: 2000 }),
@@ -34,7 +35,7 @@ export const x_everi_luxesc_concierge_run = Table({
         plan_state: StringColumn({ label: 'Plan state', maxLength: 40 }),
         execution_ms: IntegerColumn({ label: 'Execution time (ms)' }),
         finished_on: DateTimeColumn({ label: 'Finished on' }),
-        // Briefing (concierge) or triage (intake) JSON
+        // Briefing (concierge), triage (intake) or plan (plan) JSON
         briefing: StringColumn({ label: 'Result', maxLength: 16000 }),
         output: StringColumn({ label: 'Output', maxLength: 4000 }),
         error: StringColumn({ label: 'Error', maxLength: 1000 }),

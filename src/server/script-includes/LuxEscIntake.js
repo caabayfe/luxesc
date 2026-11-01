@@ -7,6 +7,10 @@ var LuxEscIntake = Class.create();
 LuxEscIntake.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscIntake.LIMIT = 5;
 LuxEscIntake.TYPES = ['incident', 'catalog', 'none'];
+// The request planner shares the catalog search
+LuxEscIntake.KINDS = ['intake', 'plan'];
+// Items that go in the cart (no record producers, order guides or content items)
+LuxEscIntake.ORDERABLE = 'sc_cat_item,pc_hardware_cat_item,pc_software_cat_item,sc_cat_item_service';
 LuxEscIntake.URGENCIES = ['1', '2', '3'];
 
 LuxEscIntake.prototype = {
@@ -63,14 +67,15 @@ LuxEscIntake.prototype = {
         };
     },
 
-    // Orderable catalog items (requests for hardware, software, access)
-    searchCatalog: function (runId, query) {
+    // Catalog items (requests for hardware, software, access); orderableOnly keeps the ones that
+    // can go in the cart, for the request planner
+    searchCatalog: function (runId, query, orderableOnly) {
         if (!this._run(runId)) return { error: 'Unknown intake run' };
         var self = this;
         var items = this._search(query, function (words) {
             var item = new GlideRecord('sc_cat_item');
             item.addActiveQuery();
-            item.addQuery('sys_class_name', 'IN', 'sc_cat_item,sc_cat_item_producer');
+            item.addQuery('sys_class_name', 'IN', orderableOnly ? LuxEscIntake.ORDERABLE : LuxEscIntake.ORDERABLE + ',sc_cat_item_producer');
             item.addQuery('123TEXTQUERY321', words);
             return item;
         }, function (item) {
@@ -126,7 +131,7 @@ LuxEscIntake.prototype = {
 
     _run: function (runId) {
         var run = new GlideRecord(LuxEscIntake.RUN);
-        return run.get(runId) && run.getValue('kind') === 'intake' ? run : null;
+        return run.get(runId) && LuxEscIntake.KINDS.indexOf(run.getValue('kind')) >= 0 ? run : null;
     },
 
     _cleanSelfHelp: function (selfHelp) {

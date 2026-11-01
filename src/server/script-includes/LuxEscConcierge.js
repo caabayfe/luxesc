@@ -4,7 +4,7 @@
 // Classic script on purpose: the sn_aia runtime rejects calls made from module code.
 var LuxEscConcierge = Class.create();
 
-LuxEscConcierge.AGENTS = { concierge: 'Employee Concierge', intake: 'Employee Intake' };
+LuxEscConcierge.AGENTS = { concierge: 'Employee Concierge', intake: 'Employee Intake', plan: 'Request Planner' };
 LuxEscConcierge.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscConcierge.REQUEST_CLASSES = 'sc_req_item,incident';
 // Execution plan states after which the agent writes no more steps
@@ -17,11 +17,11 @@ LuxEscConcierge.prototype = {
 
     // ---- REST: start, latest, trace -------------------------------------------------------
 
-    // kind: 'concierge' (default) or 'intake', which needs the employee's own words in text
+    // kind: 'concierge' (default), or 'intake' and 'plan', which need the employee's own words in text
     start: function (kind, text) {
-        kind = kind === 'intake' ? 'intake' : 'concierge';
+        kind = LuxEscConcierge.AGENTS.hasOwnProperty(kind) ? kind : 'concierge';
         text = String(text || '').trim().substring(0, 2000);
-        if (kind === 'intake' && !text) throw new Error('Describe the problem first');
+        if (kind !== 'concierge' && !text) throw new Error('Describe what you need first');
 
         var run = new GlideRecord(LuxEscConcierge.RUN);
         run.initialize();
@@ -35,10 +35,13 @@ LuxEscConcierge.prototype = {
             var agent = LuxEscConcierge.AGENTS[kind];
             var agentId = this._agentId(agent);
             if (!agentId) throw new Error('The ' + agent + ' agent is not installed');
-            var objective = kind === 'intake'
-                ? 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId +
-                    '. The employee wrote: """' + text.replace(/"""/g, '"') + '"""'
-                : 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId;
+            var words = '. The employee wrote: """' + text.replace(/"""/g, '"') + '"""';
+            var objective = {
+                concierge: 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId,
+                intake: 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId + words,
+                plan: 'Plan the catalog requests for ' + gs.getUserDisplayName() + '. Today is ' +
+                    new GlideDate().getValue() + '. Run id: ' + runId + words,
+            }[kind];
             var result = new sn_aia.AiAgentRuntimeUtil().startAiAgentConversation({
                 agentId: agentId,
                 objective: objective,
@@ -260,7 +263,7 @@ LuxEscConcierge.prototype = {
         if (LuxEscConcierge.DONE_STATES.indexOf(planState) >= 0) {
             var output = this._finalAnswer(plan.getUniqueValue());
             var saved = !!run.getValue('briefing');
-            var noun = run.getValue('kind') === 'intake' ? 'triage' : 'briefing';
+            var noun = { intake: 'triage', plan: 'plan' }[run.getValue('kind')] || 'briefing';
             run.setValue('state', planState === 'completed' && saved ? 'completed' : 'failed');
             run.setValue('output', output.substring(0, 4000));
             if (!saved || planState !== 'completed') {

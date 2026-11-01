@@ -14,6 +14,7 @@ import {fetchCategories, fetchItems} from '../../utils/api.js';
 import {ITEMS_PAGE_SIZE, SERVICE_CATALOG_ID} from '../../constants/catalog.js';
 import {setDocumentTitle} from '../../utils/document-title.js';
 import '../../components/luxesc-item-gallery.js';
+import '../../components/luxesc-planner.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
 
 const {acl, title} = decorators;
@@ -37,7 +38,7 @@ export default class CatalogPage extends withWidgetContext(AIUXElement) {
   static aiContext = {
     description: 'The service catalog: categories, a search box and the matching items',
     bestFor:
-      'When the employee needs something (hardware, software, access, a service) and you have to find the right catalog item'
+      'When the employee needs something (hardware, software, access, a service) and you have to find the right catalog item, or needs several things at once (onboarding, a move, a new team)'
   };
 
   static client_tools = {
@@ -50,6 +51,21 @@ export default class CatalogPage extends withWidgetContext(AIUXElement) {
       definition: async function ({text} = {}) {
         navigate('/catalog', {query: {q: String(text || '')}});
         return {success: true};
+      }
+    },
+    // Several items at once go to the Request Planner agent, shown in the planner card on this page
+    plan_request: {
+      description:
+        'Plan a request with several catalog items at once (for example onboarding new hires) with the Request Planner agent. The plan appears on this page for the employee to review and add to the cart; nothing is ordered.',
+      arguments: [
+        {name: 'description', description: "Everything the employee needs, in their words: what, how many, for whom, where, by when", type: 'string', required: true}
+      ],
+      definition: async function ({description} = {}) {
+        const planner = this.renderRoot.querySelector('luxesc-planner');
+        const run = await planner?.plan(description);
+        return run
+          ? {success: true, nextStep: 'Tell the employee the planner is working and the plan will appear in the "Plan a bigger request" card on this page.'}
+          : {success: false, error: 'The planner could not start'};
       }
     }
   };
@@ -231,6 +247,7 @@ export default class CatalogPage extends withWidgetContext(AIUXElement) {
           </button>
         </form>
       </header>
+      <luxesc-planner></luxesc-planner>
       <div class="grid grid-cols-1 gap-6 md:grid-cols-[16rem_1fr]">
         ${this._renderCategories(categories, categoryId)}
         <section class="flex min-w-0 flex-col gap-4" aria-labelledby="results-title">

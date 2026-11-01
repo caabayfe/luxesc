@@ -18,3 +18,12 @@ export const LuxEscIntake = ScriptInclude({
     script: Now.include('../../server/script-includes/LuxEscIntake.js'),
     description: 'Tools of the Employee Intake agent: knowledge, similar incidents and catalog search, and saving the triage.',
 })
+
+export const LuxEscPlanner = ScriptInclude({
+    $id: Now.ID['luxesc-planner-si'],
+    name: 'LuxEscPlanner',
+    apiName: 'x_everi_luxesc.LuxEscPlanner',
+    accessibleFrom: 'package_private',
+    script: Now.include('../../server/script-includes/LuxEscPlanner.js'),
+    description: 'Tools of the Request Planner agent: catalog search, item questions, and saving a plan with resolved values.',
+})

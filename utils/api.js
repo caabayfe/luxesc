@@ -73,6 +73,26 @@ export function submitProducer(itemId, {variables}) {
   });
 }
 
+// The employee's cart: items added here are ordered together with one submit
+export function addToCart(itemId, {quantity, variables}) {
+  return request(`${CATALOG_API}/items/${itemId}/add_to_cart`, {
+    method: 'POST',
+    body: {sysparm_quantity: String(quantity), variables}
+  });
+}
+
+export function fetchCart() {
+  return request(`${CATALOG_API}/cart`);
+}
+
+export function removeCartItem(cartItemId) {
+  return request(`${CATALOG_API}/cart/${cartItemId}`, {method: 'DELETE'});
+}
+
+export function submitCart() {
+  return request(`${CATALOG_API}/cart/submit_order`, {method: 'POST', body: {}});
+}
+
 export function fetchRecords(table, {encodedQuery, fields, limit = 10}) {
   return request(
     `${TABLE_API}/${table}?${query({

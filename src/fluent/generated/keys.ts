@@ -366,6 +366,10 @@ declare global {
                         table: 'sys_ws_operation'
                         id: 'a9ea854a5b5940d29834ae2fe706ff3c'
                     }
+                    'concierge-api-plan': {
+                        table: 'sys_ws_operation'
+                        id: '49ea806a24004416bfb144c87f2193af'
+                    }
                     'concierge-api-start': {
                         table: 'sys_ws_operation'
                         id: '4173ce8e7bba40ea999bb0ace5371403'
@@ -406,9 +410,21 @@ declare global {
                         table: 'sys_script_include'
                         id: '6af0ead2b4c74c229abb0deccb44da99'
                     }
+                    'luxesc-planner-si': {
+                        table: 'sys_script_include'
+                        id: 'fba41166858647f9b22545f63581f8ee'
+                    }
                     package_json: {
                         table: 'sys_module'
                         id: 'd8fb701e0f3541edacf6885ba5463327'
+                    }
+                    request_planner_agent: {
+                        table: 'sn_aia_agent'
+                        id: '6074037cbc8f4a66bcd639e6d2681530'
+                    }
+                    request_planner_agent_acl: {
+                        table: 'sys_security_acl'
+                        id: '75e60069bda8412b9527f6c3dbac9cfa'
                     }
                     'src_server_script-includes_LuxEscConcierge_js': {
                         table: 'sys_module'
@@ -418,8 +434,23 @@ declare global {
                         table: 'sys_module'
                         id: 'b214be9a63734091b91b962c8168f2d8'
                     }
+                    'src_server_script-includes_LuxEscPlanner_js': {
+                        table: 'sys_module'
+                        id: '05daa101b67442f897f5a3a9e1e08405'
+                    }
                 }
                 composite: [
+                    {
+                        table: 'sys_choice'
+                        id: '056c2228264a4482b0424fe58fb20084'
+                        key: {
+                            name: 'x_everi_luxesc_concierge_run'
+                            element: 'kind'
+                            value: 'plan'
+                            language: 'en'
+                            dependent_value: 'NULL'
+                        }
+                    },
                     {
                         table: 'sys_dictionary'
                         id: '0978ebe52e7b4437a1dd7c407c2543f7'
@@ -443,6 +474,15 @@ declare global {
                         key: {
                             name: 'x_everi_luxesc_concierge_run'
                             element: 'kind'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: '0fd90d4905d64865a74d0012531b9ae5'
+                        key: {
+                            agent: '6074037cbc8f4a66bcd639e6d2681530'
+                            tool: 'a13ed92fa60c43529231f39c98701942'
+                            name: 'Describe catalog item'
                         }
                     },
                     {
@@ -492,6 +532,15 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: '1963ab60d7a844beac8238789b48ce48'
+                        key: {
+                            agent: '6074037cbc8f4a66bcd639e6d2681530'
+                            tool: '2be2500a85e84e2389a9bf13a3bd67fc'
+                            name: 'Search orderable items'
+                        }
+                    },
+                    {
                         table: 'sys_documentation'
                         id: '19efe9fa4ec541a9905eb8799d076ab7'
                         key: {
@@ -517,6 +566,20 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_tool'
+                        id: '2be2500a85e84e2389a9bf13a3bd67fc'
+                        key: {
+                            name: 'Search orderable items'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: '2dce7658432447679cbad1250f019a12'
+                        key: {
+                            name: 'Save plan'
+                        }
+                    },
+                    {
                         table: 'sn_glider_source_artifact_m2m'
                         id: '2dd877d432144661919237eb8e2d474d'
                         key: {
@@ -535,6 +598,14 @@ declare global {
                                     name: 'snc_internal'
                                 }
                             }
+                        }
+                    },
+                    {
+                        table: 'sn_aia_version'
+                        id: '30cfac94ddc0417e81b6347f9e398197'
+                        key: {
+                            target_id: '6074037cbc8f4a66bcd639e6d2681530'
+                            version_name: 'V1'
                         }
                     },
                     {
@@ -797,6 +868,31 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_agent_access_role_mapping'
+                        id: 'a05980ef86c44805b1a0991093fbbfb2'
+                        key: {
+                            agent_access_config: {
+                                id: 'cf4d9bc31d8a48eba8b13efa8e0705f4'
+                                key: {
+                                    agent: '6074037cbc8f4a66bcd639e6d2681530'
+                                }
+                            }
+                            role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        table: 'sn_aia_tool'
+                        id: 'a13ed92fa60c43529231f39c98701942'
+                        key: {
+                            name: 'Describe catalog item'
+                        }
+                    },
+                    {
                         table: 'sys_choice_set'
                         id: 'a3714be39e664c60a0ef0a70864383ef'
                         key: {
@@ -821,6 +917,15 @@ declare global {
                         key: {
                             name: 'x_everi_luxesc_concierge_run'
                             element: 'prompt'
+                        }
+                    },
+                    {
+                        table: 'sn_aia_agent_tool_m2m'
+                        id: 'a910d200bcf3490ea238b40317656180'
+                        key: {
+                            agent: '6074037cbc8f4a66bcd639e6d2681530'
+                            tool: '2dce7658432447679cbad1250f019a12'
+                            name: 'Save plan'
                         }
                     },
                     {
@@ -895,10 +1000,24 @@ declare global {
                         }
                     },
                     {
+                        table: 'sn_aia_agent_config'
+                        id: 'c7e0f7504d734d64844e4f0ab008808f'
+                        key: {
+                            agent: '6074037cbc8f4a66bcd639e6d2681530'
+                        }
+                    },
+                    {
                         table: 'sys_db_object'
                         id: 'cb06f42be59f4edeabb0d387a57724a5'
                         key: {
                             name: 'x_everi_luxesc_concierge_run'
+                        }
+                    },
+                    {
+                        table: 'sys_agent_access_role_configuration'
+                        id: 'cf4d9bc31d8a48eba8b13efa8e0705f4'
+                        key: {
+                            agent: '6074037cbc8f4a66bcd639e6d2681530'
                         }
                     },
                     {
