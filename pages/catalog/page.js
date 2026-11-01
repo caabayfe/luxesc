@@ -14,6 +14,7 @@ import {fetchCategories, fetchItems} from '../../utils/api.js';
 import {ITEMS_PAGE_SIZE, SERVICE_CATALOG_ID} from '../../constants/catalog.js';
 import {setDocumentTitle} from '../../utils/document-title.js';
 import '../../components/luxesc-item-gallery.js';
+import {catalogTools} from '../../utils/catalog-tools.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-catalog');
@@ -40,36 +41,14 @@ export default class CatalogPage extends withWidgetContext(AIUXElement) {
   };
 
   static client_tools = {
-    search_catalog: {
-      description:
-        'Search the service catalog and show the matches on the page. Returns the top items with their sys_id.',
+    ...catalogTools,
+    show_catalog_results: {
+      description: 'Show the catalog items matching a search on this page.',
       arguments: [
         {name: 'text', description: 'What the employee needs, in a few keywords', type: 'string', required: true}
       ],
       definition: async function ({text} = {}) {
-        const items = await fetchItems({catalogId: SERVICE_CATALOG_ID, text, limit: 5});
-        navigate('/catalog', {query: {q: text}});
-        return {
-          success: true,
-          items: (items || []).map(item => ({
-            sysId: item.sys_id,
-            name: item.name,
-            shortDescription: item.short_description,
-            category: item.category?.title
-          }))
-        };
-      }
-    },
-    open_catalog_item: {
-      description: 'Open the order form of a catalog item so it can be filled in.',
-      arguments: [
-        {name: 'sysId', description: 'Catalog item sys_id', type: 'string', required: true}
-      ],
-      definition: async function ({sysId} = {}) {
-        if (!/^[0-9a-f]{32}$/.test(String(sysId))) {
-          return {success: false, reason: 'sysId must be a catalog item sys_id'};
-        }
-        navigate(`/catalog/${sysId}`);
+        navigate('/catalog', {query: {q: String(text || '')}});
         return {success: true};
       }
     }
@@ -123,9 +102,12 @@ export default class CatalogPage extends withWidgetContext(AIUXElement) {
     setDocumentTitle(i18n.getMessage('Request something'));
   }
 
+  // loaderData is not a reactive property, so a new loader result is spotted by reference
   updated(changed) {
     super.updated?.(changed);
-    if (isServer || !(changed.has('_items') || changed.has('loaderData'))) return;
+    const loaderChanged = this.loaderData !== this._contextData;
+    if (isServer || !(changed.has('_items') || loaderChanged)) return;
+    this._contextData = this.loaderData;
     const {text, categoryId, categories = []} = this.loaderData || {};
     this.setAiContext({
       search: text || '',

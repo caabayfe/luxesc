@@ -1,33 +1,68 @@
-import {html, css, nothing} from 'lit';
+import {html, css, nothing, isServer} from 'lit';
 import {customElement} from 'lit/decorators.js';
 import {
   AIUXElement,
   decorators,
   getLogger,
-  userContext
+  userContext,
+  withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
 import '@servicenow/aiux/aiux-components-carousel';
 import '@servicenow/aiux/aiux-components-list';
 import '@servicenow/aiux/aiux-components-empty-state-content';
-import {fetchCategories, fetchItems, imageUrl} from '../../utils/api.js';
+import {fetchCategories, fetchItems, fetchRecords, imageUrl} from '../../utils/api.js';
 import {SERVICE_CATALOG_ID} from '../../constants/catalog.js';
 import {setDocumentTitle} from '../../utils/document-title.js';
+import {chatContext, isChatEnabled} from '../../utils/chat.js';
 import '../../components/luxesc-item-gallery.js';
+import '../../components/luxesc-ask.js';
+import {catalogTools} from '../../utils/catalog-tools.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-home');
 
 const FEATURED_COUNT = 6;
+const REQUEST_FIELDS = 'sys_id,number,short_description,state,sys_class_name,sys_updated_on';
 const MY_OPEN_REQUESTS =
   'active=true^opened_by=javascript:gs.getUserID()^sys_class_nameINsc_req_item,incident^ORDERBYDESCsys_updated_on';
 
 @customElement('x-everi-luxesc-home-page')
 @title('Home')
 @acl([{roles: ['snc_internal']}])
-export default class HomePage extends AIUXElement {
-  static contexts = [userContext];
+export default class HomePage extends withWidgetContext(AIUXElement) {
+  static contexts = [userContext, chatContext];
+
+  static aiContext = {
+    description: "Employee Center home: the employee's open requests and incidents, catalog categories and featured services",
+    bestFor:
+      'When the employee asks what they have open, wants to follow up a request, or needs something new. To order, use find_catalog_items, describe_catalog_item and open_catalog_item: they open a pre-filled form for the employee to submit.'
+  };
+
+  static client_tools = {
+    open_request: {
+      description: 'Open one of the employee\'s requests or incidents by its number (e.g. RITM0010054, INC0026088).',
+      arguments: [
+        {name: 'number', description: 'Request or incident number', type: 'string', required: true}
+      ],
+      definition: async function ({number} = {}) {
+        const found = (this.loaderData?.openRequests || []).find(
+          request => request.number.display_value === String(number).trim().toUpperCase()
+        );
+        const sysId = found?.sys_id.value ||
+          (await fetchRecords('task', {
+            encodedQuery: `number=${String(number).trim()}^opened_by=javascript:gs.getUserID()`,
+            fields: 'sys_id',
+            limit: 1
+          }).catch(() => []))?.[0]?.sys_id?.value;
+        if (!sysId) return {success: false, reason: `${number} is not one of your requests`};
+        navigate(`/requests/${sysId}`);
+        return {success: true};
+      }
+    },
+    ...catalogTools
+  };
 
   static styles = css`
     :host {
@@ -38,9 +73,10 @@ export default class HomePage extends AIUXElement {
   `;
 
   static async loader(ctx) {
-    const [categories, items] = await Promise.allSettled([
+    const [categories, items, openRequests] = await Promise.allSettled([
       fetchCategories(SERVICE_CATALOG_ID),
-      fetchItems({catalogId: SERVICE_CATALOG_ID, limit: FEATURED_COUNT})
+      fetchItems({catalogId: SERVICE_CATALOG_ID, limit: FEATURED_COUNT}),
+      fetchRecords('task', {encodedQuery: MY_OPEN_REQUESTS, fields: REQUEST_FIELDS, limit: 10})
     ]);
     if (items.status === 'rejected') {
       log.error({error: items.reason?.message}, 'Failed to load featured items');
@@ -48,7 +84,8 @@ export default class HomePage extends AIUXElement {
     return {
       basePath: ctx.basePath || '',
       categories: categories.status === 'fulfilled' ? categories.value || [] : [],
-      items: items.status === 'fulfilled' ? items.value || [] : null
+      items: items.status === 'fulfilled' ? items.value || [] : null,
+      openRequests: openRequests.status === 'fulfilled' ? openRequests.value || [] : []
     };
   }
 
@@ -60,6 +97,22 @@ export default class HomePage extends AIUXElement {
     setDocumentTitle(i18n.getMessage('Home'));
   }
 
+  // loaderData is not a reactive property, so a new loader result is spotted by reference
+  updated(changed) {
+    super.updated?.(changed);
+    if (isServer || this.loaderData === this._contextData) return;
+    this._contextData = this.loaderData;
+    this.setAiContext({
+      openRequests: (this.loaderData?.openRequests || []).map(request => ({
+        number: request.number.display_value,
+        summary: request.short_description.display_value,
+        type: request.sys_class_name.display_value,
+        state: request.state.display_value,
+        updated: request.sys_updated_on.display_value
+      }))
+    });
+  }
+
   _search(e) {
     e.preventDefault();
     const text = new FormData(e.target).get('q')?.toString().trim();
@@ -69,6 +122,17 @@ export default class HomePage extends AIUXElement {
   _openRequest(e) {
     const sysId = e.detail?.referenceSysId || e.detail?.metadata?.listSysId;
     if (sysId) navigate(`/requests/${sysId}`);
+  }
+
+  // Landing on /start rather than /home: the shell treats /home as a page that
+  // embeds its own chat, so the shared assistant would not open from here
+  get _suggestions() {
+    return [
+      {label: i18n.getMessage('My laptop is slow'), question: i18n.getMessage('My laptop is very slow. Help me fix it or request what I need.')},
+      {label: i18n.getMessage('I need software'), question: i18n.getMessage('I need new software installed. Help me find the right catalog item.')},
+      {label: i18n.getMessage('Where are my requests?'), question: i18n.getMessage('What requests and incidents do I have open, and which need my attention?')},
+      {label: i18n.getMessage('Something is broken'), question: i18n.getMessage('Something is not working and I need to report it.')}
+    ];
   }
 
   _renderHero() {
@@ -83,24 +147,32 @@ export default class HomePage extends AIUXElement {
             ? i18n.getMessage('How can we help, {0}?', firstName)
             : i18n.getMessage('How can we help?')}
         </h1>
-        <form
-          role="search"
-          aria-label=${i18n.getMessage('Search the catalog')}
-          class="flex w-full max-w-2xl flex-col gap-2 sm:flex-row"
-          @submit=${this._search}
-        >
-          <label class="aiux-input aiux-input-lg w-full text-text-primary">
-            <span class="sr-only">${i18n.getMessage('Search the catalog')}</span>
-            <input
-              type="search"
-              name="q"
-              placeholder=${i18n.getMessage('Search for services, devices and help')}
-            />
-          </label>
-          <button type="submit" class="aiux-btn aiux-btn-lg aiux-btn-secondary">
-            ${i18n.getMessage('Search')}
-          </button>
-        </form>
+        ${isChatEnabled()
+          ? html`<luxesc-ask
+              class="w-full max-w-2xl"
+              inverse
+              label=${i18n.getMessage('Ask the assistant')}
+              placeholder=${i18n.getMessage('Tell us what you need, in your own words')}
+              .suggestions=${this._suggestions}
+            ></luxesc-ask>`
+          : html`<form
+            role="search"
+            aria-label=${i18n.getMessage('Search the catalog')}
+            class="flex w-full max-w-2xl flex-col gap-2 sm:flex-row"
+            @submit=${this._search}
+          >
+            <label class="aiux-input aiux-input-lg w-full text-text-primary">
+              <span class="sr-only">${i18n.getMessage('Search the catalog')}</span>
+              <input
+                type="search"
+                name="q"
+                placeholder=${i18n.getMessage('Search for services, devices and help')}
+              />
+            </label>
+            <button type="submit" class="aiux-btn aiux-btn-lg aiux-btn-secondary">
+              ${i18n.getMessage('Search')}
+            </button>
+          </form>`}
       </div>
     </section>`;
   }

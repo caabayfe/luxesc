@@ -13,6 +13,10 @@ declare global {
                         table: 'sys_security_acl'
                         id: '030c44589be145d094803e1d235a077c'
                     }
+                    'aiux-acl|x-everi-luxesc-chat-page|read|allow_if|snc_internal': {
+                        table: 'sys_security_acl'
+                        id: '154fbde66a8143139e43093d1692bdf5'
+                    }
                     'aiux-acl|x-everi-luxesc-home-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: 'c74eb087e75f45ad8f18f3954da628ee'
@@ -30,21 +34,45 @@ declare global {
                         id: 'c94512c432999eff4e3c790c21f02a2b'
                         deleted: true
                     }
+                    'aiux-dependency|ai-handoff.js': {
+                        table: 'sys_aix_dependency'
+                        id: 'da5488ce4170b7e6bd0c2017b49fb967'
+                        deleted: true
+                    }
                     'aiux-dependency|api.js': {
                         table: 'sys_aix_dependency'
                         id: 'ccba77defd8861d7586a3ad54a52f1e6'
+                        deleted: false
+                    }
+                    'aiux-dependency|catalog-tools.js': {
+                        table: 'sys_aix_dependency'
+                        id: '7fe205a96e63e3dc1e30a991d55bba32'
                     }
                     'aiux-dependency|catalog.js': {
                         table: 'sys_aix_dependency'
                         id: 'a21f70009eff8ada224f6da431bf928d'
                     }
+                    'aiux-dependency|chat.js': {
+                        table: 'sys_aix_dependency'
+                        id: 'd355d2f13fd7b08e739d7b33b3190b73'
+                        deleted: true
+                    }
                     'aiux-dependency|document-title.js': {
                         table: 'sys_aix_dependency'
                         id: 'e2684a37134e76a5269abc1587ad23a5'
                     }
+                    'aiux-dependency|luxesc-ask.js': {
+                        table: 'sys_aix_dependency'
+                        id: '3520170c63aeeefe961f684f9c1837a8'
+                    }
                     'aiux-dependency|luxesc-item-gallery.js': {
                         table: 'sys_aix_dependency'
                         id: 'ec5442b8e7031e6ebe0e5440461dc70f'
+                        deleted: true
+                    }
+                    'aiux-dependency|variables.js': {
+                        table: 'sys_aix_dependency'
+                        id: '04832da606fae78803fae89370a82a74'
                     }
                     'aiux-experience-page-rel|x-everi-luxesc-catalog-item-page': {
                         table: 'sys_aix_experience_page_rel'
@@ -53,6 +81,10 @@ declare global {
                     'aiux-experience-page-rel|x-everi-luxesc-catalog-page': {
                         table: 'sys_aix_experience_page_rel'
                         id: '59c6f055219ffd078b524f292e0eed92'
+                    }
+                    'aiux-experience-page-rel|x-everi-luxesc-chat-page': {
+                        table: 'sys_aix_experience_page_rel'
+                        id: 'f70af99f5d9364612ffd7ca97780511d'
                     }
                     'aiux-experience-page-rel|x-everi-luxesc-home-page': {
                         table: 'sys_aix_experience_page_rel'
@@ -82,21 +114,50 @@ declare global {
                         table: 'sys_aix_widget'
                         id: '61bac87ffdca4ebcbf242d5ff8986dc1'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|ai-handoff.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'e3e9ad37f3f3d649c01371100d83d485'
+                        deleted: true
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '93e36e980f8320a0bde13280351256c6'
+                        deleted: false
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|catalog.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '98eed63af2d22190508556ed10d04007'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|chat.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'b547f7eb5895fd470765d3d33b90d981'
+                        deleted: true
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '756b940bb994aeb137f72cbd6be485ec'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|luxesc-ask.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '2e6fe8b515a923e3d6f09f34936915e5'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|variables.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '2eb3f60efce38a7003ca6d95dd5f2f51'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|ai-handoff.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '169d840078b7ba5a4546544f186cfee3'
+                        deleted: true
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '39ef6f437f0850abf852c78d8b0a7392'
+                        deleted: false
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|catalog-tools.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '1f4ed12a3e624d6dcff518f41c2d93b4'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|catalog.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -109,22 +170,55 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|luxesc-item-gallery.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'e65fdeb13c4da837a934fe18e69a81e0'
+                        deleted: true
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-catalog-page|variables.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '58ab9b106ab61594f38efc5e13f94347'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-chat-page|document-title.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '207dd8d537750ab3c6e029c127c36bda'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '5b817763ca15a7826b56a20f79d95df3'
+                        deleted: false
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|catalog-tools.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'c11525911d92fdbcfb36f6052be1b05f'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|catalog.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '388cb0a5cf53615e39434553442f126b'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|chat.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '2dd20d23624da847ca99802b7f263e38'
+                        deleted: true
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '0eacd9baa912488ba4758e96c866175c'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-ask.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '3cacc63416e3ac907d6ebe50389b395c'
+                        deleted: false
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-item-gallery.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'baaf11f214322c221364dc1edd0391f4'
+                        deleted: true
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|variables.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '67b9a8614e2c4d6a3f6377e6d79f187f'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|api.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '64a423ca05c09d2d4adc6a0478278fb9'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|catalog.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -137,10 +231,20 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '5c0d3b7bcbdb5667097ca74561d17ea6'
+                        deleted: false
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|chat.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '78348e243f5ab1e2e53ce084c8026297'
+                        deleted: true
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '73163e89850d6b955414e37c531394cb'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|luxesc-ask.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'ccded8cef75e85ae5f937f2b8c8784d1'
                     }
                     'aiux-page-widget|x-everi-luxesc-catalog-item-page': {
                         table: 'sys_aix_widget'
@@ -149,6 +253,10 @@ declare global {
                     'aiux-page-widget|x-everi-luxesc-catalog-page': {
                         table: 'sys_aix_widget'
                         id: 'e29aa4a3da8c2432cd8733a30511234e'
+                    }
+                    'aiux-page-widget|x-everi-luxesc-chat-page': {
+                        table: 'sys_aix_widget'
+                        id: 'f93d2e50e6c009fb6acb190c40731e45'
                     }
                     'aiux-page-widget|x-everi-luxesc-home-page': {
                         table: 'sys_aix_widget'
@@ -169,6 +277,10 @@ declare global {
                     'aiux-page|x-everi-luxesc-catalog-page': {
                         table: 'sys_aix_page'
                         id: '711800e3c0d43577eb5b2e6bca284565'
+                    }
+                    'aiux-page|x-everi-luxesc-chat-page': {
+                        table: 'sys_aix_page'
+                        id: '477657fcf8c2f054ec130c9704ee428c'
                     }
                     'aiux-page|x-everi-luxesc-home-page': {
                         table: 'sys_aix_page'
@@ -204,6 +316,19 @@ declare global {
                     }
                 }
                 composite: [
+                    {
+                        table: 'sys_security_acl_role'
+                        id: '111a8f1a93a444b1853d7cc5c5234570'
+                        key: {
+                            sys_security_acl: '154fbde66a8143139e43093d1692bdf5'
+                            sys_user_role: {
+                                id: '52aca163b1ad45a0909d246eafc036da'
+                                key: {
+                                    name: 'snc_internal'
+                                }
+                            }
+                        }
+                    },
                     {
                         table: 'sn_glider_source_artifact_m2m'
                         id: '2dd877d432144661919237eb8e2d474d'

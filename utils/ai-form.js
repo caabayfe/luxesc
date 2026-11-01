@@ -28,11 +28,36 @@ export function describeFields(fields, values) {
   }));
 }
 
+const words = text => normalise(text).split(/[^a-z0-9]+/).filter(word => word.length > 2);
+
+// Exact name or label first, then the field whose label shares most words with
+// the key ("software" finds "Additional software requirements")
 function findField(fields, key) {
   const wanted = normalise(key);
-  return (
+  const exact =
     fields.find(field => normalise(field.name) === wanted) ||
-    fields.find(field => normalise(field.label) === wanted)
+    fields.find(field => normalise(field.label) === wanted);
+  if (exact) return exact;
+  const keyWords = words(key);
+  let best = null;
+  let bestScore = 0;
+  for (const field of fields) {
+    const fieldWords = new Set([...words(field.label), ...words(field.name.replace(/_/g, ' '))]);
+    const score = keyWords.filter(word => fieldWords.has(word)).length;
+    if (score > bestScore) {
+      best = field;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
+const FREE_TEXT = [FieldType.Textarea, FieldType.String];
+
+/** First writable free-text field still empty, for details that fit no field. */
+export function freeTextField(fields, values) {
+  return fields.find(
+    field => FREE_TEXT.includes(field.type) && !field.readonly && !values[field.name]
   );
 }
 

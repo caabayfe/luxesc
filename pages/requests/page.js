@@ -4,7 +4,8 @@ import {keyed} from 'lit/directives/keyed.js';
 import {
   AIUXElement,
   decorators,
-  getLogger
+  getLogger,
+  withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
@@ -12,6 +13,7 @@ import '@servicenow/aiux/aiux-components-list';
 import '@servicenow/aiux/aiux-components-tabs';
 import {ListDataManager} from '@servicenow/aiux/aiux-components-list';
 import {REQUEST_CLASSES} from '../../constants/catalog.js';
+import {fetchRecords} from '../../utils/api.js';
 import {setDocumentTitle} from '../../utils/document-title.js';
 
 const {acl, title} = decorators;
@@ -27,8 +29,40 @@ const QUERIES = {
 @customElement('x-everi-luxesc-requests-page')
 @title('My requests')
 @acl([{roles: ['snc_internal']}])
-export default class RequestsPage extends AIUXElement {
+export default class RequestsPage extends withWidgetContext(AIUXElement) {
   @state() _filter = 'open';
+
+  static aiContext = {
+    description: "The employee's requests and incidents, split into open and closed tabs",
+    bestFor: 'When the employee wants to review, find or open their requests'
+  };
+
+  static client_tools = {
+    show_tab: {
+      description: 'Switch the list between open and closed requests.',
+      arguments: [{name: 'tab', description: '"open" or "closed"', type: 'string', required: true}],
+      definition: async function ({tab} = {}) {
+        if (!QUERIES[tab]) return {success: false, reason: 'tab must be "open" or "closed"'};
+        this._filter = tab;
+        this.setAiContext({tab});
+        return {success: true};
+      }
+    },
+    open_request: {
+      description: 'Open one of the employee\'s requests or incidents by its number.',
+      arguments: [{name: 'number', description: 'Request or incident number', type: 'string', required: true}],
+      definition: async function ({number} = {}) {
+        const [found] = await fetchRecords('task', {
+          encodedQuery: `number=${String(number || '').trim()}^${MINE}`,
+          fields: 'sys_id',
+          limit: 1
+        }).catch(() => []);
+        if (!found) return {success: false, reason: `${number} is not one of your requests`};
+        navigate(`/requests/${found.sys_id.value}`);
+        return {success: true};
+      }
+    }
+  };
 
   // aiux-list-connected inherits the nav layout's height chain
   static styles = css`
@@ -55,7 +89,10 @@ export default class RequestsPage extends AIUXElement {
 
   _onTab(e) {
     const id = e.detail?.id;
-    if (QUERIES[id]) this._filter = id;
+    if (QUERIES[id]) {
+      this._filter = id;
+      this.setAiContext({tab: id});
+    }
   }
 
   _open(e) {

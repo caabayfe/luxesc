@@ -23,11 +23,14 @@ import {
   toBlocks,
   toSubmission
 } from '../../../utils/variables.js';
-import {applyAiValues, describeFields} from '../../../utils/ai-form.js';
+import {applyAiValues, describeFields, freeTextField} from '../../../utils/ai-form.js';
+import {takePrefill} from '../../../utils/ai-handoff.js';
 import {RECORD_PRODUCER_CLASS} from '../../../constants/catalog.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
+import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import './components/luxesc-variable-form.js';
 import '../../../components/luxesc-rich-text.js';
+import '../../../components/luxesc-ask.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-catalog-item');
@@ -38,6 +41,8 @@ const MAX_QUANTITY = 10;
 @title('Catalog item')
 @acl([{roles: ['snc_internal']}])
 export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
+  static contexts = [chatContext];
+
   static aiContext = {
     description:
       'Order form for one service catalog item: its variables, current answers, price and quantity',
@@ -83,6 +88,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
   @state() _quantity = 1;
   @state() _submitting = false;
   @state() _error = '';
+  @state() _prefilled = false;
 
   _prevLoaderData = null;
   _blocks = [];
@@ -98,7 +104,10 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
   static async loader(ctx) {
     const itemId = ctx.params.item;
     try {
-      return {basePath: ctx.basePath || '', item: await fetchItem(itemId)};
+      return {
+        basePath: ctx.basePath || '',
+        item: await fetchItem(itemId)
+      };
     } catch (error) {
       log.error({error: error.message, itemId}, 'Failed to load catalog item');
       return {basePath: ctx.basePath || '', item: null};
@@ -117,6 +126,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
       this._invalid = [];
       this._quantity = 1;
       this._error = '';
+      this._prefilled = false;
     }
   }
 
@@ -162,10 +172,27 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
     };
   }
 
+  async _applyPrefill() {
+    const item = this.loaderData.item;
+    const prefill = takePrefill(item.sys_id);
+    if (!prefill) return;
+    if (prefill.quantity && item.show_quantity && !this._isProducer) {
+      this._quantity = Math.min(MAX_QUANTITY, Math.max(1, Number(prefill.quantity) || 1));
+    }
+    if (prefill.values) await this._applyAiValues(prefill.values);
+    const notes = freeTextField(this._fields, this._values);
+    if (prefill.details && notes) await this._applyAiValues({[notes.name]: prefill.details});
+    this._prefilled = true;
+  }
+
+  // loaderData is not a reactive property, so a new loader result is spotted by reference
   updated(changed) {
     super.updated?.(changed);
     if (isServer || !this.loaderData?.item) return;
-    if (changed.has('loaderData') || changed.has('_values') || changed.has('_quantity')) {
+    const loaderChanged = this.loaderData !== this._contextData;
+    this._contextData = this.loaderData;
+    if (loaderChanged) this._applyPrefill();
+    if (loaderChanged || changed.has('_values') || changed.has('_quantity')) {
       const item = this.loaderData.item;
       this.setAiContext({
         catalogItem: {
@@ -243,7 +270,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
     return html`<header class="flex flex-col gap-4">
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
-          <li><a href="${basePath}/home">${i18n.getMessage('Home')}</a></li>
+          <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
           <li><a href="${basePath}/catalog">${i18n.getMessage('Request something')}</a></li>
           ${item.category?.title
             ? html`<li>
@@ -274,6 +301,31 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
         </div>
       </div>
     </header>`;
+  }
+
+  _renderAssist() {
+    if (!isChatEnabled() || !this._fields.length) return nothing;
+    return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="assist-title">
+      <div class="aiux-card-body gap-3">
+        <h2 id="assist-title" class="aiux-card-title text-base">
+          ${i18n.getMessage('Describe it instead')}
+        </h2>
+        ${this._prefilled
+          ? html`<div class="aiux-alert aiux-alert-info aiux-alert-soft text-sm" role="status">
+              ${i18n.getMessage('The assistant filled in this form from your conversation. Review it before you submit.')}
+            </div>`
+          : html`<p class="text-sm text-text-secondary">
+              ${i18n.getMessage('Say what you need in your own words and the assistant fills in the form. You review it and submit.')}
+            </p>`}
+        <luxesc-ask
+          multiline
+          label=${i18n.getMessage('Describe what you need')}
+          placeholder=${i18n.getMessage('For example: two laptops for the new hires in Madrid, with Visual Studio Code')}
+          action=${i18n.getMessage('Fill it for me')}
+          prefix=${i18n.getMessage('Fill in the order form on this page for me. Here is what I need:')}
+        ></luxesc-ask>
+      </div>
+    </section>`;
   }
 
   _renderOrderPanel(item) {
@@ -356,6 +408,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
                 </div>
               </section>`
             : nothing}
+          ${this._renderAssist()}
           <div role="alert">
             ${this._error
               ? html`<div class="aiux-alert aiux-alert-error aiux-alert-soft">${this._error}</div>`

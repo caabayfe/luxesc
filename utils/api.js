@@ -95,6 +95,14 @@ export async function fetchRecord(table, sysId, fields) {
 }
 
 // The catalog API returns image paths relative to the instance root
+// Journal entry visible to the requester and the fulfillers (Additional comments)
+export function addComment(table, sysId, text) {
+  return request(`${TABLE_API}/${table}/${sysId}?${query({sysparm_fields: 'sys_id'})}`, {
+    method: 'PATCH',
+    body: {comments: text}
+  });
+}
+
 export function imageUrl(path) {
   if (!path) return '';
   return path.startsWith('/') || path.startsWith('http') ? path : `/${path}`;

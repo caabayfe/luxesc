@@ -1,10 +1,11 @@
-import {html, css, nothing} from 'lit';
+import {html, css, nothing, isServer} from 'lit';
 import {customElement} from 'lit/decorators.js';
 import {classMap} from 'lit/directives/class-map.js';
 import {
   AIUXElement,
   decorators,
-  getLogger
+  getLogger,
+  withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import '@servicenow/aiux/aiux-components-record';
@@ -15,15 +16,17 @@ import {
 import '@servicenow/aiux/aiux-components-catalog';
 import '@servicenow/aiux/aiux-components-attachment';
 import '@servicenow/aiux/aiux-components-empty-state-content';
-import {fetchRecord} from '../../../utils/api.js';
+import {addComment, fetchRecord} from '../../../utils/api.js';
+import '../../../components/luxesc-ask.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
+import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import {lockVariables} from '../../../utils/read-only-variables.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-ticket');
 
 const SUMMARY_FIELDS =
-  'sys_id,sys_class_name,number,short_description,state,active,opened_at,sys_updated_on';
+  'sys_id,sys_class_name,number,short_description,description,state,active,opened_at,sys_updated_on,assignment_group,due_date,approval';
 
 // Self-service view; the platform falls back to the default view when a table has none
 const ESS_VIEW = 'ess';
@@ -33,7 +36,37 @@ const VARIABLES_VIEW = 'default';
 @customElement('x-everi-luxesc-ticket-page')
 @title('Request')
 @acl([{roles: ['snc_internal']}])
-export default class TicketPage extends AIUXElement {
+export default class TicketPage extends withWidgetContext(AIUXElement) {
+  static contexts = [chatContext];
+
+  static aiContext = {
+    description: "One of the employee's requests or incidents: number, state, dates, assignment and approval",
+    bestFor: 'When the employee asks about the status of this request, what happens next, or wants to add information or chase it up'
+  };
+
+  // Posts in the employee's name, so only on their explicit request
+  static client_tools = {
+    add_comment: {
+      description:
+        'Add a comment to this request, visible to the people working on it. Only use when the employee explicitly asks to add information or chase it up; show them the exact text first.',
+      arguments: [
+        {name: 'text', description: 'The comment, written as the employee', type: 'string', required: true}
+      ],
+      definition: async function ({text} = {}) {
+        const comment = String(text || '').trim();
+        const {summary, table} = this.loaderData || {};
+        if (!comment || !summary) return {success: false, reason: 'Nothing to post'};
+        try {
+          await addComment(table, summary.sys_id.value, comment);
+          return {success: true, posted: comment};
+        } catch (error) {
+          log.error({error: error.message}, 'Comment failed');
+          return {success: false, reason: 'You cannot comment on this request'};
+        }
+      }
+    }
+  };
+
   static styles = css`
     :host {
       display: block;
@@ -73,6 +106,54 @@ export default class TicketPage extends AIUXElement {
     }
   }
 
+  // loaderData is not a reactive property, so a new loader result is spotted by reference
+  updated(changed) {
+    super.updated?.(changed);
+    const summary = this.loaderData?.summary;
+    if (isServer || !summary || this.loaderData === this._contextData) return;
+    this._contextData = this.loaderData;
+    const value = name => summary[name]?.display_value || '';
+    this.setAiContext({
+      request: {
+        number: value('number'),
+        type: value('sys_class_name'),
+        summary: value('short_description'),
+        description: value('description').slice(0, 1000),
+        state: value('state'),
+        open: summary.active?.value === 'true',
+        openedAt: value('opened_at'),
+        updatedAt: value('sys_updated_on'),
+        assignedGroup: value('assignment_group'),
+        dueDate: value('due_date'),
+        approval: value('approval')
+      }
+    });
+  }
+
+  _renderAssist(summary) {
+    if (!isChatEnabled()) return nothing;
+    const number = summary.number?.display_value;
+    const suggestions = [
+      {label: i18n.getMessage('Where is it now?'), question: i18n.getMessage('What is the status of my request {0} and what happens next?', number)},
+      {label: i18n.getMessage('When will it be done?'), question: i18n.getMessage('When can I expect {0} to be completed? Explain any SLA or due date.', number)},
+      {label: i18n.getMessage('Summarize the activity'), question: i18n.getMessage('Summarize what has happened so far on {0}.', number)},
+      ...(summary.active?.value === 'true'
+        ? [{label: i18n.getMessage('Chase it up'), question: i18n.getMessage('Draft a short, polite comment asking for an update on {0}. Show it to me and post it on this request only after I confirm.', number)}]
+        : [])
+    ];
+    return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="assist-title">
+      <div class="aiux-card-body gap-3">
+        <h2 id="assist-title" class="aiux-card-title text-base">${i18n.getMessage('Ask about this request')}</h2>
+        <luxesc-ask
+          label=${i18n.getMessage('Ask about this request')}
+          placeholder=${i18n.getMessage('Ask anything about {0}', number)}
+          prefix=${i18n.getMessage('About my request {0}:', number)}
+          .suggestions=${suggestions}
+        ></luxesc-ask>
+      </div>
+    </section>`;
+  }
+
   firstUpdated() {
     const number = this.loaderData?.summary?.number?.display_value;
     setDocumentTitle(number || i18n.getMessage('Request'));
@@ -84,7 +165,7 @@ export default class TicketPage extends AIUXElement {
     return html`<header class="flex flex-col gap-3">
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
-          <li><a href="${basePath}/home">${i18n.getMessage('Home')}</a></li>
+          <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
           <li><a href="${basePath}/requests">${i18n.getMessage('My requests')}</a></li>
           <li aria-current="page">${summary.number?.display_value}</li>
         </ul>
@@ -128,7 +209,7 @@ export default class TicketPage extends AIUXElement {
 
     const sysId = summary.sys_id.value;
     return html`<div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 lg:p-8">
-      ${this._renderHeader(summary)}
+      ${this._renderHeader(summary)} ${this._renderAssist(summary)}
       <aiux-record-provider .data=${record} disable-presence>
         <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_24rem]">
           <section
