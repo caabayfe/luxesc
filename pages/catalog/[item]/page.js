@@ -1,6 +1,5 @@
 import {html, css, nothing} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
-import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {
   AIUXElement,
   decorators,
@@ -8,7 +7,6 @@ import {
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
-import {sanitizeHtml} from '@servicenow/aiux/aiux-utils/sanitizeHtml';
 import {triggerTransientToast} from '@servicenow/aiux/aiux-components-toast';
 import '@servicenow/aiux/aiux-components-empty-state-content';
 import {
@@ -27,6 +25,7 @@ import {
 import {RECORD_PRODUCER_CLASS} from '../../../constants/catalog.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import './components/luxesc-variable-form.js';
+import '../../../components/luxesc-rich-text.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-catalog-item');
@@ -272,7 +271,11 @@ export default class CatalogItemPage extends AIUXElement {
           ${item.description
             ? html`<section class="aiux-card bg-base-100 shadow-sm">
                 <div class="aiux-card-body max-w-full break-words text-sm">
-                  ${unsafeHTML(sanitizeHtml(item.description))}
+                  <luxesc-rich-text
+                    name="description"
+                    label=${i18n.getMessage('Description')}
+                    .value=${item.description}
+                  ></luxesc-rich-text>
                 </div>
               </section>`
             : nothing}

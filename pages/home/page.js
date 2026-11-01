@@ -188,14 +188,15 @@ export default class HomePage extends AIUXElement {
           .query=${MY_OPEN_REQUESTS}
           .pageSize=${5}
           .listOptions=${{
-            heading: i18n.getMessage('My open requests'),
+            heading: i18n.getMessage('Recently updated'),
             selectionEnabled: false,
             selectAllEnabled: false,
             showCount: true,
             showConditionBuilderButton: false,
             showEditColumnsButton: false,
             showZingSearch: false,
-            showCopyURLButton: false
+            showCopyURLButton: false,
+            showEditRowAction: false
           }}
           @aiux-list-connected:reference-link-clicked=${this._openRequest}
         ></aiux-list-connected>

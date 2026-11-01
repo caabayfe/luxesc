@@ -17,6 +17,7 @@ import '@servicenow/aiux/aiux-components-attachment';
 import '@servicenow/aiux/aiux-components-empty-state-content';
 import {fetchRecord} from '../../../utils/api.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
+import {lockVariables} from '../../../utils/read-only-variables.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-ticket');
@@ -26,6 +27,8 @@ const SUMMARY_FIELDS =
 
 // Self-service view; the platform falls back to the default view when a table has none
 const ESS_VIEW = 'ess';
+// The variable editor formatter lives on the default view of sc_req_item
+const VARIABLES_VIEW = 'default';
 
 @customElement('x-everi-luxesc-ticket-page')
 @title('Request')
@@ -53,7 +56,17 @@ export default class TicketPage extends AIUXElement {
         log.error({error: error.message, table, sysId}, 'Failed to load record');
         return null;
       });
-      return {basePath, summary, record, table};
+      const variables =
+        table === 'sc_req_item'
+          ? await RecordDataManager.fetchRecord(
+              {table, sysId, view: VARIABLES_VIEW, ignoreUserViewPreference: true, isCoreUI: false},
+              [RecordAPIKey.Form]
+            ).then(lockVariables).catch(error => {
+              log.error({error: error.message, sysId}, 'Failed to load variables');
+              return null;
+            })
+          : null;
+      return {basePath, summary, record, variables, table};
     } catch (error) {
       log.error({error: error.message, sysId}, 'Failed to load request');
       return {basePath, summary: null, record: null};
@@ -103,7 +116,7 @@ export default class TicketPage extends AIUXElement {
   }
 
   render() {
-    const {summary, record, table} = this.loaderData || {};
+    const {summary, record, variables, table} = this.loaderData || {};
     if (!summary || !record) {
       return html`<div class="mx-auto max-w-3xl p-4 lg:p-8">
         <aiux-empty-state-content
@@ -117,7 +130,7 @@ export default class TicketPage extends AIUXElement {
     return html`<div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 lg:p-8">
       ${this._renderHeader(summary)}
       <aiux-record-provider .data=${record} disable-presence>
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_24rem]">
+        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_24rem]">
           <section
             class="aiux-card min-w-0 bg-base-100 shadow-sm"
             aria-labelledby="activity-title"
@@ -149,13 +162,15 @@ export default class TicketPage extends AIUXElement {
                 ></aiux-record-form>
               </div>
             </section>
-            ${table === 'sc_req_item'
+            ${variables
               ? html`<section class="aiux-card bg-base-100 shadow-sm" aria-labelledby="variables-title">
                   <div class="aiux-card-body gap-2">
                     <h2 id="variables-title" class="aiux-card-title text-base">
                       ${i18n.getMessage('What you asked for')}
                     </h2>
-                    <aiux-catalog-form .noGutter=${true} .readOnlyOption=${'printable'}></aiux-catalog-form>
+                    <aiux-record-provider .data=${variables} disable-presence>
+                      <aiux-catalog-form .noGutter=${true} .readOnlyOption=${'printable'}></aiux-catalog-form>
+                    </aiux-record-provider>
                   </div>
                 </section>`
               : nothing}

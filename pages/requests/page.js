@@ -1,5 +1,6 @@
 import {html, css} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
+import {keyed} from 'lit/directives/keyed.js';
 import {
   AIUXElement,
   decorators,
@@ -67,6 +68,7 @@ export default class RequestsPage extends AIUXElement {
     if (sysId) navigate(`/requests/${sysId}`);
   }
 
+  // Each tab gets its own list instance so switching refetches its rows
   render() {
     const tabs = [
       {id: 'open', label: i18n.getMessage('Open')},
@@ -81,11 +83,11 @@ export default class RequestsPage extends AIUXElement {
         @aiux-tab-group:tab-change=${this._onTab}
       ></aiux-tab-group>
       <div class="aiux-card flex min-h-0 flex-1 border border-base-300 bg-base-100">
-        <aiux-list-connected
+        ${keyed(this._filter, html`<aiux-list-connected
           table="task"
           columns=${COLUMNS}
           .query=${QUERIES[this._filter]}
-          .data=${this._filter === 'open' ? this.loaderData?.data : null}
+          .data=${this._filter === 'open' ? this.loaderData?.data : undefined}
           .listOptions=${{
             heading:
               this._filter === 'open'
@@ -98,10 +100,11 @@ export default class RequestsPage extends AIUXElement {
             showZingSearch: true,
             showConditionBuilderButton: false,
             showEditColumnsButton: false,
-            showCopyURLButton: false
+            showCopyURLButton: false,
+            showEditRowAction: false
           }}
           @aiux-list-connected:reference-link-clicked=${this._open}
-        ></aiux-list-connected>
+        ></aiux-list-connected>`)}
       </div>
     </div>`;
   }

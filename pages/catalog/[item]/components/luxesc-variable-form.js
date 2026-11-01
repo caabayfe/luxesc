@@ -3,8 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {AIUXElement} from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {createFormControl} from '@servicenow/aiux/aiux-components-control';
-import {sanitizeHtml} from '@servicenow/aiux/aiux-utils/sanitizeHtml';
-import {unsafeHTML} from 'lit/directives/unsafe-html.js';
+import '../../../../components/luxesc-rich-text.js';
 
 const FIELD_LAYOUT = {layout: 'vertical'};
 
@@ -46,10 +45,24 @@ export class VariableForm extends AIUXElement {
     return this._handlers.get(name);
   }
 
+  // A variable is not a dictionary field, so the reference control looks the
+  // target table up by its own sys_id column instead (reference qualifiers are
+  // not applied: the controls factory does not forward an additional qualifier)
+  _lookupFor(field) {
+    if (!field.reference) return {};
+    return {
+      name: 'sys_id',
+      tableName: field.reference,
+      overrideReferenceTable: field.reference,
+      recordSysId: '-1'
+    };
+  }
+
   _renderField(field) {
     const isInvalid = this.invalid.includes(field.name);
     const control = {
       ...field,
+      ...this._lookupFor(field),
       value: this.values[field.name] ?? field.value,
       displayValue: this.displayValues[field.name] ?? field.displayValue,
       readonly: field.readonly || this.disabled,
@@ -70,7 +83,7 @@ export class VariableForm extends AIUXElement {
       case 'text':
         return html`<div class="max-w-full break-words text-sm text-text-secondary">
           ${block.html
-            ? unsafeHTML(sanitizeHtml(block.html))
+            ? html`<luxesc-rich-text .label=${block.label} .value=${block.html}></luxesc-rich-text>`
             : html`<p class="font-medium text-text-primary">${block.label}</p>`}
         </div>`;
       case 'section':
