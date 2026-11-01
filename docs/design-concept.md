@@ -87,6 +87,11 @@ OOB list on My stuff "Done".
 
 ## Phases
 
+Status 2026-11-01: all four phases built and tested in the browser (desktop and a 356 px preview).
+Not done: a pass impersonating the analyst, and a run with the UI language switched to Spanish
+(every UI string has a Spanish entry; the manifest coverage check is empty).
+
+
 1. **Home "For you"**: one box with instant results and in-place agent answers (intake and planner merged
    behind it), Needs you / In progress with journeys, Happening now, Trending. (1.5 days)
 2. **Navigation and Explore**: three destinations, combined search page, ⌘K from any page. (1 day)

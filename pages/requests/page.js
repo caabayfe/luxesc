@@ -118,7 +118,7 @@ export default class MyStuffPage extends withWidgetContext(AIUXElement) {
     }
     if (!items.length) return html`<aiux-empty-state-content heading=${empty.heading} body=${empty.body}></aiux-empty-state-content>`;
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-label=${label}>
-      <div class="aiux-card-body py-2">
+      <div class="aiux-card-body py-2 max-sm:px-4">
         <luxesc-record-list .items=${items} label=${label}></luxesc-record-list>
       </div>
     </section>`;
@@ -166,7 +166,7 @@ export default class MyStuffPage extends withWidgetContext(AIUXElement) {
     return html`<div class="mx-auto flex h-full w-full max-w-5xl flex-col gap-4 p-4 lg:p-8">
       <header class="flex flex-wrap items-end justify-between gap-3">
         <div class="flex min-w-0 flex-col gap-1">
-          <h1 class="text-3xl font-bold">${i18n.getMessage('My stuff')}</h1>
+          <h1 class="text-2xl font-bold sm:text-3xl">${i18n.getMessage('My stuff')}</h1>
           <p class="text-text-secondary">${i18n.getMessage('Your requests, incidents and approvals, and where each one is.')}</p>
         </div>
         <a class="aiux-btn aiux-btn-outline" href="${this.loaderData?.basePath || ''}/explore">${i18n.getMessage('Request something')}</a>

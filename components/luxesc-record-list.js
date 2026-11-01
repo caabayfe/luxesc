@@ -179,10 +179,13 @@ export class RecordList extends AIUXElement {
     const need = needsYou(item);
     const text = need ? kindLabel(item.kind) : item.status || kindLabel(item.kind);
     const tone = need ? KIND_TONE[item.kind] : item.attention || item.kind === 'stale' ? 'bg-warning' : 'bg-info';
-    return html`<span class="flex min-w-0 items-center gap-2 text-sm">
-      <span class="size-2 shrink-0 rounded-full ${tone}" aria-hidden="true"></span>
-      <span class="truncate ${need || item.attention ? 'font-medium' : 'text-text-secondary'}">${text}</span>
-      ${item.number ? html`<span class="shrink-0 text-text-secondary">· ${item.number}</span>` : nothing}
+    // Wraps rather than truncates: on a phone the status matters more than one line
+    return html`<span class="flex min-w-0 flex-wrap items-center gap-x-2 text-sm">
+      <span class="flex min-w-0 items-center gap-2">
+        <span class="size-2 shrink-0 rounded-full ${tone}" aria-hidden="true"></span>
+        <span class="break-words ${need || item.attention ? 'font-medium' : 'text-text-secondary'}">${text}</span>
+      </span>
+      ${item.number ? html`<span class="text-text-secondary">· ${item.number}</span>` : nothing}
     </span>`;
   }
 

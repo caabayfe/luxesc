@@ -226,7 +226,7 @@ export class CommandBox extends AIUXElement {
       </div>`;
     }
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="command-title">
-      <div class="aiux-card-body gap-4">
+      <div class="aiux-card-body gap-4 max-sm:p-4">
         <h2 id="command-title" class="text-xl font-semibold">${i18n.getMessage('What do you need?')}</h2>
         ${this._renderContent()}
       </div>

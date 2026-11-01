@@ -37,6 +37,8 @@ export class Concierge extends AIUXElement {
   @state() _tab = '';
   @state() _loading = true;
   @state() _error = '';
+  // A run started on this page has just finished (announced to screen readers)
+  @state() _finished = false;
 
   _timer = null;
   _startedAt = 0;
@@ -96,7 +98,10 @@ export class Concierge extends AIUXElement {
       } catch (error) {
         log.warn({error: error.message}, 'Concierge progress unavailable');
       }
-      if (this._run?.state !== 'running') return;
+      if (this._run?.state !== 'running') {
+        this._finished = true;
+        return;
+      }
       if (Date.now() - this._startedAt > GIVE_UP_MS) {
         this._error = i18n.getMessage('The concierge is taking longer than usual. Check back in a few minutes.');
         return;
@@ -161,6 +166,13 @@ export class Concierge extends AIUXElement {
     </details>`;
   }
 
+  // Only the briefing's progress is announced, not every row opened or tab switched
+  _announcement(running) {
+    if (this._error) return this._error;
+    if (running) return this._previous ? i18n.getMessage('Refreshing your briefing…') : i18n.getMessage('Preparing your briefing…');
+    return this._finished ? i18n.getMessage('Your briefing is ready.') : '';
+  }
+
   _renderBody(run, shown) {
     if (!run) {
       return html`<button type="button" class="aiux-btn aiux-btn-primary aiux-btn-sm self-start" ?disabled=${this._loading} @click=${this._start}>
@@ -184,9 +196,9 @@ export class Concierge extends AIUXElement {
     // While refreshing, the previous briefing stays and the agent's steps fold away
     const shown = running && this._previous ? this._previous : run;
     return html`<section class="aiux-card h-full border border-base-300 bg-base-100 shadow-sm" aria-labelledby="concierge-title">
-      <div class="aiux-card-body gap-3">
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex min-w-0 flex-col">
+      <div class="aiux-card-body gap-3 max-sm:p-4">
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <div class="flex min-w-0 flex-1 basis-48 flex-col">
             <h2 id="concierge-title" class="aiux-card-title text-lg">${i18n.getMessage('Your requests and approvals')}</h2>
             ${shown?.startedOn && shown.state !== 'running'
               ? html`<p class="text-xs text-text-secondary">${i18n.getMessage('Checked by an AI agent at {0}', shown.startedOn)}</p>`
@@ -210,7 +222,8 @@ export class Concierge extends AIUXElement {
               : nothing}
           </div>
         </div>
-        <div role="status" aria-live="polite" class="flex flex-col gap-3">
+        <p class="sr-only" role="status">${this._announcement(running)}</p>
+        <div class="flex flex-col gap-3">
           ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>` : nothing}
           ${this._renderBody(run, shown)}
         </div>

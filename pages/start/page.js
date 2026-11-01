@@ -152,7 +152,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
   _renderLinks({id, heading, rows, more}) {
     if (!rows.length) return nothing;
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby=${id}>
-      <div class="aiux-card-body gap-2">
+      <div class="aiux-card-body gap-2 max-sm:p-4">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id=${id} class="aiux-card-title text-lg">${heading}</h2>
           <a class="aiux-link aiux-link-primary text-sm" href=${more.href}>${more.label}</a>
@@ -177,7 +177,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     if (!categories.length) return nothing;
     const base = this._basePath;
     return html`<section class="aiux-card flex-1 border border-base-300 bg-base-100 shadow-sm" aria-labelledby="services-title">
-      <div class="aiux-card-body gap-3">
+      <div class="aiux-card-body gap-3 max-sm:p-4">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="services-title" class="aiux-card-title text-lg">${i18n.getMessage('Browse services')}</h2>
           <a class="aiux-link aiux-link-primary text-sm" href=${exploreHref(base, {tab: 'services'})}>${i18n.getMessage('Full catalog')}</a>
@@ -199,7 +199,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     const {categories = [], trending = []} = this.loaderData || {};
     const base = this._basePath;
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-6 p-4 lg:p-8">
-      <h1 class="break-words text-3xl font-bold">${this._renderGreeting()}</h1>
+      <h1 class="break-words text-2xl font-bold sm:text-3xl">${this._renderGreeting()}</h1>
       <luxesc-known-issues></luxesc-known-issues>
       <luxesc-command-box .basePath=${base} .suggestions=${this._suggestions}></luxesc-command-box>
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

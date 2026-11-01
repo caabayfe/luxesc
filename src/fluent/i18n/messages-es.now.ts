@@ -1569,6 +1569,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-765e38c6414b'],
+    table: 'sys_ui_message',
+    data: { key: "Your briefing is ready.", message: "Su resumen está listo.", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-e097019b3d3b'],
     table: 'sys_ui_message',
     data: { key: "Your cart could not be loaded.", message: "No se pudo cargar su cesta.", language: 'es' },

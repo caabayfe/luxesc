@@ -310,12 +310,12 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
         <h2 id="services-title" class="sr-only">${i18n.getMessage('Services')}</h2>
         ${this._renderCategories()}
         ${category?.description ? html`<p class="max-w-full break-words text-sm text-text-secondary">${category.description}</p>` : nothing}
-        <div role="status" aria-live="polite" class="flex flex-col gap-4">${this._renderServices({preview: false})}</div>
+        <div class="flex flex-col gap-4">${this._renderServices({preview: false})}</div>
       </section>`;
     }
     if (tab === 'answers') {
       return html`<section class="aiux-card border border-base-300 bg-base-100" aria-labelledby="answers-title">
-        <div class="aiux-card-body gap-2">
+        <div class="aiux-card-body gap-2 max-sm:p-4">
           <h2 id="answers-title" class="sr-only">${i18n.getMessage('Answers')}</h2>
           ${this._renderAnswers({preview: false})}
         </div>
@@ -328,7 +328,7 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
         ${this._renderServices({preview: true})}
       </section>
       <section class="aiux-card h-fit min-w-0 border border-base-300 bg-base-100" aria-labelledby="answers-title">
-        <div class="aiux-card-body gap-2">
+        <div class="aiux-card-body gap-2 max-sm:p-4">
           <h2 id="answers-title" class="aiux-card-title text-lg">
             ${this._view.text ? i18n.getMessage('Answers') : i18n.getMessage('Most read answers')}
           </h2>
@@ -347,9 +347,9 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
     ];
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-6 p-4 lg:p-8">
       <header class="flex flex-col gap-3">
-        <h1 class="text-3xl font-bold">${i18n.getMessage('Explore')}</h1>
+        <h1 class="text-2xl font-bold sm:text-3xl">${i18n.getMessage('Explore')}</h1>
         <p class="text-text-secondary">${i18n.getMessage('Services you can request and answers you can read, in one place.')}</p>
-        <form role="search" aria-label=${i18n.getMessage('Search services and answers')} class="flex w-full gap-2" @submit=${this._search}>
+        <form role="search" aria-label=${i18n.getMessage('Search services and answers')} class="flex w-full flex-col gap-2 sm:flex-row" @submit=${this._search}>
           <label class="aiux-input aiux-input-lg w-full">
             ${icon({name: 'magnifying-glass', size: 'sm'})}
             <span class="sr-only">${i18n.getMessage('Search services and answers')}</span>
