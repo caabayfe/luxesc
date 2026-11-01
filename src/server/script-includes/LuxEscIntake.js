@@ -138,6 +138,7 @@ LuxEscIntake.prototype = {
         if (!selfHelp || !(selfHelp.steps instanceof Array) || !selfHelp.steps.length) return null;
         return {
             title: String(selfHelp.title || '').substring(0, 200),
+            fixedIncidents: Math.min(LuxEscIntake.LIMIT, Math.max(0, parseInt(selfHelp.fixedIncidents, 10) || 0)),
             steps: selfHelp.steps.slice(0, 6).map(function (step) {
                 return String(step).substring(0, 400);
             }),

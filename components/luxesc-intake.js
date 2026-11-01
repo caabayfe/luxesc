@@ -172,6 +172,11 @@ export class Intake extends AIUXElement {
               )}
             </div>`
           : nothing}
+        ${selfHelp.fixedIncidents
+          ? html`<p class="text-sm text-text-secondary">
+              ${i18n.getMessage('Based on {0} similar issues our support team fixed.', selfHelp.fixedIncidents)}
+            </p>`
+          : nothing}
         ${this._stage === 'help'
           ? html`<div class="flex flex-wrap gap-2">
               <button type="button" class="aiux-btn aiux-btn-sm aiux-btn-success" @click=${() => (this._stage = 'fixed')}>
