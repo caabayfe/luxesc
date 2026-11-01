@@ -506,6 +506,10 @@ declare global {
                         table: 'sys_script_include'
                         id: 'e0c1ab8f88784a1cb96cae722072753b'
                     }
+                    'luxesc-es-002b124dca6d': {
+                        table: 'sys_ui_message'
+                        id: '755cf228043c4940ac99c5d1455f807c'
+                    }
                     'luxesc-es-01d26411d0ea': {
                         table: 'sys_ui_message'
                         id: '7b370435801e42018333155ba140832c'
@@ -538,6 +542,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '1bd3b2627d974c99ac2cf752e286e29d'
                     }
+                    'luxesc-es-0acddc8a217f': {
+                        table: 'sys_ui_message'
+                        id: '24484f1f60664ee486fb970f4dcf0053'
+                    }
                     'luxesc-es-0baa5dc0b3a7': {
                         table: 'sys_ui_message'
                         id: 'cc8ba071729d41d2879c622b257c8a41'
@@ -561,6 +569,10 @@ declare global {
                     'luxesc-es-0d8fb35ec479': {
                         table: 'sys_ui_message'
                         id: '82b56e26166744d1bb264f47f7a8e15d'
+                    }
+                    'luxesc-es-0d9d0df1102b': {
+                        table: 'sys_ui_message'
+                        id: '66ed91ca525b4b66a8a6d175b623b5ed'
                     }
                     'luxesc-es-10d7e23f84e5': {
                         table: 'sys_ui_message'
@@ -594,6 +606,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '4d9d57bffc22453b914d576c34088c2e'
                     }
+                    'luxesc-es-21617b847558': {
+                        table: 'sys_ui_message'
+                        id: '95008809eb5b424b8206d0b6f2d686a2'
+                    }
                     'luxesc-es-26eb89fb7b06': {
                         table: 'sys_ui_message'
                         id: 'c4899741a075441095a1cb5bc0b558ec'
@@ -602,9 +618,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: '4d74b64fa2684108a17469434960a3ac'
                     }
+                    'luxesc-es-2ef875b9bf67': {
+                        table: 'sys_ui_message'
+                        id: 'afa8751a63ae4e9bad3f8669d63bf63b'
+                    }
                     'luxesc-es-334e47713eee': {
                         table: 'sys_ui_message'
                         id: 'b91a89a0c73e4f3798d86f2dc40a1e45'
+                    }
+                    'luxesc-es-33e3274a1367': {
+                        table: 'sys_ui_message'
+                        id: '7577519d3d9044cbb1836805592e1562'
                     }
                     'luxesc-es-35b681a90767': {
                         table: 'sys_ui_message'
@@ -618,6 +642,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '5a6fd5aed59d4512a442a44c4c7b5ebb'
                     }
+                    'luxesc-es-39477affe14d': {
+                        table: 'sys_ui_message'
+                        id: '242f3e5f2ee54ac3bc593358090c3c10'
+                    }
                     'luxesc-es-39ebe4ee1197': {
                         table: 'sys_ui_message'
                         id: 'd0b6b063f45b4967b3547db232fc9039'
@@ -626,9 +654,21 @@ declare global {
                         table: 'sys_ui_message'
                         id: '0891778da68043f1986aa21c918b5db9'
                     }
+                    'luxesc-es-3c06d3f574ff': {
+                        table: 'sys_ui_message'
+                        id: '88ab9734ba6b4755b0762a2d66db2f5e'
+                    }
+                    'luxesc-es-3ce37f1321a1': {
+                        table: 'sys_ui_message'
+                        id: '29f7181175c4431686819a421e384c56'
+                    }
                     'luxesc-es-3d2fd182aefb': {
                         table: 'sys_ui_message'
                         id: '80df9929f86742c9b4924b1cba7ed412'
+                    }
+                    'luxesc-es-3d3dcceab4ec': {
+                        table: 'sys_ui_message'
+                        id: '33f82f5ea3ca436eba2e4910b681d41c'
                     }
                     'luxesc-es-3dc0fe587be3': {
                         table: 'sys_ui_message'
@@ -637,6 +677,10 @@ declare global {
                     'luxesc-es-3e96a394ef52': {
                         table: 'sys_ui_message'
                         id: '1ded670f061e45c7969fc33c5ce40f27'
+                    }
+                    'luxesc-es-4004b79de852': {
+                        table: 'sys_ui_message'
+                        id: '7d9337f815c24a21b3b90d2189c4f9d0'
                     }
                     'luxesc-es-40d45a3a8517': {
                         table: 'sys_ui_message'
@@ -666,6 +710,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '703c6a5905fa420a8e318e0c6ee2a2c0'
                     }
+                    'luxesc-es-464f838e36ff': {
+                        table: 'sys_ui_message'
+                        id: 'e6e79a7f5c484fc190dcc59494352d10'
+                    }
                     'luxesc-es-475634ddb3bb': {
                         table: 'sys_ui_message'
                         id: '32a5312e09f0456098c6cd0fda6d3832'
@@ -677,6 +725,10 @@ declare global {
                     'luxesc-es-4ca4b11b32c1': {
                         table: 'sys_ui_message'
                         id: '3c51e995cdb4414f80cfe584adccd912'
+                    }
+                    'luxesc-es-4d3c418a83de': {
+                        table: 'sys_ui_message'
+                        id: '29b35fd975604ad7a88af280b123bf8d'
                     }
                     'luxesc-es-4d66c1793252': {
                         table: 'sys_ui_message'
@@ -718,9 +770,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: '195ad156934745e4ae45874270dd6989'
                     }
+                    'luxesc-es-5cbd58404686': {
+                        table: 'sys_ui_message'
+                        id: '4fa4b06df2e847a6af5323d28c588bde'
+                    }
                     'luxesc-es-5de77552730c': {
                         table: 'sys_ui_message'
                         id: 'a7ff25e4a3ae44d4ba759d3214189c7f'
+                    }
+                    'luxesc-es-5e56e8a852b9': {
+                        table: 'sys_ui_message'
+                        id: 'ace3859e51d34c34a94cd5d51c896280'
                     }
                     'luxesc-es-5ef5732fb5c5': {
                         table: 'sys_ui_message'
@@ -750,9 +810,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: '6029c900858249368baea25bf831920b'
                     }
+                    'luxesc-es-65ca71b841bb': {
+                        table: 'sys_ui_message'
+                        id: 'a79522c6e805493c8c0d7bfdafd82e02'
+                    }
                     'luxesc-es-68511032243f': {
                         table: 'sys_ui_message'
                         id: '56c77289c4fd4157b6ca31910a197212'
+                    }
+                    'luxesc-es-68a7e39f7c91': {
+                        table: 'sys_ui_message'
+                        id: '33d568857069494db31f6cb35fb9671d'
                     }
                     'luxesc-es-6a446ef4725e': {
                         table: 'sys_ui_message'
@@ -769,6 +837,10 @@ declare global {
                     'luxesc-es-6d58768e1347': {
                         table: 'sys_ui_message'
                         id: '0ecd37684f62408c9cb4e81b2ed5d72f'
+                    }
+                    'luxesc-es-6e4d4efc910e': {
+                        table: 'sys_ui_message'
+                        id: 'd043f928e1cf4ceaa6cf01a6adca4a53'
                     }
                     'luxesc-es-6e8c67fac7d8': {
                         table: 'sys_ui_message'
@@ -790,6 +862,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'eed78665930849e6a8f665f8affda1a5'
                     }
+                    'luxesc-es-73733cd667b2': {
+                        table: 'sys_ui_message'
+                        id: '8eeba9d9a87f4ba3a97c495cef3454d8'
+                    }
                     'luxesc-es-743076460f20': {
                         table: 'sys_ui_message'
                         id: 'f7657321aa664d4bad3ccf8344f35b46'
@@ -797,6 +873,10 @@ declare global {
                     'luxesc-es-74f9ff67bac5': {
                         table: 'sys_ui_message'
                         id: '74be5a37444e4cceafd0d93614785ba2'
+                    }
+                    'luxesc-es-755844bc3946': {
+                        table: 'sys_ui_message'
+                        id: '4120e2d29e1a4607bf792d8b1e71d190'
                     }
                     'luxesc-es-75c153bdd622': {
                         table: 'sys_ui_message'
@@ -817,6 +897,10 @@ declare global {
                     'luxesc-es-788664686711': {
                         table: 'sys_ui_message'
                         id: 'fc78fc85960d40fd9df19732d2a4d593'
+                    }
+                    'luxesc-es-79601f3620c1': {
+                        table: 'sys_ui_message'
+                        id: '1b2467877de54433acfe8c99a9ca3a8c'
                     }
                     'luxesc-es-7b842a5746a4': {
                         table: 'sys_ui_message'
@@ -846,6 +930,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'd920e74ef6f048638bdf241347f31ad8'
                     }
+                    'luxesc-es-87ab90037e03': {
+                        table: 'sys_ui_message'
+                        id: '78d9319cdb584532ace6f629c849e8ec'
+                    }
                     'luxesc-es-887b47591534': {
                         table: 'sys_ui_message'
                         id: '6e14a2cbbcf741bf9a41d272c469e2c7'
@@ -857,6 +945,10 @@ declare global {
                     'luxesc-es-8bb0d48793af': {
                         table: 'sys_ui_message'
                         id: '67361f119247486399627f6b7638365f'
+                    }
+                    'luxesc-es-8cc047ac17d3': {
+                        table: 'sys_ui_message'
+                        id: '70b408b403d44f0bbc75639b75ec85fe'
                     }
                     'luxesc-es-8d4fdf225672': {
                         table: 'sys_ui_message'
@@ -894,9 +986,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: '3a8c82e298694c5280df1219a8f01ebd'
                     }
+                    'luxesc-es-9631af52c66f': {
+                        table: 'sys_ui_message'
+                        id: '9a42dae9d4ac4cb89192c7eed7b42fdb'
+                    }
                     'luxesc-es-967f91808aef': {
                         table: 'sys_ui_message'
                         id: '8b192da5eb464f669bfc5d03b2ca0486'
+                    }
+                    'luxesc-es-9a398df72f48': {
+                        table: 'sys_ui_message'
+                        id: '4b6066aec8614dbe8bed36ce10664d8a'
                     }
                     'luxesc-es-9a71b747297f': {
                         table: 'sys_ui_message'
@@ -942,6 +1042,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '8a6ef2ee90dd45e1bd30657c051a02db'
                     }
+                    'luxesc-es-a6f9f8ce894a': {
+                        table: 'sys_ui_message'
+                        id: '6cf2ffd8d8f1412281445fd20d5668f1'
+                    }
                     'luxesc-es-a734de00cca2': {
                         table: 'sys_ui_message'
                         id: 'ba7caec1c41e4367bc71fcc726789d0b'
@@ -957,6 +1061,10 @@ declare global {
                     'luxesc-es-ab4eef003af3': {
                         table: 'sys_ui_message'
                         id: '8371bd9a4e034e038ffe6c389456fcd0'
+                    }
+                    'luxesc-es-abc0ea9859b5': {
+                        table: 'sys_ui_message'
+                        id: '8bdea0c64f75421abc50a0776bf1c110'
                     }
                     'luxesc-es-ac1da7a07eba': {
                         table: 'sys_ui_message'
@@ -1009,6 +1117,10 @@ declare global {
                     'luxesc-es-b0829f956d43': {
                         table: 'sys_ui_message'
                         id: '2f2eead696944f21bf9115a033f612d0'
+                    }
+                    'luxesc-es-b12fcedc7bf1': {
+                        table: 'sys_ui_message'
+                        id: 'ac4ef1af5b4a41ff9856b07c9a75c598'
                     }
                     'luxesc-es-b215d3661cac': {
                         table: 'sys_ui_message'
@@ -1082,6 +1194,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '657d6ba81dd8410fa2c5b5ec458bc5a2'
                     }
+                    'luxesc-es-c52e42db58dd': {
+                        table: 'sys_ui_message'
+                        id: 'cb9553a03532419bbb6fc3c15a4d46c7'
+                    }
                     'luxesc-es-c5573c053079': {
                         table: 'sys_ui_message'
                         id: '3e9fadead49c4aa291ba17bd1b8b4abb'
@@ -1106,6 +1222,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'e0ca90d2a5ff4927bdadad69fb730366'
                     }
+                    'luxesc-es-ce787b9c3f46': {
+                        table: 'sys_ui_message'
+                        id: '822487dc48fe4fd3a9b9759960d6eead'
+                    }
                     'luxesc-es-d0355776d3e3': {
                         table: 'sys_ui_message'
                         id: '7c026e7f55c14039a9d9f7620ebc98ac'
@@ -1121,6 +1241,10 @@ declare global {
                     'luxesc-es-d2104735906e': {
                         table: 'sys_ui_message'
                         id: '5841d2fd74d2486f9d8e08c77f0b678d'
+                    }
+                    'luxesc-es-d2417b6449af': {
+                        table: 'sys_ui_message'
+                        id: '3f6ef17e71314bc29dd00e20509b713d'
                     }
                     'luxesc-es-d3714ed9cb02': {
                         table: 'sys_ui_message'
@@ -1149,6 +1273,10 @@ declare global {
                     'luxesc-es-ddd3996ad2dd': {
                         table: 'sys_ui_message'
                         id: '08c74e28fa6a490abee0e091ae921279'
+                    }
+                    'luxesc-es-ddd9480d2846': {
+                        table: 'sys_ui_message'
+                        id: 'e59ae70ff861491c8152f84444bbfa70'
                     }
                     'luxesc-es-deba442c1cda': {
                         table: 'sys_ui_message'
@@ -1194,9 +1322,17 @@ declare global {
                         table: 'sys_ui_message'
                         id: '6c1d3daa07b14f92ac727536b0a71b8b'
                     }
+                    'luxesc-es-e9b450d14bc2': {
+                        table: 'sys_ui_message'
+                        id: '3854795fb35a405db97261e9da9e0982'
+                    }
                     'luxesc-es-ed9c5ef53d6e': {
                         table: 'sys_ui_message'
                         id: 'd554d3452d3f43a3941919060f577f59'
+                    }
+                    'luxesc-es-ee2dbd5d6d82': {
+                        table: 'sys_ui_message'
+                        id: '822fead8a6d04ec0b135bd3d0119c420'
                     }
                     'luxesc-es-f14e8f550946': {
                         table: 'sys_ui_message'
@@ -1209,6 +1345,10 @@ declare global {
                     'luxesc-es-f422a546a65c': {
                         table: 'sys_ui_message'
                         id: '3453dfa54db84194ba5c0340b3a0788a'
+                    }
+                    'luxesc-es-f7ff9e8b7bb2': {
+                        table: 'sys_ui_message'
+                        id: 'bddfb601ea3742e7824fa40db9214209'
                     }
                     'luxesc-es-f8c24833126b': {
                         table: 'sys_ui_message'

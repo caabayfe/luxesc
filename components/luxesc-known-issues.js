@@ -1,8 +1,9 @@
 import {html, css, nothing, isServer} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 import {AIUXElement, getLogger} from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
+import {icon} from '@servicenow/aiux/aiux-directive-icon';
 import {callConcierge} from '../utils/agent-runs.js';
 
 const log = getLogger('luxesc-known-issues');
@@ -15,6 +16,8 @@ const log = getLogger('luxesc-known-issues');
  */
 @customElement('luxesc-known-issues')
 export class KnownIssues extends AIUXElement {
+  // Home tile ("Happening now") instead of the full-width alert strip
+  @property({type: Boolean}) tile = false;
   @state() _issues = [];
   // sysId of the issue awaiting confirmation, and of the one being joined
   @state() _confirming = '';
@@ -91,8 +94,33 @@ export class KnownIssues extends AIUXElement {
     </button>`;
   }
 
+  _renderTile() {
+    return html`<section class="aiux-card border border-warning bg-base-100 shadow-sm" aria-labelledby="known-issues-title">
+      <div class="aiux-card-body gap-2">
+        <h2 id="known-issues-title" class="aiux-card-title text-lg">
+          <span class="text-warning">${icon({name: 'triangle-exclamation', size: 'sm'})}</span>
+          ${i18n.getMessage('Happening now')}
+        </h2>
+        ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm" role="alert">${this._error}</div>` : nothing}
+        <ul class="flex flex-col divide-y divide-base-300">
+          ${this._issues.map(
+            issue => html`<li class="flex flex-col items-start gap-1 py-2">
+              <span class="break-words font-medium">${issue.title}</span>
+              <span class="text-sm text-text-secondary">${i18n.getMessage('Our team has been working on it since {0}', issue.since)}</span>
+              ${issue.update
+                ? html`<span class="line-clamp-2 break-words text-sm" title=${issue.update}>${i18n.getMessage('Latest update: {0}', issue.update)}</span>`
+                : nothing}
+              <div class="pt-1">${this._renderActions(issue)}</div>
+            </li>`
+          )}
+        </ul>
+      </div>
+    </section>`;
+  }
+
   render() {
     if (!this._issues.length) return nothing;
+    if (this.tile) return this._renderTile();
     return html`<section class="flex flex-col gap-2" aria-labelledby="known-issues-title">
       <h2 id="known-issues-title" class="text-sm font-semibold">${i18n.getMessage('Known issues right now')}</h2>
       ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm" role="alert">${this._error}</div>` : nothing}

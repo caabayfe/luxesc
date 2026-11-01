@@ -1,5 +1,5 @@
 import {html, css, nothing, isServer} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 import {AIUXElement, getLogger} from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
@@ -21,6 +21,9 @@ const ready = step => !step.missing.length;
  */
 @customElement('luxesc-planner')
 export class Planner extends AIUXElement {
+  // Inside the home command box: no card or form of its own, the box holds the text
+  @property({type: Boolean}) embedded = false;
+
   @state() _text = '';
   @state() _run = null;
   @state() _error = '';
@@ -330,6 +333,14 @@ export class Planner extends AIUXElement {
   render() {
     const run = this._run;
     const running = run?.state === 'running';
+    const status = html`<div role="status" aria-live="polite" class="flex flex-col gap-4">
+      ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>` : nothing}
+      ${run && (running || !run.briefing)
+        ? html`<luxesc-agent-steps .steps=${run.steps || []} ?running=${running} label=${i18n.getMessage('What the planner is doing')}></luxesc-agent-steps>`
+        : nothing}
+      ${run && !running ? this._renderPlan(run) : nothing}
+    </div>`;
+    if (this.embedded) return status;
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="planner-title">
       <div class="aiux-card-body gap-4">
         <div class="flex flex-wrap items-start justify-between gap-3">
@@ -345,13 +356,7 @@ export class Planner extends AIUXElement {
             ? html`<button type="button" class="aiux-btn aiux-btn-sm aiux-btn-ghost" @click=${this._reset}>${i18n.getMessage('Start over')}</button>`
             : nothing}
         </div>
-        <div role="status" aria-live="polite" class="flex flex-col gap-4">
-          ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>` : nothing}
-          ${run && (running || !run.briefing)
-            ? html`<luxesc-agent-steps .steps=${run.steps || []} ?running=${running} label=${i18n.getMessage('What the planner is doing')}></luxesc-agent-steps>`
-            : nothing}
-          ${run && !running ? this._renderPlan(run) : nothing}
-        </div>
+        ${status}
         ${run ? nothing : this._renderForm()}
       </div>
     </section>`;

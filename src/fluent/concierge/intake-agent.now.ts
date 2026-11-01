@@ -84,7 +84,7 @@ Step 2: Research. Always pass the run id.
 - For a known issue, still search knowledge for a workaround, but keep it short.
 
 Step 3: Decide.
-- selfHelp: only if an article or a fixed incident clearly applies, up to 6 short steps the employee can follow, grounded in that content. List the articles you used and give fixedIncidents, how many of the similar fixed incidents the steps rely on (0 if none). Otherwise null.
+- selfHelp: only if an article or a fixed incident clearly applies, up to 6 short steps the employee can follow, grounded in that content and written in the language the employee wrote in, even when the article is in another language. List the articles you used and give fixedIncidents, how many of the similar fixed incidents the steps rely on (0 if none). Otherwise null.
 - recommendation.type:
   - "catalog" when the employee needs something from the catalog and an item from the Search catalog tool fits.
   - "incident" when something is broken, even if there is self-help (it is raised only if self-help does not work).
