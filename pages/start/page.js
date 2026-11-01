@@ -17,7 +17,6 @@ import {chatContext} from '../../utils/chat.js';
 import '../../components/luxesc-command-box.js';
 import '../../components/luxesc-concierge.js';
 import '../../components/luxesc-known-issues.js';
-import '../../components/luxesc-on-its-way.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
 import {callConcierge} from '../../utils/agent-runs.js';
 
@@ -171,19 +170,40 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
     </section>`;
   }
 
+  // Categories as pills: a way in to the catalog that takes little room; the tile
+  // stretches so both columns of the row end together
+  _renderServices(categories) {
+    if (!categories.length) return nothing;
+    const base = this._basePath;
+    return html`<section class="aiux-card flex-1 border border-base-300 bg-base-100 shadow-sm" aria-labelledby="services-title">
+      <div class="aiux-card-body gap-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="services-title" class="aiux-card-title text-lg">${i18n.getMessage('Browse services')}</h2>
+          <a class="aiux-link aiux-link-primary text-sm" href="${base}/catalog">${i18n.getMessage('Full catalog')}</a>
+        </div>
+        <ul class="flex flex-wrap gap-2">
+          ${categories.slice(0, CATEGORY_COUNT).map(
+            c => html`<li>
+              <a class="aiux-btn aiux-btn-sm aiux-btn-outline h-auto min-h-8 max-w-full whitespace-normal py-1 text-start" href="${base}/catalog?category=${c.sys_id}">
+                ${c.title}
+              </a>
+            </li>`
+          )}
+        </ul>
+      </div>
+    </section>`;
+  }
+
   render() {
     const {categories = [], trending = []} = this.loaderData || {};
     const base = this._basePath;
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-6 p-4 lg:p-8">
       <h1 class="break-words text-3xl font-bold">${this._renderGreeting()}</h1>
+      <luxesc-known-issues></luxesc-known-issues>
       <luxesc-command-box .basePath=${base} .suggestions=${this._suggestions}></luxesc-command-box>
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="flex min-w-0 flex-col gap-6 lg:col-span-2">
-          <luxesc-concierge compact .basePath=${base}></luxesc-concierge>
-          <luxesc-on-its-way .basePath=${base}></luxesc-on-its-way>
-        </div>
+        <luxesc-concierge class="min-w-0 lg:col-span-2" .basePath=${base}></luxesc-concierge>
         <div class="flex min-w-0 flex-col gap-6">
-          <luxesc-known-issues tile></luxesc-known-issues>
           ${this._renderLinks({
             id: 'trending-title',
             heading: i18n.getMessage('Trending'),
@@ -199,12 +219,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
             })),
             more: {href: `${base}/knowledge`, label: i18n.getMessage('All answers')}
           })}
-          ${this._renderLinks({
-            id: 'services-title',
-            heading: i18n.getMessage('Browse services'),
-            rows: categories.slice(0, CATEGORY_COUNT).map(c => ({href: `${base}/catalog?category=${c.sys_id}`, title: c.title})),
-            more: {href: `${base}/catalog`, label: i18n.getMessage('View the full catalog')}
-          })}
+          ${this._renderServices(categories)}
         </div>
       </div>
     </div>`;

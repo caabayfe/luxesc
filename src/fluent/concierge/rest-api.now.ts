@@ -95,6 +95,16 @@ const viewScript = `(function process(request, response) {
     response.setBody({ recorded: new x_everi_luxesc.LuxEscKnowledge().recordView(request.pathParams.article) });
 })(request, response);`
 
+const journeyScript = `(function process(request, response) {
+    var journey = new x_everi_luxesc.LuxEscConcierge().journey(request.pathParams.task);
+    if (!journey) {
+        response.setStatus(404);
+        response.setBody({ error: { message: 'Not found' } });
+        return;
+    }
+    response.setBody({ journey: journey });
+})(request, response);`
+
 const latestScript = `(function process(request, response) {
     var run = new x_everi_luxesc.LuxEscConcierge().latest() || {};
     if (run === null) {
@@ -117,7 +127,7 @@ const traceScript = `(function process(request, response) {
 
 // URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes,
 // /runs/{run}/fixed, /intake, /plans, /known-issues, /known-issues/{issue}/follow,
-// /knowledge/trending, /knowledge/{article}/view
+// /knowledge/trending, /knowledge/{article}/view, /journey/{task}
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -208,6 +218,15 @@ export const conciergeApi = RestApi({
             script: viewScript,
             version: 1,
             shortDescription: 'Record that the employee opened a knowledge article (kb.view event)',
+        },
+        {
+            $id: Now.ID['concierge-api-journey'],
+            name: 'record journey',
+            method: 'GET',
+            path: '/journey/{task}',
+            script: journeyScript,
+            version: 1,
+            shortDescription: 'What happened to a request or incident, where it is now and what comes next',
         },
         {
             $id: Now.ID['concierge-api-latest'],

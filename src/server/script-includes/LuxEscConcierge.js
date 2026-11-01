@@ -188,9 +188,134 @@ LuxEscConcierge.prototype = {
             }),
         };
         this._addMissingRequests(runId, clean.items);
+        this._addStatus(clean.items);
         run.setValue('briefing', JSON.stringify(clean));
         run.update();
         return 'Briefing saved with ' + clean.items.length + ' items';
+    },
+
+    // Each record's plain-language status ("Being prepared by Software", "Waiting for your
+    // reply") and whether it is late, from its journey, for the briefing's rows
+    _addStatus: function (items) {
+        var self = this;
+        items.forEach(function (item) {
+            var journey = item.sysId ? self.journey(item.sysId) : null;
+            if (!journey) return;
+            item.status = journey.status;
+            item.attention = journey.attention;
+        });
+    },
+
+    // ---- Journey -----------------------------------------------------------------------------
+
+    // What happened to a request or incident so far, where it is now and what comes next, from
+    // the record's own fields (stage, approvals, assignment, due date, resolution), read with the
+    // employee's access. Steps: {label, at, state: done|current|next, tone: warning|error}.
+    journey: function (taskId) {
+        var task = new GlideRecordSecure('task');
+        if (!/^[0-9a-f]{32}$/.test(String(taskId)) || !task.get(taskId)) return null;
+        var record = new GlideRecordSecure(task.getRecordClassName());
+        if (!record.get(taskId)) return null;
+        var steps = record.getRecordClassName() === 'sc_req_item' ? this._itemSteps(record) : this._taskSteps(record);
+        var current = steps.filter(function (step) {
+            return step.state === 'current';
+        })[0];
+        var late = steps.filter(function (step) {
+            return step.state === 'next' && step.tone === 'warning';
+        })[0];
+        return {
+            steps: steps,
+            update: this._lastUpdate(record),
+            status: current ? current.label + (late ? ' · ' + late.short : '') : '',
+            attention: !!(late || (current && current.tone)),
+        };
+    },
+
+    _itemSteps: function (item) {
+        var steps = [{ label: gs.getMessage('Requested'), at: item.getDisplayValue('opened_at'), state: 'done' }];
+        var stage = item.getValue('stage') || '';
+        var approval = item.getValue('approval');
+        var group = item.getDisplayValue('assignment_group');
+        if (item.getValue('active') !== '1') {
+            steps.push({ label: gs.getMessage('Closed'), at: item.getDisplayValue('closed_at'), state: 'done' });
+            return steps;
+        }
+        if (approval === 'rejected') {
+            steps.push({ label: gs.getMessage('Rejected'), state: 'current', tone: 'error' });
+            return steps;
+        }
+        if (approval === 'approved') {
+            steps.push({ label: gs.getMessage('Approved'), at: this._approvedOn(item), state: 'done' });
+        } else if (approval === 'requested' || /approv/.test(stage)) {
+            steps.push({ label: gs.getMessage('Waiting for approval'), state: 'current' });
+        }
+        if (/deliver/.test(stage)) {
+            steps.push({ label: gs.getMessage('Prepared'), state: 'done' });
+            steps.push({ label: gs.getMessage('On its way to you'), state: 'current' });
+        } else if (!/approv/.test(stage) || approval === 'approved') {
+            steps.push({
+                label: group ? gs.getMessage('Being prepared by {0}', group) : gs.getMessage('Being prepared'),
+                state: 'current',
+            });
+        }
+        var due = item.getValue('due_date');
+        if (due) {
+            var late = Math.floor(GlideDateTime.subtract(new GlideDateTime(due), new GlideDateTime()).getNumericValue() / 86400000);
+            var date = item.getDisplayValue('due_date').split(' ')[0];
+            steps.push(late >= 1
+                ? { label: gs.getMessage('Expected {0}', date), short: gs.getMessage('{0} days late', String(late)), state: 'next', tone: 'warning' }
+                : { label: gs.getMessage('Expected {0}', date), state: 'next' });
+        }
+        return steps;
+    },
+
+    // Incidents and other tasks: opened, who has it, and resolution (state values are the OOB ones)
+    _taskSteps: function (task) {
+        var steps = [{ label: gs.getMessage('Opened'), at: task.getDisplayValue('opened_at'), state: 'done' }];
+        var group = task.getDisplayValue('assignment_group');
+        var state = task.getValue('state');
+        var withGroup = group ? gs.getMessage('With {0}', group) : '';
+        if (state === '6') {
+            if (withGroup) steps.push({ label: withGroup, state: 'done' });
+            steps.push({ label: gs.getMessage('Resolved'), at: task.getDisplayValue('resolved_at'), state: 'done' });
+            steps.push({ label: gs.getMessage('Waiting for you to confirm the fix'), state: 'current', tone: 'warning' });
+        } else if (task.getValue('active') !== '1') {
+            if (withGroup) steps.push({ label: withGroup, state: 'done' });
+            steps.push({ label: gs.getMessage('Closed'), at: task.getDisplayValue('closed_at'), state: 'done' });
+        } else if (state === '3') {
+            // On hold awaiting the caller (hold_reason 1) needs the employee
+            var waitingOnYou = task.isValidField('hold_reason') && task.getValue('hold_reason') === '1';
+            steps.push(waitingOnYou
+                ? { label: gs.getMessage('Waiting for your reply'), state: 'current', tone: 'warning' }
+                : { label: gs.getMessage('On hold'), state: 'current' });
+        } else if (state === '1') {
+            steps.push({ label: withGroup || gs.getMessage('Waiting to be picked up'), state: 'current' });
+        } else {
+            steps.push({ label: group ? gs.getMessage('Being worked on by {0}', group) : gs.getMessage('Being worked on'), state: 'current' });
+        }
+        return steps;
+    },
+
+    // When the item, or the request it belongs to, was last approved
+    _approvedOn: function (item) {
+        var approval = new GlideRecord('sysapproval_approver');
+        approval.addQuery('sysapproval', 'IN', [item.getUniqueValue(), item.getValue('request')].join(','));
+        approval.addQuery('state', 'approved');
+        approval.orderByDesc('sys_updated_on');
+        approval.setLimit(1);
+        approval.query();
+        return approval.next() ? approval.getDisplayValue('sys_updated_on') : '';
+    },
+
+    // The latest comment the employee can see (not work notes)
+    _lastUpdate: function (task) {
+        var journal = new GlideRecord('sys_journal_field');
+        journal.addQuery('element_id', task.getUniqueValue());
+        journal.addQuery('element', 'comments');
+        journal.orderByDesc('sys_created_on');
+        journal.setLimit(1);
+        journal.query();
+        return journal.next() ? { text: String(journal.getValue('value')).substring(0, 300), at: journal.getDisplayValue('sys_created_on') } : null;
     },
 
     // Every open catalog request belongs in the briefing; the ones the agent left out are

@@ -5,20 +5,12 @@ import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
 import {icon} from '@servicenow/aiux/aiux-directive-icon';
 import '@servicenow/aiux/aiux-components-tabs';
-import {GIVE_UP_MS, POLL_MS, callRuns} from '../utils/agent-runs.js';
+import {GIVE_UP_MS, POLL_MS, callConcierge, callRuns} from '../utils/agent-runs.js';
 import {addComment, updateRecord} from '../utils/api.js';
 import {askAssistant} from './luxesc-ask.js';
 import './luxesc-agent-steps.js';
 
 const log = getLogger('luxesc-concierge');
-
-const KIND_BADGE = {
-  approval: 'aiux-badge-warning',
-  action: 'aiux-badge-error',
-  stale: 'aiux-badge-warning',
-  progress: 'aiux-badge-info',
-  done: 'aiux-badge-success'
-};
 
 function kindLabel(kind) {
   return (
@@ -64,19 +56,19 @@ const ACTIONS = {
   }
 };
 
-// The briefing's tabs, most urgent first; kinds the agent invents land in On track
+// The briefing's two tabs: what waits on the employee, and everything else that is moving
+const NEED_KINDS = ['approval', 'action', 'done'];
 const GROUPS = [
-  {id: 'need', kinds: ['approval', 'action', 'done'], label: count => i18n.getMessage('Need you ({0})', count)},
-  {id: 'stale', kinds: ['stale'], label: count => i18n.getMessage('No recent update ({0})', count)},
-  {id: 'track', kinds: [], label: count => i18n.getMessage('On track ({0})', count)}
+  {id: 'need', label: count => i18n.getMessage('Needs you ({0})', count)},
+  {id: 'progress', label: count => i18n.getMessage('In progress ({0})', count)}
 ];
-const groupOf = item => (GROUPS.find(group => group.kinds.includes(item.kind)) || GROUPS[2]).id;
+const groupOf = item => (NEED_KINDS.includes(item.kind) ? 'need' : 'progress');
 
 // Shown on the row; the others (Still not fixed) wait in the item's details
 const ROW_ACTIONS = ['approve', 'reject', 'close', 'comment'];
 
-// Items shown on the home tile; the rest wait behind "See all"
-const COMPACT_ITEMS = 4;
+// Colour of the row's status dot
+const KIND_TONE = {approval: 'bg-warning', action: 'bg-error', done: 'bg-success', stale: 'bg-warning'};
 
 function actionLabel(action) {
   return {
@@ -100,15 +92,15 @@ const itemKey = item => item.approvalId || item.sysId || item.title;
 
 /**
  * The Employee Concierge: runs the custom AI agent that reviews the
- * employee's requests and approvals and shows the briefing as tabs (Need you,
- * No recent update, On track) of one-line items with their main action; the
- * detail, other actions and a question for the assistant open on demand.
+ * employee's requests and approvals and shows the briefing as two tabs (Needs
+ * you, In progress). Each row says in plain words where the record is ("Being
+ * prepared · 2 days late") with its main action; opening it shows the record's
+ * journey (the milestones it actually went through, where it is now and what
+ * comes next), the latest update, the agent's explanation and other actions.
  */
 @customElement('luxesc-concierge')
 export class Concierge extends AIUXElement {
   @property({type: String}) basePath = '';
-  // Home tile: only the items that need the employee, with their actions
-  @property({type: Boolean}) compact = false;
 
   @state() _run = null;
   // The last finished run, still shown while a refresh is running
@@ -120,6 +112,8 @@ export class Concierge extends AIUXElement {
   @state() _error = '';
   // The action being confirmed: {key, action, comment, busy, error}
   @state() _pending = null;
+  // Journeys read when an item is opened, by item key: the journey, 'loading' or 'error'
+  @state() _journeys = {};
 
   _timer = null;
   _startedAt = 0;
@@ -163,6 +157,7 @@ export class Concierge extends AIUXElement {
       this._pending = null;
       this._expanded = '';
       this._tab = '';
+      this._journeys = {};
       this._startedAt = Date.now();
       if (this._run?.state === 'running') this._poll();
     } catch (error) {
@@ -293,11 +288,92 @@ export class Concierge extends AIUXElement {
     </button>`;
   }
 
+  _toggle(item) {
+    const key = itemKey(item);
+    if (this._expanded === key) {
+      this._expanded = '';
+      return;
+    }
+    this._expanded = key;
+    if (item.sysId && (!this._journeys[key] || this._journeys[key] === 'error')) this._loadJourney(item, key);
+  }
+
+  async _loadJourney(item, key) {
+    this._journeys = {...this._journeys, [key]: 'loading'};
+    try {
+      const result = await callConcierge(`/journey/${item.sysId}`);
+      this._journeys = {...this._journeys, [key]: result?.journey || null};
+    } catch (error) {
+      log.warn({error: error.message}, 'Journey unavailable');
+      this._journeys = {...this._journeys, [key]: 'error'};
+    }
+  }
+
+  _renderMarker(step) {
+    if (step.state === 'done') return html`<span class="text-success">${icon({name: 'circle-check', size: 'sm'})}</span>`;
+    if (step.state === 'current') {
+      return html`<span class=${step.tone === 'warning' ? 'text-warning' : 'text-info'}>${icon({name: 'circle-half', size: 'sm'})}</span>`;
+    }
+    return step.tone === 'warning'
+      ? html`<span class="text-warning">${icon({name: 'calendar-triangle-exclamation', size: 'sm'})}</span>`
+      : html`<span class="text-text-secondary">${icon({name: 'circle-dashed', size: 'sm'})}</span>`;
+  }
+
+  // The milestones the record really went through, where it is now and what comes next
+  _renderJourney(item, journey) {
+    const steps = journey.steps || [];
+    const stateLabel = {done: i18n.getMessage('Done'), current: i18n.getMessage('Now'), next: i18n.getMessage('Next')};
+    // A connector is filled when the step it leads to has been reached; the theme's
+    // connector is taller and has margins, which split the line on a compact list
+    const line = step => html`<hr class="m-0! h-auto! min-h-2! self-stretch ${step.state === 'next' ? 'bg-base-300' : 'bg-success'}" />`;
+    return html`<ol class="aiux-timeline aiux-timeline-vertical aiux-timeline-compact" aria-label=${i18n.getMessage('Progress of {0}', item.title)}>
+      ${steps.map(
+        (step, index) => html`<li aria-current=${step.state === 'current' ? 'step' : 'false'}>
+          ${index ? line(step) : nothing}
+          <div class="aiux-timeline-middle">${this._renderMarker(step)}</div>
+          <div class="aiux-timeline-end flex flex-col pb-3 ps-1">
+            <span class="sr-only">${stateLabel[step.state]}:</span>
+            <span class="text-sm ${step.state === 'current' ? 'font-semibold' : step.state === 'next' ? 'text-text-secondary' : ''}">${step.label}</span>
+            ${step.at || step.short
+              ? html`<span class="text-xs ${step.tone === 'warning' ? 'font-medium' : 'text-text-secondary'}">
+                  ${[step.at, step.short].filter(Boolean).join(' · ')}
+                </span>`
+              : nothing}
+          </div>
+          ${index < steps.length - 1 ? line(steps[index + 1]) : nothing}
+        </li>`
+      )}
+    </ol>`;
+  }
+
+  _renderJourneyArea(item) {
+    if (!item.sysId) return nothing;
+    const journey = this._journeys[itemKey(item)];
+    if (journey === 'loading' || journey === undefined) {
+      return html`<div class="flex flex-col gap-2 py-1" aria-hidden="true">
+        <div class="aiux-skeleton h-4 w-1/2"></div>
+        <div class="aiux-skeleton h-4 w-1/3"></div>
+        <div class="aiux-skeleton h-4 w-2/5"></div>
+      </div>`;
+    }
+    if (journey === 'error' || !journey) {
+      return html`<p class="text-sm text-text-secondary">${i18n.getMessage('The progress of this record could not be loaded.')}</p>`;
+    }
+    return html`${this._renderJourney(item, journey)}
+      ${journey.update
+        ? html`<figure class="m-0 flex max-w-full flex-col items-start gap-1 border-s-2 border-base-300 ps-3">
+            <figcaption class="text-xs text-text-secondary">${i18n.getMessage('Latest update · {0}', journey.update.at)}</figcaption>
+            <blockquote class="m-0 line-clamp-3 break-words text-sm">${journey.update.text}</blockquote>
+          </figure>`
+        : nothing}`;
+  }
+
   _renderDetails(item, id) {
     const more = ACTIONS[item.outcome] || this._pending?.key === itemKey(item)
       ? []
       : actionsFor(item).filter(action => !ROW_ACTIONS.includes(action));
-    return html`<div id=${id} class="flex flex-col items-start gap-2 ps-1">
+    return html`<div id=${id} class="flex flex-col items-start gap-3 ps-1">
+      ${this._renderJourneyArea(item)}
       ${item.detail ? html`<p class="max-w-full break-words text-sm text-text-secondary">${item.detail}</p>` : nothing}
       ${more.length || item.sysId
         ? html`<div class="flex flex-wrap items-center gap-2">
@@ -321,18 +397,27 @@ export class Concierge extends AIUXElement {
     </div>`;
   }
 
+  // Where the record is, in plain words: what the employee must do, or where it is in its journey
+  _renderStatus(item) {
+    const need = groupOf(item) === 'need';
+    const text = need ? kindLabel(item.kind) : item.status || kindLabel(item.kind);
+    const tone = need ? KIND_TONE[item.kind] : item.attention || item.kind === 'stale' ? 'bg-warning' : 'bg-info';
+    return html`<span class="flex min-w-0 items-center gap-2 text-sm">
+      <span class="size-2 shrink-0 rounded-full ${tone}" aria-hidden="true"></span>
+      <span class="truncate ${need || item.attention ? 'font-medium' : 'text-text-secondary'}">${text}</span>
+      ${item.number ? html`<span class="shrink-0 text-text-secondary">· ${item.number}</span>` : nothing}
+    </span>`;
+  }
+
   _renderRow(item, index) {
     const key = itemKey(item);
     const expanded = this._expanded === key;
     const detailsId = `concierge-item-${index}`;
-    return html`<li class="flex flex-col gap-2 py-3">
+    return html`<li class="flex flex-col gap-3 py-3">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <div class="flex min-w-0 flex-1 basis-64 items-center gap-2">
-          <span class="aiux-badge aiux-badge-sm aiux-badge-soft shrink-0 ${KIND_BADGE[item.kind] || 'aiux-badge-info'}">
-            ${kindLabel(item.kind)}
-          </span>
-          ${item.number ? html`<span class="shrink-0 text-sm text-text-secondary">${item.number}</span>` : nothing}
+        <div class="flex min-w-0 flex-1 basis-64 flex-col gap-0.5">
           <span class="min-w-0 font-medium ${expanded ? 'break-words' : 'truncate'}" title=${item.title}>${item.title}</span>
+          ${this._renderStatus(item)}
         </div>
         <div class="flex flex-wrap items-center gap-2">
           ${this._renderRowActions(item)}
@@ -343,7 +428,7 @@ export class Concierge extends AIUXElement {
             aria-controls=${detailsId}
             aria-label=${expanded ? i18n.getMessage('Hide details') : i18n.getMessage('Show details')}
             title=${expanded ? i18n.getMessage('Hide details') : i18n.getMessage('Show details')}
-            @click=${() => (this._expanded = expanded ? '' : key)}
+            @click=${() => this._toggle(item)}
           >
             ${icon({name: expanded ? 'chevron-up-outline' : 'chevron-down-outline', size: 'sm'})}
           </button>
@@ -355,36 +440,35 @@ export class Concierge extends AIUXElement {
   }
 
   _renderResult(run) {
-    if (run.state === 'failed') {
+    if (run.state === 'failed' || !run.briefing) {
       return html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">
         ${i18n.getMessage('The concierge could not finish your briefing. Try again.')}
       </div>`;
     }
     const briefing = run.briefing;
-    if (!briefing) return nothing;
     const items = briefing.items || [];
-    const groups = GROUPS.map(group => ({...group, items: items.filter(item => groupOf(item) === group.id)})).filter(
-      group => group.items.length
-    );
-    const active = groups.find(group => group.id === this._tab) || groups[0];
-    return html`<p class="max-w-full break-words font-medium">${briefing.headline}</p>
-      ${groups[0]?.id !== 'need' ? html`<p class="text-sm text-text-secondary">${i18n.getMessage('Nothing needs you right now.')}</p>` : nothing}
-      ${active
-        ? html`<aiux-tab-group
-              variant="bordered"
-              size="sm"
-              tablist-label=${i18n.getMessage('Briefing groups')}
-              .tabs=${groups.map(group => ({id: group.id, label: group.label(group.items.length)}))}
-              .activeTab=${active.id}
-              @aiux-tab-group:tab-change=${e => {
-                this._tab = e.detail.id;
-                this._expanded = '';
-              }}
-            ></aiux-tab-group>
-            <ul class="flex flex-col divide-y divide-base-300" aria-label=${active.label(active.items.length)}>
-              ${active.items.map((item, index) => this._renderRow(item, index))}
-            </ul>`
-        : nothing}`;
+    const groups = GROUPS.map(group => ({...group, items: items.filter(item => groupOf(item) === group.id)}));
+    // Both tabs always show, so the tile keeps its shape; it opens on the one that has something
+    const active = groups.find(group => group.id === this._tab) || groups.find(group => group.items.length) || groups[0];
+    return html`<p class="max-w-full break-words text-sm">${briefing.headline}</p>
+      <aiux-tab-group
+        variant="bordered"
+        size="sm"
+        tablist-label=${i18n.getMessage('Briefing groups')}
+        .tabs=${groups.map(group => ({id: group.id, label: group.label(group.items.length)}))}
+        .activeTab=${active.id}
+        @aiux-tab-group:tab-change=${e => {
+          this._tab = e.detail.id;
+          this._expanded = '';
+        }}
+      ></aiux-tab-group>
+      ${active.items.length
+        ? html`<ul class="flex flex-col divide-y divide-base-300" aria-label=${active.label(active.items.length)}>
+            ${active.items.map((item, index) => this._renderRow(item, index))}
+          </ul>`
+        : html`<p class="py-2 text-sm text-text-secondary">
+            ${active.id === 'need' ? i18n.getMessage('Nothing needs you right now.') : i18n.getMessage('Nothing else is in progress.')}
+          </p>`}`;
   }
 
   _renderProgress(run) {
@@ -396,146 +480,58 @@ export class Concierge extends AIUXElement {
     </details>`;
   }
 
-  _renderCompactBody(run, shown) {
-    const running = run?.state === 'running';
+  _renderBody(run, shown) {
     if (!run) {
       return html`<button type="button" class="aiux-btn aiux-btn-primary aiux-btn-sm self-start" ?disabled=${this._loading} @click=${this._start}>
         ${i18n.getMessage('Brief me')}
       </button>`;
     }
-    if (running && !this._previous) {
+    if (run.state === 'running' && !this._previous) {
       return html`${this._renderProgress(run)}
         <div class="flex flex-col gap-2" aria-hidden="true">
-          <div class="aiux-skeleton h-10 w-full"></div>
-          <div class="aiux-skeleton h-10 w-full"></div>
+          <div class="aiux-skeleton h-8 w-1/2"></div>
+          <div class="aiux-skeleton h-12 w-full"></div>
+          <div class="aiux-skeleton h-12 w-full"></div>
         </div>`;
     }
-    if (shown.state === 'failed' || !shown.briefing) {
-      return html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">
-        ${i18n.getMessage('The concierge could not finish your briefing. Try again.')}
-      </div>`;
-    }
-    const items = (shown.briefing.items || []).filter(item => groupOf(item) === 'need');
-    const others = (shown.briefing.items || []).length - items.length;
-    return html`${running ? this._renderProgress(run) : nothing}
-      ${items.length
-        ? html`<ul class="flex flex-col divide-y divide-base-300">
-            ${items.slice(0, COMPACT_ITEMS).map((item, index) => this._renderRow(item, index))}
-          </ul>`
-        : html`<p class="py-2 text-sm text-text-secondary">
-            ${others
-              ? i18n.getMessage('Nothing needs you right now. {0} other things are on track.', others)
-              : i18n.getMessage('Nothing needs you right now.')}
-          </p>`}
-      ${items.length > COMPACT_ITEMS
-        ? html`<a class="aiux-link aiux-link-primary self-start text-sm" href="${this.basePath}/requests">
-            ${i18n.getMessage('See all ({0})', items.length)}
-          </a>`
-        : nothing}`;
-  }
-
-  _renderCompact() {
-    const run = this._run;
-    const running = run?.state === 'running';
-    const shown = running && this._previous ? this._previous : run;
-    const count = shown?.briefing ? (shown.briefing.items || []).filter(item => groupOf(item) === 'need').length : 0;
-    return html`<section class="aiux-card h-full border border-base-300 bg-base-100 shadow-sm" aria-labelledby="concierge-title">
-      <div class="aiux-card-body gap-2">
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex min-w-0 flex-col">
-            <h2 id="concierge-title" class="aiux-card-title text-lg">
-              ${count ? i18n.getMessage('Needs you · {0}', count) : i18n.getMessage('Needs you')}
-            </h2>
-            ${shown?.startedOn && shown.state !== 'running'
-              ? html`<p class="text-xs text-text-secondary">${i18n.getMessage('Checked by an AI agent at {0}', shown.startedOn)}</p>`
-              : nothing}
-          </div>
-          ${run
-            ? html`<button
-                type="button"
-                class="aiux-btn aiux-btn-sm aiux-btn-ghost aiux-btn-square"
-                aria-label=${i18n.getMessage('Refresh my briefing')}
-                title=${i18n.getMessage('Refresh my briefing')}
-                ?disabled=${this._loading || running}
-                @click=${this._start}
-              >
-                ${running || this._loading
-                  ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
-                  : icon({name: 'rotate-clockwise', size: 'sm'})}
-              </button>`
-            : nothing}
-        </div>
-        <div role="status" aria-live="polite" class="flex flex-col gap-2">
-          ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>` : nothing}
-          ${this._renderCompactBody(run, shown)}
-        </div>
-      </div>
-    </section>`;
+    return html`${run.state === 'running' ? this._renderProgress(run) : nothing} ${this._renderResult(shown)}`;
   }
 
   render() {
-    if (this.compact) return this._renderCompact();
     const run = this._run;
     const running = run?.state === 'running';
     // While refreshing, the previous briefing stays and the agent's steps fold away
     const shown = running && this._previous ? this._previous : run;
-    return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="concierge-title">
+    return html`<section class="aiux-card h-full border border-base-300 bg-base-100 shadow-sm" aria-labelledby="concierge-title">
       <div class="aiux-card-body gap-3">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex min-w-0 flex-col gap-1">
-            <h2 id="concierge-title" class="aiux-card-title text-xl">${i18n.getMessage('Your concierge')}</h2>
-            <p class="text-sm text-text-secondary">
-              ${shown?.startedOn && shown.state !== 'running'
-                ? i18n.getMessage('An AI agent reviewed your requests and approvals at {0}.', shown.startedOn)
-                : i18n.getMessage('An AI agent reviews your requests and approvals and tells you what needs you.')}
-            </p>
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex min-w-0 flex-col">
+            <h2 id="concierge-title" class="aiux-card-title text-lg">${i18n.getMessage('Your requests and approvals')}</h2>
+            ${shown?.startedOn && shown.state !== 'running'
+              ? html`<p class="text-xs text-text-secondary">${i18n.getMessage('Checked by an AI agent at {0}', shown.startedOn)}</p>`
+              : nothing}
           </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <a class="aiux-link aiux-link-primary text-sm" href="${this.basePath}/requests">
-              ${i18n.getMessage('View all requests')}
-            </a>
-            <button
-              type="button"
-              class="aiux-btn aiux-btn-sm ${run ? 'aiux-btn-outline' : 'aiux-btn-primary'}"
-              ?disabled=${this._loading || running}
-              @click=${this._start}
-            >
-              ${running || this._loading
-                ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
-                : nothing}
-              ${run ? i18n.getMessage('Refresh my briefing') : i18n.getMessage('Brief me')}
-            </button>
+          <div class="flex shrink-0 items-center gap-2">
+            <a class="aiux-link aiux-link-primary text-sm" href="${this.basePath}/requests">${i18n.getMessage('View all')}</a>
+            ${run
+              ? html`<button
+                  type="button"
+                  class="aiux-btn aiux-btn-sm aiux-btn-ghost aiux-btn-square"
+                  aria-label=${i18n.getMessage('Refresh my briefing')}
+                  title=${i18n.getMessage('Refresh my briefing')}
+                  ?disabled=${this._loading || running}
+                  @click=${this._start}
+                >
+                  ${running || this._loading
+                    ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
+                    : icon({name: 'rotate-clockwise', size: 'sm'})}
+                </button>`
+              : nothing}
           </div>
         </div>
         <div role="status" aria-live="polite" class="flex flex-col gap-3">
-          ${this._error
-            ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>`
-            : nothing}
-          ${running
-            ? html`<details class="text-sm">
-                  <summary class="cursor-pointer">
-                    ${this._previous ? i18n.getMessage('Refreshing your briefing…') : i18n.getMessage('Preparing your briefing…')}
-                  </summary>
-                  <luxesc-agent-steps
-                    .steps=${run.steps || []}
-                    running
-                    label=${i18n.getMessage('What the concierge is doing')}
-                  ></luxesc-agent-steps>
-                </details>
-                ${this._previous
-                  ? nothing
-                  : html`<div class="flex flex-col gap-2" aria-hidden="true">
-                      <div class="aiux-skeleton h-5 w-3/4"></div>
-                      <div class="aiux-skeleton h-10 w-full"></div>
-                      <div class="aiux-skeleton h-10 w-full"></div>
-                    </div>`}`
-            : run && !run.briefing
-              ? html`<luxesc-agent-steps
-                  .steps=${run.steps || []}
-                  label=${i18n.getMessage('What the concierge is doing')}
-                ></luxesc-agent-steps>`
-              : nothing}
-          ${shown && shown.state !== 'running' ? this._renderResult(shown) : nothing}
+          ${this._error ? html`<div class="aiux-alert aiux-alert-warning aiux-alert-soft text-sm">${this._error}</div>` : nothing}
+          ${this._renderBody(run, shown)}
         </div>
       </div>
     </section>`;

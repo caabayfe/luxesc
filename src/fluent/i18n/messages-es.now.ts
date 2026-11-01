@@ -9,6 +9,60 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-68511032243f'],
+    table: 'sys_ui_message',
+    data: { key: "{0} - Employee Center", message: "{0} - Centro para empleados", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-155a03dab471'],
+    table: 'sys_ui_message',
+    data: { key: "{0} — picked {1}. Also matching: {2}.", message: "{0}: se eligió {1}. También coinciden: {2}.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-b6e370fd9a7a'],
+    table: 'sys_ui_message',
+    data: { key: "{0} · {1} · Updated {2}", message: "{0} · {1} · Actualizado {2}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-d3714ed9cb02'],
+    table: 'sys_ui_message',
+    data: { key: "{0} · Opened {1} · Updated {2}", message: "{0} · Abierto {1} · Actualizado {2}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-6197b73f8ec0'],
+    table: 'sys_ui_message',
+    data: { key: "{0} · our team has been working on it since {1}", message: "{0} · nuestro equipo trabaja en ello desde {1}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-3d2fd182aefb'],
+    table: 'sys_ui_message',
+    data: { key: "{0} colleagues reported something similar in the last few hours, so the service desk is likely already on it.", message: "{0} compañeros han notificado algo similar en las últimas horas, así que probablemente el service desk ya esté en ello.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-65ca71b841bb'],
+    table: 'sys_ui_message',
+    data: { key: "{0} days late", message: "{0} días de retraso", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-8bfc1419dbe0'],
+    table: 'sys_ui_message',
+    data: { key: "{0} views this month", message: "{0} visitas este mes", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-4d3c418a83de'],
+    table: 'sys_ui_message',
+    data: { key: "{0}: {1}", message: "{0}: {1}", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-8da8093005b6'],
     table: 'sys_ui_message',
     data: { key: "1 view this month", message: "1 visita este mes", language: 'es' },
@@ -75,6 +129,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-41b81eb8db1b'],
+    table: 'sys_ui_message',
+    data: { key: "Approved", message: "Aprobado", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-0baa5dc0b3a7'],
     table: 'sys_ui_message',
     data: { key: "Approved.", message: "Aprobada.", language: 'es' },
@@ -114,6 +174,30 @@ Record({
     $id: Now.ID['luxesc-es-7e1eb36e516f'],
     table: 'sys_ui_message',
     data: { key: "Based on {0} similar issues our support team fixed.", message: "Basado en {0} problemas similares que nuestro equipo de soporte resolvió.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-08f2c1ae38aa'],
+    table: 'sys_ui_message',
+    data: { key: "Being prepared", message: "En preparación", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-f12822c277b2'],
+    table: 'sys_ui_message',
+    data: { key: "Being prepared by {0}", message: "En preparación por {0}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-9315b16cf044'],
+    table: 'sys_ui_message',
+    data: { key: "Being worked on", message: "En curso", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-2ef326377709'],
+    table: 'sys_ui_message',
+    data: { key: "Being worked on by {0}", message: "En curso con {0}", language: 'es' },
 })
 
 Record({
@@ -189,15 +273,15 @@ Record({
 })
 
 Record({
-    $id: Now.ID['luxesc-es-d853c413dd96'],
-    table: 'sys_ui_message',
-    data: { key: "Confirm: submit order", message: "Confirmar: enviar pedido", language: 'es' },
-})
-
-Record({
     $id: Now.ID['luxesc-es-c1296eaa4968'],
     table: 'sys_ui_message',
     data: { key: "Confirm: {0}", message: "Confirmar: {0}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-d853c413dd96'],
+    table: 'sys_ui_message',
+    data: { key: "Confirm: submit order", message: "Confirmar: enviar pedido", language: 'es' },
 })
 
 Record({
@@ -237,15 +321,15 @@ Record({
 })
 
 Record({
-    $id: Now.ID['luxesc-es-4d66c1793252'],
-    table: 'sys_ui_message',
-    data: { key: "Does it fit my problem?", message: "¿Se ajusta a mi problema?", language: 'es' },
-})
-
-Record({
     $id: Now.ID['luxesc-es-b080b8c8dc1d'],
     table: 'sys_ui_message',
     data: { key: "Does {0} apply to my problem? Ask me what you need to know.", message: "¿{0} sirve para mi problema? Pregúnteme lo que necesite saber.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-4d66c1793252'],
+    table: 'sys_ui_message',
+    data: { key: "Does it fit my problem?", message: "¿Se ajusta a mi problema?", language: 'es' },
 })
 
 Record({
@@ -264,6 +348,12 @@ Record({
     $id: Now.ID['luxesc-es-002b124dca6d'],
     table: 'sys_ui_message',
     data: { key: "Due {0}", message: "Vence el {0}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-cee07df8cb40'],
+    table: 'sys_ui_message',
+    data: { key: "Expected {0}", message: "Previsto para el {0}", language: 'es' },
 })
 
 Record({
@@ -342,6 +432,12 @@ Record({
     $id: Now.ID['luxesc-es-3ce37f1321a1'],
     table: 'sys_ui_message',
     data: { key: "Fulfillment", message: "Preparación", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-c8ad944b4f5f'],
+    table: 'sys_ui_message',
+    data: { key: "Full catalog", message: "Catálogo completo", language: 'es' },
 })
 
 Record({
@@ -447,6 +543,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-fcca77dd383e'],
+    table: 'sys_ui_message',
+    data: { key: "In progress ({0})", message: "En curso ({0})", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-9a71b747297f'],
     table: 'sys_ui_message',
     data: { key: "In your cart", message: "En su cesta", language: 'es' },
@@ -492,6 +594,12 @@ Record({
     $id: Now.ID['luxesc-es-e40bf1316dc3'],
     table: 'sys_ui_message',
     data: { key: "Known issues right now", message: "Incidencias conocidas ahora mismo", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-d9535e673384'],
+    table: 'sys_ui_message',
+    data: { key: "Latest update · {0}", message: "Última actualización · {0}", language: 'es' },
 })
 
 Record({
@@ -567,6 +675,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-9ecf872bc79b'],
+    table: 'sys_ui_message',
+    data: { key: "Needs you ({0})", message: "Requiere su atención ({0})", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-06b8c728d6df'],
     table: 'sys_ui_message',
     data: { key: "Needs your action", message: "Requiere su acción", language: 'es' },
@@ -576,6 +690,12 @@ Record({
     $id: Now.ID['luxesc-es-7b842a5746a4'],
     table: 'sys_ui_message',
     data: { key: "Needs your approval", message: "Requiere su aprobación", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-bc981983e7f5'],
+    table: 'sys_ui_message',
+    data: { key: "Next", message: "Siguiente", language: 'es' },
 })
 
 Record({
@@ -633,6 +753,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-42fac9aa949b'],
+    table: 'sys_ui_message',
+    data: { key: "Nothing else is in progress.", message: "No hay nada más en curso.", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-fe3735743864'],
     table: 'sys_ui_message',
     data: { key: "Nothing needs you right now.", message: "Ahora mismo nada requiere su atención.", language: 'es' },
@@ -651,6 +777,18 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-e3b82040565b'],
+    table: 'sys_ui_message',
+    data: { key: "Now", message: "Ahora", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-7725fc0eb4b4'],
+    table: 'sys_ui_message',
+    data: { key: "On hold", message: "En espera", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-5e56e8a852b9'],
     table: 'sys_ui_message',
     data: { key: "On its way", message: "En camino", language: 'es' },
@@ -660,6 +798,12 @@ Record({
     $id: Now.ID['luxesc-es-68a7e39f7c91'],
     table: 'sys_ui_message',
     data: { key: "On its way · {0}", message: "En camino · {0}", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-a6b0816c9b18'],
+    table: 'sys_ui_message',
+    data: { key: "On its way to you", message: "De camino", language: 'es' },
 })
 
 Record({
@@ -681,15 +825,21 @@ Record({
 })
 
 Record({
-    $id: Now.ID['luxesc-es-db14f4987e96'],
+    $id: Now.ID['luxesc-es-c4f1f5b1d49f'],
     table: 'sys_ui_message',
-    data: { key: "Order summary", message: "Resumen del pedido", language: 'es' },
+    data: { key: "Opened", message: "Abierto", language: 'es' },
 })
 
 Record({
     $id: Now.ID['luxesc-es-9fb134d358bc'],
     table: 'sys_ui_message',
     data: { key: "Order {0} submitted. You can follow each item in My requests.", message: "Pedido {0} enviado. Puede seguir cada artículo en Mis solicitudes.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-db14f4987e96'],
+    table: 'sys_ui_message',
+    data: { key: "Order summary", message: "Resumen del pedido", language: 'es' },
 })
 
 Record({
@@ -747,9 +897,21 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-d8b21a674c89'],
+    table: 'sys_ui_message',
+    data: { key: "Prepared", message: "Preparado", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-5ef5732fb5c5'],
     table: 'sys_ui_message',
     data: { key: "Preparing your briefing…", message: "Preparando su resumen…", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-be0f727e9c63'],
+    table: 'sys_ui_message',
+    data: { key: "Progress of {0}", message: "Progreso de {0}", language: 'es' },
 })
 
 Record({
@@ -801,6 +963,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-27eeb7a291bf'],
+    table: 'sys_ui_message',
+    data: { key: "Rejected", message: "Rechazado", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-6557047df5bd'],
     table: 'sys_ui_message',
     data: { key: "Rejected.", message: "Rechazada.", language: 'es' },
@@ -813,15 +981,27 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-91d0eb96f66c'],
+    table: 'sys_ui_message',
+    data: { key: "Request {0} submitted", message: "Solicitud {0} enviada", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-26eb89fb7b06'],
     table: 'sys_ui_message',
     data: { key: "Request it: {0}", message: "Solicitarlo: {0}", language: 'es' },
 })
 
 Record({
-    $id: Now.ID['luxesc-es-91d0eb96f66c'],
+    $id: Now.ID['luxesc-es-c26bf60fed37'],
     table: 'sys_ui_message',
-    data: { key: "Request {0} submitted", message: "Solicitud {0} enviada", language: 'es' },
+    data: { key: "Requested", message: "Solicitado", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-d999aeb0545f'],
+    table: 'sys_ui_message',
+    data: { key: "Resolved", message: "Resuelto", language: 'es' },
 })
 
 Record({
@@ -882,6 +1062,12 @@ Record({
     $id: Now.ID['luxesc-es-42c9c9254f7c'],
     table: 'sys_ui_message',
     data: { key: "Show details", message: "Mostrar detalles", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-11aeb518ea39'],
+    table: 'sys_ui_message',
+    data: { key: "Since {0} · {1}", message: "Desde {0} · {1}", language: 'es' },
 })
 
 Record({
@@ -1023,6 +1209,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-5806f7a88609'],
+    table: 'sys_ui_message',
+    data: { key: "The progress of this record could not be loaded.", message: "No se ha podido cargar el progreso de este registro.", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-416e449df56e'],
     table: 'sys_ui_message',
     data: { key: "This article is not available", message: "Este artículo no está disponible", language: 'es' },
@@ -1089,21 +1281,51 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-931e1a4b152a'],
+    table: 'sys_ui_message',
+    data: { key: "View all", message: "Ver todo", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-ada32ec43806'],
     table: 'sys_ui_message',
     data: { key: "View the full catalog", message: "Ver el catálogo completo", language: 'es' },
 })
 
 Record({
-    $id: Now.ID['luxesc-es-367746f788e8'],
+    $id: Now.ID['luxesc-es-0a1ea5282f05'],
     table: 'sys_ui_message',
-    data: { key: "Walk me through it", message: "Guíame paso a paso", language: 'es' },
+    data: { key: "Waiting for approval", message: "Pendiente de aprobación", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-23257f112840'],
+    table: 'sys_ui_message',
+    data: { key: "Waiting for you to confirm the fix", message: "Pendiente de que confirme la solución", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-8058b968786a'],
+    table: 'sys_ui_message',
+    data: { key: "Waiting for your reply", message: "Pendiente de su respuesta", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-6662ecedfa7c'],
+    table: 'sys_ui_message',
+    data: { key: "Waiting to be picked up", message: "Pendiente de asignación", language: 'es' },
 })
 
 Record({
     $id: Now.ID['luxesc-es-a610798604b5'],
     table: 'sys_ui_message',
     data: { key: "Walk me through {0} step by step.", message: "Guíame por {0} paso a paso.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-367746f788e8'],
+    table: 'sys_ui_message',
+    data: { key: "Walk me through it", message: "Guíame paso a paso", language: 'es' },
 })
 
 Record({
@@ -1185,6 +1407,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-7d913ed804b3'],
+    table: 'sys_ui_message',
+    data: { key: "With {0}", message: "Asignado a {0}", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-acd6cc30176d'],
     table: 'sys_ui_message',
     data: { key: "Yes, I am affected", message: "Sí, me afecta", language: 'es' },
@@ -1257,6 +1485,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-625b9c25d187'],
+    table: 'sys_ui_message',
+    data: { key: "Your requests and approvals", message: "Sus solicitudes y aprobaciones", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-9a398df72f48'],
     table: 'sys_ui_message',
     data: { key: "Your requests could not be loaded.", message: "No se pudieron cargar sus solicitudes.", language: 'es' },
@@ -1266,58 +1500,4 @@ Record({
     $id: Now.ID['luxesc-es-755844bc3946'],
     table: 'sys_ui_message',
     data: { key: "Yours", message: "Suyos", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-68511032243f'],
-    table: 'sys_ui_message',
-    data: { key: "{0} - Employee Center", message: "{0} - Centro para empleados", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-3d2fd182aefb'],
-    table: 'sys_ui_message',
-    data: { key: "{0} colleagues reported something similar in the last few hours, so the service desk is likely already on it.", message: "{0} compañeros han notificado algo similar en las últimas horas, así que probablemente el service desk ya esté en ello.", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-65ca71b841bb'],
-    table: 'sys_ui_message',
-    data: { key: "{0} days late", message: "{0} días de retraso", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-8bfc1419dbe0'],
-    table: 'sys_ui_message',
-    data: { key: "{0} views this month", message: "{0} visitas este mes", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-d3714ed9cb02'],
-    table: 'sys_ui_message',
-    data: { key: "{0} · Opened {1} · Updated {2}", message: "{0} · Abierto {1} · Actualizado {2}", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-6197b73f8ec0'],
-    table: 'sys_ui_message',
-    data: { key: "{0} · our team has been working on it since {1}", message: "{0} · nuestro equipo trabaja en ello desde {1}", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-b6e370fd9a7a'],
-    table: 'sys_ui_message',
-    data: { key: "{0} · {1} · Updated {2}", message: "{0} · {1} · Actualizado {2}", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-155a03dab471'],
-    table: 'sys_ui_message',
-    data: { key: "{0} — picked {1}. Also matching: {2}.", message: "{0}: se eligió {1}. También coinciden: {2}.", language: 'es' },
-})
-
-Record({
-    $id: Now.ID['luxesc-es-4d3c418a83de'],
-    table: 'sys_ui_message',
-    data: { key: "{0}: {1}", message: "{0}: {1}", language: 'es' },
 })

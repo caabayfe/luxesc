@@ -30,45 +30,39 @@ The portal grew feature by feature and now looks like a classic portal with AI b
 ## Home: "For you"
 
 ```
-Good evening, Fer                                                       ⌘K
+Good evening, Fer
+┌ ⚠ Happening now: Teams calls dropping · Since 21:43 · rolling back…  [I'm affected too] ┐
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  What do you need?                                                       │
-│  [ Describe a problem, ask for something, or ask a question…        ] ↵ │
-│  ┌ as you type ───────────────────────────────────────────────────────┐ │
-│  │ Answers   VPN: no puedo conectarme desde casa…   KB0010019          │ │
-│  │ Services  Developer Laptop (Mac)                  $1,499             │ │
-│  │ Yours     INC0026092 MFA notifications not arriving                 │ │
-│  │ ↵  Let an agent handle it                                           │ │
-│  └─────────────────────────────────────────────────────────────────────┘ │
-│  Recent: My laptop is slow · Teams keeps dropping · New hire setup       │
+│  What do you need?   [ Describe a problem, ask for something…       ] ↵ │
+│  as you type: Answers · Services · Yours        ↵ Let an agent handle it │
 └──────────────────────────────────────────────────────────────────────────┘
-┌ Needs you · 3 ────────────────────────────┐ ┌ Happening now ───────────┐
-│ ● Approve Adobe CC for a new hire  [✓][✕] │ │ ⚠ Teams calls dropping    │
-│ ● SAP orders saving again?     [Yes, fixed]│ │   Fix in progress · 21:43 │
-│ ● Second monitor — fixed?      [Yes, fixed]│ │   [I'm affected too]      │
-│                         See all (6) →      │ └───────────────────────────┘
-└────────────────────────────────────────────┘ ┌ Popular answers ──────────┐
-┌ On its way ────────────────────────────────┐ │ Set up VPN on a Mac       │
-│ Developer Laptop (Mac)                     │ │ Recover deleted email     │
-│ ◉──────○──────○──────○   Approval · due Fri│ │ Phishing: how to spot it  │
-│ Visio Pro for Office 365                   │ └───────────────────────────┘
-│ ◉──────◉──────○──────○   Fulfillment · 2 days late │
-└────────────────────────────────────────────┘
+┌ Your requests and approvals        View all ⟳ ┐ ┌ Trending ─────────────────┐
+│ [Needs you (4)] [In progress (6)]             │ │ VPN: no puedo conectar…   │
+│ Visio Pro for Office 365                    ⌄ │ │ How to configure VPN…     │
+│ ● Being prepared · 2 days late · RITM0010057  │ └───────────────────────────┘
+│   ✓ Requested 28 Oct                          │ ┌ Browse services ──────────┐
+│   ✓ Approved                                  │ │ (Hardware) (Office) (…)   │
+│   ◐ Being prepared                            │ │                           │
+│   ⚠ Expected 30 Oct · 2 days late             │ │                           │
+└───────────────────────────────────────────────┘ └───────────────────────────┘
 ```
 
-- **Needs you** is the concierge, reduced to the items that need an action (approve, confirm a fix, answer a
-  question), each with its one-click action. "See all" opens My stuff.
-- **On its way** is new and needs no AI: requested items with a 4-step tracker from `stage`
-  (Approval → Fulfillment → Delivery → Done), the due date, and "late" when the due date has passed.
-- **Happening now** is the known issues tile (hidden when there are none).
-- **Popular answers**: most read articles; the full list lives in Explore.
+- **Happening now** is a slim alert strip above the box (hidden when there are none): it is the most
+  urgent thing on the page and does not take a column.
+- **Your requests and approvals** is the concierge in two tabs: *Needs you* (approve, confirm a fix,
+  answer) and *In progress* (everything moving). Each row says in plain words where the record is
+  ("Being prepared · 2 days late", "Waiting for your reply"), computed from the record, not the agent.
+  Opening a row shows its **journey**: only the milestones it really went through, with dates, where it
+  is now and what comes next (expected date, late), plus the latest public update. No fixed four-step
+  tracker: an incident and a laptop request do not share the same steps.
+- **Trending**: most read articles of the last 30 days; **Browse services**: categories as pills.
 - The answer to the box opens between the box and the tiles; the tiles stay where they are.
 
 ## My stuff
 
-Tabs: **Needs you** · **Open** · **Done**. One row per record with the same tracker (requests) or a plain
-state line (incidents), the concierge's one-sentence explanation when there is one, and the main action.
-The request page gets the tracker at the top and the activity below.
+Tabs: **Needs you** · **Open** · **Done**. One row per record with its plain-language status and the
+same journey on expand, the concierge's one-sentence explanation when there is one, and the main action.
+The request page gets the journey at the top and the activity below.
 
 ## Explore
 
@@ -83,18 +77,18 @@ Knowledge in the navigation.
 - Bento tiles with the same radius and padding; tile headers are a label and a count, no paragraphs.
 - Type scale with fewer sizes: greeting (2xl), tile titles (sm, semibold, uppercase-free), body (sm).
 - Motion: the answer card expands with the Horizon expand token; reduced motion respected.
-- Mobile: the box stays at the top; tiles stack in priority order (Needs you, Happening now, On its way).
+- Mobile: the box stays at the top; tiles stack in priority order (Happening now, Needs you, Trending).
 
 ## What stays
 
 All agents, REST routes and record logic stay as they are; this is a front-end recomposition. OOB pieces:
-aiux nav layout, tab group, steps (tracker), badges, buttons, cards, inputs, modal (⌘K), empty states,
+aiux nav layout, tab group, timeline (journey), badges, buttons, cards, inputs, modal (⌘K), empty states,
 OOB list on My stuff "Done".
 
 ## Phases
 
 1. **Home "For you"**: one box with instant results and in-place agent answers (intake and planner merged
-   behind it), Needs you, On its way (tracker), Happening now, Popular answers. (1.5 days)
+   behind it), Needs you / In progress with journeys, Happening now, Trending. (1.5 days)
 2. **Navigation and Explore**: three destinations, combined search page, ⌘K from any page. (1 day)
 3. **My stuff and the request page**: tabs with trackers, explanation lines, tracker on the record page.
    (1 day)
