@@ -7,8 +7,9 @@ import {i18n} from '@servicenow/aiux/aiux-services';
 const DONE = ['completed', 'success'];
 
 /**
- * What an AI agent is doing, step by step: the tools it calls and its
- * reasoning, from the run trace (LuxEscConcierge._steps).
+ * What an AI agent is doing, step by step: the tools it calls, with its
+ * reasoning folded away for the curious, from the run trace
+ * (LuxEscConcierge._steps).
  */
 @customElement('luxesc-agent-steps')
 export class AgentSteps extends AIUXElement {
@@ -37,7 +38,10 @@ export class AgentSteps extends AIUXElement {
             ${step.actions?.length ? step.actions.join(', ') : step.name}
           </span>
           ${step.thought
-            ? html`<span class="min-w-0 break-words text-text-secondary">${step.thought}</span>`
+            ? html`<details class="min-w-0 text-text-secondary">
+                <summary class="cursor-pointer text-xs">${i18n.getMessage('How the agent decided')}</summary>
+                <p class="break-words pt-1">${step.thought}</p>
+              </details>`
             : nothing}
         </li>`
       )}
