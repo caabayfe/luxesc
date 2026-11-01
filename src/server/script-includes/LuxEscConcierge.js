@@ -43,7 +43,9 @@ LuxEscConcierge.prototype = {
             if (!agentId) throw new Error('The ' + agent + ' agent is not installed');
             var words = '. The employee wrote: """' + text.replace(/"""/g, '"') + '"""';
             var objective = {
-                concierge: 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId,
+                // The briefing has no words of the employee to follow, so it takes their UI language
+                concierge: 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId +
+                    '. Write it in the language with code "' + (gs.getSession().getLanguage() || 'en') + '"',
                 intake: 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId + words,
                 plan: 'Plan the catalog requests for ' + gs.getUserDisplayName() + '. Today is ' +
                     new GlideDate().getValue() + '. Run id: ' + runId + words,

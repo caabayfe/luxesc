@@ -482,6 +482,662 @@ declare global {
                         table: 'sys_script_include'
                         id: 'e0c1ab8f88784a1cb96cae722072753b'
                     }
+                    'luxesc-es-01d26411d0ea': {
+                        table: 'sys_ui_message'
+                        id: '7b370435801e42018333155ba140832c'
+                    }
+                    'luxesc-es-02334cd8f361': {
+                        table: 'sys_ui_message'
+                        id: 'eaab27a3eeaa4dd3a00886310c69ae65'
+                    }
+                    'luxesc-es-03dab8d30026': {
+                        table: 'sys_ui_message'
+                        id: 'c4ffbdd4da574b6aaa8cc3abddcff20e'
+                    }
+                    'luxesc-es-04b888cc5dd8': {
+                        table: 'sys_ui_message'
+                        id: '9cd39da36f17472f9da048ae187e1436'
+                    }
+                    'luxesc-es-066c3bcf4edc': {
+                        table: 'sys_ui_message'
+                        id: '9214d2c15674487487ca3866aaaee974'
+                    }
+                    'luxesc-es-06b8c728d6df': {
+                        table: 'sys_ui_message'
+                        id: 'accc2577d73b467b92e18c4fb8c63e84'
+                    }
+                    'luxesc-es-0a0292d0097f': {
+                        table: 'sys_ui_message'
+                        id: 'e6351ad783f44ce4823fe423f645bee5'
+                    }
+                    'luxesc-es-0a378a053080': {
+                        table: 'sys_ui_message'
+                        id: '1bd3b2627d974c99ac2cf752e286e29d'
+                    }
+                    'luxesc-es-0baa5dc0b3a7': {
+                        table: 'sys_ui_message'
+                        id: 'cc8ba071729d41d2879c622b257c8a41'
+                    }
+                    'luxesc-es-0c7d6f7493ea': {
+                        table: 'sys_ui_message'
+                        id: '3fe72c6fff1449c2a5e117ff202343c9'
+                    }
+                    'luxesc-es-0cedd961b7d0': {
+                        table: 'sys_ui_message'
+                        id: 'be972696600349f28c3601b9e2fbea6e'
+                    }
+                    'luxesc-es-0d6764493ac2': {
+                        table: 'sys_ui_message'
+                        id: '7b3b9f8998d244fc91c0d5457fc779b4'
+                    }
+                    'luxesc-es-0d8fb35ec479': {
+                        table: 'sys_ui_message'
+                        id: '82b56e26166744d1bb264f47f7a8e15d'
+                    }
+                    'luxesc-es-10d7e23f84e5': {
+                        table: 'sys_ui_message'
+                        id: '0d1a740acef6423aab33231185485d0f'
+                    }
+                    'luxesc-es-110763227ca2': {
+                        table: 'sys_ui_message'
+                        id: '1dd4303edd0342d3a5e03be514eb54a5'
+                    }
+                    'luxesc-es-132d13a13ebb': {
+                        table: 'sys_ui_message'
+                        id: '9b735b6f37b24fdda22cc092908c56b8'
+                    }
+                    'luxesc-es-155a03dab471': {
+                        table: 'sys_ui_message'
+                        id: 'cdedf6822dfb44d08cfac5b75891c666'
+                    }
+                    'luxesc-es-15a5d4b5d045': {
+                        table: 'sys_ui_message'
+                        id: '877405da18ee4345a0c8b99d858fbc84'
+                    }
+                    'luxesc-es-1642323d23fb': {
+                        table: 'sys_ui_message'
+                        id: 'd73c74657df9412bb4b6f6a21ff2edaf'
+                    }
+                    'luxesc-es-1e5ff9e500c2': {
+                        table: 'sys_ui_message'
+                        id: '655f9b394f2b45d39ce0ffb70609d8fe'
+                    }
+                    'luxesc-es-1f545d7d437b': {
+                        table: 'sys_ui_message'
+                        id: '4d9d57bffc22453b914d576c34088c2e'
+                    }
+                    'luxesc-es-26eb89fb7b06': {
+                        table: 'sys_ui_message'
+                        id: 'c4899741a075441095a1cb5bc0b558ec'
+                    }
+                    'luxesc-es-2d76cae58185': {
+                        table: 'sys_ui_message'
+                        id: '4d74b64fa2684108a17469434960a3ac'
+                    }
+                    'luxesc-es-334e47713eee': {
+                        table: 'sys_ui_message'
+                        id: 'b91a89a0c73e4f3798d86f2dc40a1e45'
+                    }
+                    'luxesc-es-35b681a90767': {
+                        table: 'sys_ui_message'
+                        id: '10e10165e7274b468ca4f9fcfc93a00f'
+                    }
+                    'luxesc-es-3663caec7bf0': {
+                        table: 'sys_ui_message'
+                        id: 'e3058088398a419c93cb2b3814b8477c'
+                    }
+                    'luxesc-es-367746f788e8': {
+                        table: 'sys_ui_message'
+                        id: '5a6fd5aed59d4512a442a44c4c7b5ebb'
+                    }
+                    'luxesc-es-39ebe4ee1197': {
+                        table: 'sys_ui_message'
+                        id: 'd0b6b063f45b4967b3547db232fc9039'
+                    }
+                    'luxesc-es-3a4694be22a9': {
+                        table: 'sys_ui_message'
+                        id: '0891778da68043f1986aa21c918b5db9'
+                    }
+                    'luxesc-es-3d2fd182aefb': {
+                        table: 'sys_ui_message'
+                        id: '80df9929f86742c9b4924b1cba7ed412'
+                    }
+                    'luxesc-es-3dc0fe587be3': {
+                        table: 'sys_ui_message'
+                        id: 'c0a58ee5aaf8486b83a218058fdc45b4'
+                    }
+                    'luxesc-es-416e449df56e': {
+                        table: 'sys_ui_message'
+                        id: '7c2fce3b116247ed8e650374fb30a1b9'
+                    }
+                    'luxesc-es-435e423ae5d9': {
+                        table: 'sys_ui_message'
+                        id: '55e93d9c2f98481b885d55bc161b3656'
+                    }
+                    'luxesc-es-4360c2dcd4af': {
+                        table: 'sys_ui_message'
+                        id: 'e4a52089b2064fac8b4b40a791881c96'
+                    }
+                    'luxesc-es-43d1352a402f': {
+                        table: 'sys_ui_message'
+                        id: '703c6a5905fa420a8e318e0c6ee2a2c0'
+                    }
+                    'luxesc-es-475634ddb3bb': {
+                        table: 'sys_ui_message'
+                        id: '32a5312e09f0456098c6cd0fda6d3832'
+                    }
+                    'luxesc-es-497ccf613e34': {
+                        table: 'sys_ui_message'
+                        id: '3255ce0391e547b2a74787b63b6004c1'
+                    }
+                    'luxesc-es-4ca4b11b32c1': {
+                        table: 'sys_ui_message'
+                        id: '3c51e995cdb4414f80cfe584adccd912'
+                    }
+                    'luxesc-es-4d66c1793252': {
+                        table: 'sys_ui_message'
+                        id: 'd85e922a4e0f466aaff28e30418e2a10'
+                    }
+                    'luxesc-es-4f2ef8052a94': {
+                        table: 'sys_ui_message'
+                        id: '85418ad452d249bc8b08505ba3f281fc'
+                    }
+                    'luxesc-es-506461e97c28': {
+                        table: 'sys_ui_message'
+                        id: '81503e3110e647b295b9ce9e9b39ff7e'
+                    }
+                    'luxesc-es-516c18d85e41': {
+                        table: 'sys_ui_message'
+                        id: '2e73499f218348a9b8463b5fe8b97135'
+                    }
+                    'luxesc-es-54d4a3404420': {
+                        table: 'sys_ui_message'
+                        id: 'b9632f87dac849eab40396de1a3bbc10'
+                    }
+                    'luxesc-es-5529f49254a6': {
+                        table: 'sys_ui_message'
+                        id: 'd736109c17df4b4a964974400c0cd265'
+                    }
+                    'luxesc-es-5782ca61c395': {
+                        table: 'sys_ui_message'
+                        id: '97a59c22ed3a446e825a8d216b5d5233'
+                    }
+                    'luxesc-es-5899c6a0e942': {
+                        table: 'sys_ui_message'
+                        id: '63a18b7a1b7747daac17be422e336faf'
+                    }
+                    'luxesc-es-5de77552730c': {
+                        table: 'sys_ui_message'
+                        id: 'a7ff25e4a3ae44d4ba759d3214189c7f'
+                    }
+                    'luxesc-es-5f0500ccf919': {
+                        table: 'sys_ui_message'
+                        id: '0d68e4652ae24f76ab0e11980c6743d6'
+                    }
+                    'luxesc-es-61852524b8f8': {
+                        table: 'sys_ui_message'
+                        id: '817dae234abe4cba845ff42491457639'
+                    }
+                    'luxesc-es-6197b73f8ec0': {
+                        table: 'sys_ui_message'
+                        id: 'e3aba66222ed4c3a9b4e22b4bf8692ea'
+                    }
+                    'luxesc-es-62bbea2a98a1': {
+                        table: 'sys_ui_message'
+                        id: '75d3e7918170406a9242dcaef237acad'
+                    }
+                    'luxesc-es-6557047df5bd': {
+                        table: 'sys_ui_message'
+                        id: '5d6733d986294a5a98d5a85657b2669c'
+                    }
+                    'luxesc-es-65ca2e1e8982': {
+                        table: 'sys_ui_message'
+                        id: '6029c900858249368baea25bf831920b'
+                    }
+                    'luxesc-es-68511032243f': {
+                        table: 'sys_ui_message'
+                        id: '56c77289c4fd4157b6ca31910a197212'
+                    }
+                    'luxesc-es-6a446ef4725e': {
+                        table: 'sys_ui_message'
+                        id: '0b0ce28573b0467ab6c2fbf9c3825cde'
+                    }
+                    'luxesc-es-6adc6cef07e3': {
+                        table: 'sys_ui_message'
+                        id: '17c1d43ec5764b39922ddf09d1feaa7d'
+                    }
+                    'luxesc-es-6b687dce88a6': {
+                        table: 'sys_ui_message'
+                        id: 'febbc3d4d6064f2ea5734e2d78fa687c'
+                    }
+                    'luxesc-es-6d58768e1347': {
+                        table: 'sys_ui_message'
+                        id: '0ecd37684f62408c9cb4e81b2ed5d72f'
+                    }
+                    'luxesc-es-6e8c67fac7d8': {
+                        table: 'sys_ui_message'
+                        id: '42a41ede882d485c885972ee51d83093'
+                    }
+                    'luxesc-es-6e9ffd08947d': {
+                        table: 'sys_ui_message'
+                        id: 'f916d9dde0794510b81e6a61cfe67b06'
+                    }
+                    'luxesc-es-71b1d1abc5e7': {
+                        table: 'sys_ui_message'
+                        id: '1de304775fbb47c79d8854ae8b944ac1'
+                    }
+                    'luxesc-es-71dbe0935f7e': {
+                        table: 'sys_ui_message'
+                        id: '356f2d1de9c944709cc0804267836cc6'
+                    }
+                    'luxesc-es-71e58e5f9bfd': {
+                        table: 'sys_ui_message'
+                        id: 'eed78665930849e6a8f665f8affda1a5'
+                    }
+                    'luxesc-es-743076460f20': {
+                        table: 'sys_ui_message'
+                        id: 'f7657321aa664d4bad3ccf8344f35b46'
+                    }
+                    'luxesc-es-74f9ff67bac5': {
+                        table: 'sys_ui_message'
+                        id: '74be5a37444e4cceafd0d93614785ba2'
+                    }
+                    'luxesc-es-75c153bdd622': {
+                        table: 'sys_ui_message'
+                        id: '59226183f0e246f5bc252e4403bf2e54'
+                    }
+                    'luxesc-es-77a311e6227b': {
+                        table: 'sys_ui_message'
+                        id: '2b954dffd2ea416bab4a8975f0347064'
+                    }
+                    'luxesc-es-77fdd384f5d0': {
+                        table: 'sys_ui_message'
+                        id: '41adb6cc67a24d819b1f3c9f807ee660'
+                    }
+                    'luxesc-es-785474873496': {
+                        table: 'sys_ui_message'
+                        id: '6e8c6f7170ad4bb18978da2ecc757f18'
+                    }
+                    'luxesc-es-788664686711': {
+                        table: 'sys_ui_message'
+                        id: 'fc78fc85960d40fd9df19732d2a4d593'
+                    }
+                    'luxesc-es-7b842a5746a4': {
+                        table: 'sys_ui_message'
+                        id: '3ae66542a1bf4a3ba1b4151f46cb5e2a'
+                    }
+                    'luxesc-es-7d1f81782b65': {
+                        table: 'sys_ui_message'
+                        id: 'def7996061b64e3cab21fd44a7e15d12'
+                    }
+                    'luxesc-es-7dc17c27e08e': {
+                        table: 'sys_ui_message'
+                        id: '729c7f71a7d447ec88b15f2ea64a630d'
+                    }
+                    'luxesc-es-7e1eb36e516f': {
+                        table: 'sys_ui_message'
+                        id: '259ca6a9e172437cb19ff8f44a3d63fb'
+                    }
+                    'luxesc-es-80128dc282c6': {
+                        table: 'sys_ui_message'
+                        id: '3f8147c8d8e044e0b161ca8a309d5daa'
+                    }
+                    'luxesc-es-840dedfe783e': {
+                        table: 'sys_ui_message'
+                        id: 'cb681429c5a645c0a5ebae3e859aa02d'
+                    }
+                    'luxesc-es-84a92bbe58ac': {
+                        table: 'sys_ui_message'
+                        id: 'd920e74ef6f048638bdf241347f31ad8'
+                    }
+                    'luxesc-es-887b47591534': {
+                        table: 'sys_ui_message'
+                        id: '6e14a2cbbcf741bf9a41d272c469e2c7'
+                    }
+                    'luxesc-es-8a6ff50e5e46': {
+                        table: 'sys_ui_message'
+                        id: '301a1144d25e475b913e687742486840'
+                    }
+                    'luxesc-es-8bb0d48793af': {
+                        table: 'sys_ui_message'
+                        id: '67361f119247486399627f6b7638365f'
+                    }
+                    'luxesc-es-8d4fdf225672': {
+                        table: 'sys_ui_message'
+                        id: 'd2ad578234a046aba13eb6aa143a81dd'
+                    }
+                    'luxesc-es-8e505d0fdbdd': {
+                        table: 'sys_ui_message'
+                        id: '1b044e3cb0d2473fbc02617fe2f7419f'
+                    }
+                    'luxesc-es-8e781e873679': {
+                        table: 'sys_ui_message'
+                        id: '74c0600a6e734f1eb29be9b03e78870c'
+                    }
+                    'luxesc-es-91d0eb96f66c': {
+                        table: 'sys_ui_message'
+                        id: '941bdd4b803740bcb1beb9a6e6c6a09f'
+                    }
+                    'luxesc-es-91f1f2d2fca9': {
+                        table: 'sys_ui_message'
+                        id: '746f19c22e5441d485fd9617bbabd9f1'
+                    }
+                    'luxesc-es-92a88e0e91e0': {
+                        table: 'sys_ui_message'
+                        id: '852624e6f62e4683992d874822bfdac1'
+                    }
+                    'luxesc-es-9441edec7142': {
+                        table: 'sys_ui_message'
+                        id: 'fe8c4c9e7dba40ae82809ce149d599dc'
+                    }
+                    'luxesc-es-9486b0155005': {
+                        table: 'sys_ui_message'
+                        id: 'cca4c8555d6744cfb57dbbcb39ea8347'
+                    }
+                    'luxesc-es-96192c9774a3': {
+                        table: 'sys_ui_message'
+                        id: '3a8c82e298694c5280df1219a8f01ebd'
+                    }
+                    'luxesc-es-967f91808aef': {
+                        table: 'sys_ui_message'
+                        id: '8b192da5eb464f669bfc5d03b2ca0486'
+                    }
+                    'luxesc-es-9a71b747297f': {
+                        table: 'sys_ui_message'
+                        id: 'f1fc724319894ce8bfbbe135e03711e1'
+                    }
+                    'luxesc-es-9e364458b646': {
+                        table: 'sys_ui_message'
+                        id: 'c28bc652e71a4676ae3b971369e3618c'
+                    }
+                    'luxesc-es-9fb134d358bc': {
+                        table: 'sys_ui_message'
+                        id: 'd401d9c292444a08b2c99f5d5e1c9492'
+                    }
+                    'luxesc-es-9fe520d8c094': {
+                        table: 'sys_ui_message'
+                        id: '883d7e9045db4c43add947458fd05626'
+                    }
+                    'luxesc-es-a09c60fa784c': {
+                        table: 'sys_ui_message'
+                        id: 'a9eceb3e9dee416ca356d542d0596ae2'
+                    }
+                    'luxesc-es-a146fdfcf35b': {
+                        table: 'sys_ui_message'
+                        id: '369cbf652a4847a38748645fb80a13e7'
+                    }
+                    'luxesc-es-a1c2d4890cbd': {
+                        table: 'sys_ui_message'
+                        id: 'c65b4a8f1aa74645a8aa65c507926026'
+                    }
+                    'luxesc-es-a3a7f4f7afc3': {
+                        table: 'sys_ui_message'
+                        id: '6253b62342224e5baac1f911839c1484'
+                    }
+                    'luxesc-es-a609ba107479': {
+                        table: 'sys_ui_message'
+                        id: '0e6389f6c265479687980dc536e02670'
+                    }
+                    'luxesc-es-a610798604b5': {
+                        table: 'sys_ui_message'
+                        id: '8a6ef2ee90dd45e1bd30657c051a02db'
+                    }
+                    'luxesc-es-a734de00cca2': {
+                        table: 'sys_ui_message'
+                        id: 'ba7caec1c41e4367bc71fcc726789d0b'
+                    }
+                    'luxesc-es-a87c8bf7d562': {
+                        table: 'sys_ui_message'
+                        id: '4b4b66d96133446e87dcf285efac0d38'
+                    }
+                    'luxesc-es-a95df16310eb': {
+                        table: 'sys_ui_message'
+                        id: 'b4aeb3832daf4580843124b0254a6e22'
+                    }
+                    'luxesc-es-ab4eef003af3': {
+                        table: 'sys_ui_message'
+                        id: '8371bd9a4e034e038ffe6c389456fcd0'
+                    }
+                    'luxesc-es-ac1da7a07eba': {
+                        table: 'sys_ui_message'
+                        id: '9095ff2898064f5dba205e33f1c8289d'
+                    }
+                    'luxesc-es-ac4b7012ef9c': {
+                        table: 'sys_ui_message'
+                        id: '64634e1d0ff947d6b5bcff5e18dbbc01'
+                    }
+                    'luxesc-es-acc45881a73e': {
+                        table: 'sys_ui_message'
+                        id: '57f5e8c9420747d48bcbc3d1ec14ef1d'
+                    }
+                    'luxesc-es-acd6cc30176d': {
+                        table: 'sys_ui_message'
+                        id: '78709559040e4af7ab31818361942501'
+                    }
+                    'luxesc-es-ad323ab6b470': {
+                        table: 'sys_ui_message'
+                        id: '9ce33df018a645ec895834bdb71d336a'
+                    }
+                    'luxesc-es-ada32ec43806': {
+                        table: 'sys_ui_message'
+                        id: 'a870d989e0ce412f8bc67cb2c6ac415a'
+                    }
+                    'luxesc-es-ada55cf69059': {
+                        table: 'sys_ui_message'
+                        id: 'a1a8f8a2624840eabba137427a2d2c78'
+                    }
+                    'luxesc-es-ae3e3ca45632': {
+                        table: 'sys_ui_message'
+                        id: '99133eebc24c4026a4fa1703850c716c'
+                    }
+                    'luxesc-es-af7dcab0314c': {
+                        table: 'sys_ui_message'
+                        id: '494cb205128f4c78ae410e867ea7d8f2'
+                    }
+                    'luxesc-es-af9d8d1aeb21': {
+                        table: 'sys_ui_message'
+                        id: '80b009f94daf49e29b74da8e01472d43'
+                    }
+                    'luxesc-es-b080b8c8dc1d': {
+                        table: 'sys_ui_message'
+                        id: 'c62fd7e2b65c4ab5a31dec89e7b1680c'
+                    }
+                    'luxesc-es-b0829f956d43': {
+                        table: 'sys_ui_message'
+                        id: '2f2eead696944f21bf9115a033f612d0'
+                    }
+                    'luxesc-es-b215d3661cac': {
+                        table: 'sys_ui_message'
+                        id: '0d5e1e5678b547ae8f4997ef135e6a39'
+                    }
+                    'luxesc-es-b27a8ccae7ec': {
+                        table: 'sys_ui_message'
+                        id: 'c9d0cb3537f14294bda0b2fabd196696'
+                    }
+                    'luxesc-es-b4a583e31d67': {
+                        table: 'sys_ui_message'
+                        id: '16e65811d1fa4165baef6c305b6b028a'
+                    }
+                    'luxesc-es-b4e7a8896eb9': {
+                        table: 'sys_ui_message'
+                        id: '664ec2714da548cd9871c3cfda53966f'
+                    }
+                    'luxesc-es-b54e35b43e9a': {
+                        table: 'sys_ui_message'
+                        id: '4297501b6e114b279a9ae7d24c376883'
+                    }
+                    'luxesc-es-b5c793c7bd1e': {
+                        table: 'sys_ui_message'
+                        id: '84fbbc349b5f40baa702c4dffcd8e2f0'
+                    }
+                    'luxesc-es-b6e370fd9a7a': {
+                        table: 'sys_ui_message'
+                        id: '17cda59729c94ff28a03592688a458e3'
+                    }
+                    'luxesc-es-b6f7a73fd1b7': {
+                        table: 'sys_ui_message'
+                        id: '0b3318307b6649e09f50892772a9cb55'
+                    }
+                    'luxesc-es-bba0686f8a64': {
+                        table: 'sys_ui_message'
+                        id: '8324247242564ae6b30b18d66c3b6236'
+                    }
+                    'luxesc-es-bd7444d92bca': {
+                        table: 'sys_ui_message'
+                        id: '199e1d1cbdd646e984e9d2ad350140c2'
+                    }
+                    'luxesc-es-c0020aebcfdd': {
+                        table: 'sys_ui_message'
+                        id: '1090a2a6b2dd4c739ede68eb1cd4b66b'
+                    }
+                    'luxesc-es-c1296eaa4968': {
+                        table: 'sys_ui_message'
+                        id: 'd345d5bf900b4ce783e1f27866501355'
+                    }
+                    'luxesc-es-c1c35664d415': {
+                        table: 'sys_ui_message'
+                        id: '0785815efb994d17aae6defcb6f59855'
+                    }
+                    'luxesc-es-c2c82bfb70eb': {
+                        table: 'sys_ui_message'
+                        id: '657d6ba81dd8410fa2c5b5ec458bc5a2'
+                    }
+                    'luxesc-es-c5573c053079': {
+                        table: 'sys_ui_message'
+                        id: '3e9fadead49c4aa291ba17bd1b8b4abb'
+                    }
+                    'luxesc-es-c5fec0d3a8d6': {
+                        table: 'sys_ui_message'
+                        id: '3bbfac5d6e794b24b0e02778a09c7fe6'
+                    }
+                    'luxesc-es-c79ed44eee74': {
+                        table: 'sys_ui_message'
+                        id: 'a6f6c3778cff43a99c8e36c06afcad64'
+                    }
+                    'luxesc-es-c7c771566158': {
+                        table: 'sys_ui_message'
+                        id: 'b52c9c2d86ad41b38e9ad6c9dcce84f9'
+                    }
+                    'luxesc-es-c94981fe7503': {
+                        table: 'sys_ui_message'
+                        id: '0bfbd8ad144045dc85c2c2e7ad5b326d'
+                    }
+                    'luxesc-es-cd994a9a04cf': {
+                        table: 'sys_ui_message'
+                        id: 'e0ca90d2a5ff4927bdadad69fb730366'
+                    }
+                    'luxesc-es-d0355776d3e3': {
+                        table: 'sys_ui_message'
+                        id: '7c026e7f55c14039a9d9f7620ebc98ac'
+                    }
+                    'luxesc-es-d1db79923714': {
+                        table: 'sys_ui_message'
+                        id: '446e2ba7b44f46f2a19da08be8a400b4'
+                    }
+                    'luxesc-es-d1ff1767df8d': {
+                        table: 'sys_ui_message'
+                        id: 'b0a22918cb7b472d9b8d630550183134'
+                    }
+                    'luxesc-es-d2104735906e': {
+                        table: 'sys_ui_message'
+                        id: '5841d2fd74d2486f9d8e08c77f0b678d'
+                    }
+                    'luxesc-es-d3714ed9cb02': {
+                        table: 'sys_ui_message'
+                        id: '01221fcfc78b44e494c5711a6068056d'
+                    }
+                    'luxesc-es-d7ca0b8cda88': {
+                        table: 'sys_ui_message'
+                        id: '11cdc6b2874e4c2aa0f632d1001a611b'
+                    }
+                    'luxesc-es-d853c413dd96': {
+                        table: 'sys_ui_message'
+                        id: 'df650a7398064fa9bf6f4117af17191e'
+                    }
+                    'luxesc-es-db14f4987e96': {
+                        table: 'sys_ui_message'
+                        id: '4469a7701fa34e2d9d846815a98923c5'
+                    }
+                    'luxesc-es-ddc04e083593': {
+                        table: 'sys_ui_message'
+                        id: '7d6cfa01321a4a9db16e7c13ddbf1700'
+                    }
+                    'luxesc-es-ddd3996ad2dd': {
+                        table: 'sys_ui_message'
+                        id: '08c74e28fa6a490abee0e091ae921279'
+                    }
+                    'luxesc-es-deba442c1cda': {
+                        table: 'sys_ui_message'
+                        id: '62514ea062504a6dbe5b3d93a0e2d6e1'
+                    }
+                    'luxesc-es-e097019b3d3b': {
+                        table: 'sys_ui_message'
+                        id: '664e4232b8c24bf1a7da4d92bde424f0'
+                    }
+                    'luxesc-es-e0d98314050d': {
+                        table: 'sys_ui_message'
+                        id: '1325530168b745a580217cd94c2064f1'
+                    }
+                    'luxesc-es-e184898c8493': {
+                        table: 'sys_ui_message'
+                        id: '4a4e39928bab47b88b9adc1bca82be76'
+                    }
+                    'luxesc-es-e204686e5e41': {
+                        table: 'sys_ui_message'
+                        id: '6a008505132344caa7f44e95367e6b4b'
+                    }
+                    'luxesc-es-e40bf1316dc3': {
+                        table: 'sys_ui_message'
+                        id: '98b99b110c7b44cd8307bf63ab4ab646'
+                    }
+                    'luxesc-es-e691cca2260e': {
+                        table: 'sys_ui_message'
+                        id: 'b7a34942a70f43128a78ef51151b8892'
+                    }
+                    'luxesc-es-e6e43f624a2a': {
+                        table: 'sys_ui_message'
+                        id: '4505d873e4174f62a4199ef3cedcc2e0'
+                    }
+                    'luxesc-es-e75831415277': {
+                        table: 'sys_ui_message'
+                        id: '6e3732e444174285b896461e8255cdb6'
+                    }
+                    'luxesc-es-e93ce4148ddc': {
+                        table: 'sys_ui_message'
+                        id: '6c1d3daa07b14f92ac727536b0a71b8b'
+                    }
+                    'luxesc-es-ed9c5ef53d6e': {
+                        table: 'sys_ui_message'
+                        id: 'd554d3452d3f43a3941919060f577f59'
+                    }
+                    'luxesc-es-f14e8f550946': {
+                        table: 'sys_ui_message'
+                        id: 'e412208415ce4bdfb36ed864cc4f5dbb'
+                    }
+                    'luxesc-es-f28415962b3b': {
+                        table: 'sys_ui_message'
+                        id: '57038a02b60740eba1b0ba185ac647d0'
+                    }
+                    'luxesc-es-f422a546a65c': {
+                        table: 'sys_ui_message'
+                        id: '3453dfa54db84194ba5c0340b3a0788a'
+                    }
+                    'luxesc-es-fc282f63f06a': {
+                        table: 'sys_ui_message'
+                        id: 'f1467ec63018482e8218e79db7289cea'
+                    }
+                    'luxesc-es-fe2a73c98eb2': {
+                        table: 'sys_ui_message'
+                        id: '8cec850cf75d4e21adf0a20cec3d9f8a'
+                    }
+                    'luxesc-es-ff231b5724d2': {
+                        table: 'sys_ui_message'
+                        id: '830c14b44eb94f9e9cd329972b7f8815'
+                    }
+                    'luxesc-es-ff33c9d4e363': {
+                        table: 'sys_ui_message'
+                        id: '0392d935376341089a9662d159d472b8'
+                    }
                     'luxesc-experience-acl': {
                         table: 'sys_security_acl'
                         id: '7b8f4034f01e47ebb0aaa51fc6913b6d'
