@@ -16,7 +16,7 @@ import {
 import '@servicenow/aiux/aiux-components-catalog';
 import '@servicenow/aiux/aiux-components-attachment';
 import '@servicenow/aiux/aiux-components-empty-state-content';
-import {addComment, fetchRecord} from '../../../utils/api.js';
+import {addComment, fetchRecord, fetchRecords} from '../../../utils/api.js';
 import '../../../components/luxesc-ask.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
@@ -24,6 +24,26 @@ import {lockVariables} from '../../../utils/read-only-variables.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-ticket');
+
+const SLA_FIELDS = 'sla,stage,has_breached,planned_end_time,business_percentage,business_time_left';
+
+// Service levels on the record, so the assistant can say when it should be done.
+// Requesters often cannot read task_sla; then there is simply nothing to tell.
+async function fetchSlas(sysId) {
+  const slas = await fetchRecords('task_sla', {
+    encodedQuery: `task=${sysId}^ORDERBYplanned_end_time`,
+    fields: SLA_FIELDS,
+    limit: 5
+  }).catch(() => null);
+  return (slas || []).map(sla => ({
+    name: sla.sla.display_value,
+    stage: sla.stage.display_value,
+    breached: sla.has_breached.value === 'true',
+    dueBy: sla.planned_end_time.display_value,
+    elapsedPercent: sla.business_percentage.display_value,
+    timeLeft: sla.business_time_left.display_value
+  }));
+}
 
 const SUMMARY_FIELDS =
   'sys_id,sys_class_name,number,short_description,description,state,active,opened_at,sys_updated_on,assignment_group,due_date,approval';
@@ -40,7 +60,7 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
   static contexts = [chatContext];
 
   static aiContext = {
-    description: "One of the employee's requests or incidents: number, state, dates, assignment and approval",
+    description: "One of the employee's requests or incidents: number, state, dates, assignment, approval and service levels (SLAs: stage, due by, time left, breached)",
     bestFor: 'When the employee asks about the status of this request, what happens next, or wants to add information or chase it up'
   };
 
@@ -99,7 +119,8 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
               return null;
             })
           : null;
-      return {basePath, summary, record, variables, table};
+      const slas = await fetchSlas(sysId);
+      return {basePath, summary, record, variables, table, slas};
     } catch (error) {
       log.error({error: error.message, sysId}, 'Failed to load request');
       return {basePath, summary: null, record: null};
@@ -126,7 +147,8 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
         assignedGroup: value('assignment_group'),
         dueDate: value('due_date'),
         approval: value('approval')
-      }
+      },
+      slas: this.loaderData.slas || []
     });
   }
 

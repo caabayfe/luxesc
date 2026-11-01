@@ -89,6 +89,8 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
   @state() _submitting = false;
   @state() _error = '';
   @state() _prefilled = false;
+  // Reference values the assistant picked from several matches, until the employee changes them
+  @state() _guesses = [];
 
   _prevLoaderData = null;
   _blocks = [];
@@ -127,6 +129,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
       this._quantity = 1;
       this._error = '';
       this._prefilled = false;
+      this._guesses = [];
     }
   }
 
@@ -149,6 +152,7 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
     if (this._invalid.includes(name)) {
       this._invalid = this._invalid.filter(invalid => invalid !== name);
     }
+    this._guesses = this._guesses.filter(guess => guess.name !== name);
   }
 
   _onQuantity(e) {
@@ -160,15 +164,25 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
     this._values = {...this._values, ...result.values};
     this._displayValues = {...this._displayValues, ...result.displayValues};
     this._invalid = this._invalid.filter(name => !(name in result.values));
+    this._guesses = [
+      ...this._guesses.filter(guess => !(guess.name in result.values)),
+      ...result.guessed
+    ];
+    if (result.applied.length) this._prefilled = true;
     const missing = missingMandatory(this._fields, this._values).map(field => field.label);
     return {
       success: result.applied.length > 0,
       applied: result.applied,
       rejected: result.rejected,
+      guessed: result.guessed,
       missingMandatory: missing,
-      nextStep: missing.length
-        ? 'Ask the employee for the missing mandatory fields.'
-        : 'Ask the employee to review the form and press the request button.'
+      nextStep: [
+        result.guessed.length &&
+          'Tell the employee which value was picked for each guessed field and offer the alternatives.',
+        missing.length
+          ? 'Ask the employee for the missing mandatory fields.'
+          : 'Ask the employee to review the form and press the request button.'
+      ].filter(Boolean).join(' ')
     };
   }
 
@@ -314,6 +328,19 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
           ? html`<div class="aiux-alert aiux-alert-info aiux-alert-soft text-sm" role="status">
               ${i18n.getMessage('The assistant filled in this form from your conversation. Review it before you submit.')}
             </div>`
+          : nothing}
+        ${this._guesses.length
+          ? html`<ul class="flex flex-col gap-1 text-sm" aria-label=${i18n.getMessage('Values to check')}>
+              ${this._guesses.map(
+                guess => html`<li class="break-words">
+                  <span class="aiux-badge aiux-badge-sm aiux-badge-warning aiux-badge-soft me-1">${i18n.getMessage('Check')}</span>
+                  ${i18n.getMessage('{0} — picked {1}. Also matching: {2}.', guess.field, guess.chosen, guess.alternatives.join(', '))}
+                </li>`
+              )}
+            </ul>`
+          : nothing}
+        ${this._prefilled
+          ? nothing
           : html`<p class="text-sm text-text-secondary">
               ${i18n.getMessage('Say what you need in your own words and the assistant fills in the form. You review it and submit.')}
             </p>`}

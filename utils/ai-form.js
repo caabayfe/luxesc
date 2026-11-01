@@ -62,19 +62,25 @@ export function freeTextField(fields, values) {
 }
 
 // Reference tables almost always carry a `name` column (users, departments,
-// locations, groups); a 32-char hex value is taken as a sys_id as-is
+// locations, groups); a 32-char hex value is taken as a sys_id as-is. An exact
+// name wins; otherwise the first match is used and the others are reported so
+// the assistant can check with the employee
 async function resolveReference(field, raw) {
   const text = String(raw).trim();
   if (/^[0-9a-f]{32}$/.test(text)) return {value: text, displayValue: text};
   const records = await fetchRecords(field.reference, {
     encodedQuery: `nameSTARTSWITH${text}^ORDERBYname`,
     fields: 'sys_id,name',
-    limit: 1
+    limit: 5
   }).catch(() => []);
-  const record = records?.[0];
-  return record
-    ? {value: record.sys_id.value, displayValue: record.name.display_value}
-    : null;
+  if (!records?.length) return null;
+  const record =
+    records.find(candidate => normalise(candidate.name.display_value) === normalise(text)) ||
+    records[0];
+  const alternatives = normalise(record.name.display_value) === normalise(text)
+    ? []
+    : records.filter(candidate => candidate !== record).map(candidate => candidate.name.display_value);
+  return {value: record.sys_id.value, displayValue: record.name.display_value, alternatives};
 }
 
 async function coerce(field, raw) {
@@ -101,13 +107,14 @@ async function coerce(field, raw) {
 
 /**
  * Applies `{nameOrLabel: value}` to the form.
- * @returns {Promise<{values: object, displayValues: object, applied: string[], rejected: Array<{field: string, reason: string}>}>}
+ * @returns {Promise<{values: object, displayValues: object, applied: string[], rejected: Array<{field: string, reason: string}>, guessed: Array<{name: string, field: string, chosen: string, alternatives: string[]}>}>}
  */
 export async function applyAiValues(fields, input = {}) {
   const values = {};
   const displayValues = {};
   const applied = [];
   const rejected = [];
+  const guessed = [];
   for (const [key, raw] of Object.entries(input)) {
     const field = findField(fields, key);
     if (!field) {
@@ -131,6 +138,9 @@ export async function applyAiValues(fields, input = {}) {
     values[field.name] = result.value;
     displayValues[field.name] = result.displayValue;
     applied.push(field.label);
+    if (result.alternatives?.length) {
+      guessed.push({name: field.name, field: field.label, chosen: result.displayValue, alternatives: result.alternatives});
+    }
   }
-  return {values, displayValues, applied, rejected};
+  return {values, displayValues, applied, rejected, guessed};
 }
