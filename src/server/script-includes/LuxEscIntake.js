@@ -15,21 +15,21 @@ LuxEscIntake.prototype = {
     // Published articles matching the words, best match first (platform text search)
     searchKnowledge: function (runId, query) {
         if (!this._run(runId)) return { error: 'Unknown intake run' };
-        var article = new GlideRecord('kb_knowledge');
-        article.addQuery('workflow_state', 'published');
-        article.addActiveQuery();
-        article.addQuery('123TEXTQUERY321', this._words(query));
-        article.setLimit(LuxEscIntake.LIMIT);
-        article.query();
-        var articles = [];
-        while (article.next()) {
-            articles.push({
+        var self = this;
+        var articles = this._search(query, function (words) {
+            var article = new GlideRecord('kb_knowledge');
+            article.addQuery('workflow_state', 'published');
+            article.addActiveQuery();
+            article.addQuery('123TEXTQUERY321', words);
+            return article;
+        }, function (article) {
+            return {
                 sysId: article.getUniqueValue(),
                 number: article.getValue('number'),
-                title: article.getValue('short_description'),
-                excerpt: this._plain(article.getValue('text')).substring(0, 1200),
-            });
-        }
+                title: self._plain(article.getValue('short_description')),
+                excerpt: self._plain(article.getValue('text')).substring(0, 1200),
+            };
+        });
         return { articles: articles };
     },
 
@@ -37,40 +37,49 @@ LuxEscIntake.prototype = {
     // the employee because the incidents belong to other people
     similarIncidents: function (runId, query) {
         if (!this._run(runId)) return { error: 'Unknown intake run' };
-        var incident = new GlideRecord('incident');
-        incident.addQuery('state', 'IN', '6,7');
-        incident.addQuery('close_notes', '!=', '');
-        incident.addQuery('123TEXTQUERY321', this._words(query));
-        incident.setLimit(LuxEscIntake.LIMIT);
-        incident.query();
-        var incidents = [];
-        while (incident.next()) {
-            incidents.push({
-                problem: incident.getValue('short_description'),
+        var self = this;
+        var incidents = this._search(query, function (words) {
+            var incident = new GlideRecord('incident');
+            incident.addQuery('state', 'IN', '6,7');
+            incident.addQuery('close_notes', '!=', '');
+            incident.addQuery('123TEXTQUERY321', words);
+            return incident;
+        }, function (incident) {
+            return {
+                problem: self._plain(incident.getValue('short_description')),
                 category: incident.getValue('category'),
-                fix: this._plain(incident.getValue('close_notes')).substring(0, 600),
-            });
-        }
-        return { incidents: incidents };
+                fix: self._plain(incident.getValue('close_notes')).substring(0, 600),
+            };
+        });
+        // Demo and cloned data repeat the same incident; one of each is enough
+        var problems = {};
+        return {
+            incidents: incidents.filter(function (incident) {
+                var key = incident.problem + '|' + incident.fix;
+                if (problems[key]) return false;
+                problems[key] = true;
+                return true;
+            }),
+        };
     },
 
     // Orderable catalog items (requests for hardware, software, access)
     searchCatalog: function (runId, query) {
         if (!this._run(runId)) return { error: 'Unknown intake run' };
-        var item = new GlideRecord('sc_cat_item');
-        item.addActiveQuery();
-        item.addQuery('sys_class_name', 'IN', 'sc_cat_item,sc_cat_item_producer');
-        item.addQuery('123TEXTQUERY321', this._words(query));
-        item.setLimit(LuxEscIntake.LIMIT);
-        item.query();
-        var items = [];
-        while (item.next()) {
-            items.push({
+        var self = this;
+        var items = this._search(query, function (words) {
+            var item = new GlideRecord('sc_cat_item');
+            item.addActiveQuery();
+            item.addQuery('sys_class_name', 'IN', 'sc_cat_item,sc_cat_item_producer');
+            item.addQuery('123TEXTQUERY321', words);
+            return item;
+        }, function (item) {
+            return {
                 sysId: item.getUniqueValue(),
                 name: item.getValue('name'),
-                description: this._plain(item.getValue('short_description')).substring(0, 300),
-            });
-        }
+                description: self._plain(item.getValue('short_description')).substring(0, 300),
+            };
+        });
         return { items: items };
     },
 
@@ -147,7 +156,34 @@ LuxEscIntake.prototype = {
     },
 
     _words: function (query) {
-        return String(query || '').replace(/[^\w\sÀ-ɏ-]/g, ' ').substring(0, 200);
+        return String(query || '').replace(/[^\w\sÀ-ɏ-]/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 200);
+    },
+
+    // Text search matches every word, so a query with no hits is retried with its longest
+    // words one at a time (the most distinctive ones), keeping results in order and unique
+    _search: function (query, build, map) {
+        var words = this._words(query);
+        var singles = words.indexOf(' ') < 0 ? [] : words.split(' ').filter(function (word) {
+            return word.length > 2;
+        }).sort(function (a, b) {
+            return b.length - a.length;
+        }).slice(0, 3);
+        var attempts = [words].concat(singles);
+        var results = [];
+        var seen = {};
+        for (var i = 0; i < attempts.length && results.length < LuxEscIntake.LIMIT; i++) {
+            if (!attempts[i]) continue;
+            var gr = build(attempts[i]);
+            gr.setLimit(LuxEscIntake.LIMIT);
+            gr.query();
+            while (gr.next() && results.length < LuxEscIntake.LIMIT) {
+                if (seen[gr.getUniqueValue()]) continue;
+                seen[gr.getUniqueValue()] = true;
+                results.push(map(gr));
+            }
+            if (i === 0 && results.length) break;
+        }
+        return results;
     },
 
     _plain: function (html) {

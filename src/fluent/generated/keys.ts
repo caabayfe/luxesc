@@ -362,6 +362,10 @@ declare global {
                         table: 'sys_ws_operation'
                         id: 'e8c520a5a7d6401e94a3aa853748e8f1'
                     }
+                    'concierge-api-outcome': {
+                        table: 'sys_ws_operation'
+                        id: 'a9ea854a5b5940d29834ae2fe706ff3c'
+                    }
                     'concierge-api-start': {
                         table: 'sys_ws_operation'
                         id: '4173ce8e7bba40ea999bb0ace5371403'

@@ -31,6 +31,22 @@ const intakeScript = `(function process(request, response) {
     }
 })(request, response);`
 
+const outcomeScript = `(function process(request, response) {
+    var body = request.body && request.body.data || {};
+    try {
+        var run = new x_everi_luxesc.LuxEscConcierge().recordOutcome(request.pathParams.run, body.key, body.action);
+        if (run === null) {
+            response.setStatus(404);
+            response.setBody({ error: { message: 'Briefing item not found' } });
+            return;
+        }
+        response.setBody({ run: run });
+    } catch (e) {
+        response.setStatus(400);
+        response.setBody({ error: { message: e.message } });
+    }
+})(request, response);`
+
 const latestScript = `(function process(request, response) {
     var run = new x_everi_luxesc.LuxEscConcierge().latest() || {};
     if (run === null) {
@@ -51,7 +67,7 @@ const traceScript = `(function process(request, response) {
     response.setBody({ run: run });
 })(request, response);`
 
-// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /intake
+// URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes, /intake
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -79,6 +95,15 @@ export const conciergeApi = RestApi({
             script: intakeScript,
             version: 1,
             shortDescription: "Start the intake agent on the employee's description of a problem ({text})",
+        },
+        {
+            $id: Now.ID['concierge-api-outcome'],
+            name: 'record outcome',
+            method: 'POST',
+            path: '/runs/{run}/outcomes',
+            script: outcomeScript,
+            version: 1,
+            shortDescription: 'Record what the employee did on a briefing item ({key, action})',
         },
         {
             $id: Now.ID['concierge-api-latest'],

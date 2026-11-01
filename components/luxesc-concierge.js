@@ -97,8 +97,6 @@ export class Concierge extends AIUXElement {
   @state() _error = '';
   // The action being confirmed: {key, action, comment, busy, error}
   @state() _pending = null;
-  // Outcome message per item key, once an action ran
-  @state() _outcomes = {};
 
   _timer = null;
   _startedAt = 0;
@@ -139,7 +137,6 @@ export class Concierge extends AIUXElement {
     try {
       this._run = await callRuns('/runs', {method: 'POST'});
       this._pending = null;
-      this._outcomes = {};
       this._startedAt = Date.now();
       if (this._run?.state === 'running') this._poll();
     } catch (error) {
@@ -185,8 +182,18 @@ export class Concierge extends AIUXElement {
     this._pending = {...pending, busy: true, error: ''};
     try {
       await action.run(item, comment);
-      this._outcomes = {...this._outcomes, [pending.key]: action.done()};
       this._pending = null;
+      this._run = {
+        ...this._run,
+        briefing: {
+          ...this._run.briefing,
+          items: this._run.briefing.items.map(entry => (itemKey(entry) === pending.key ? {...entry, outcome: pending.action} : entry))
+        }
+      };
+      // The action is done; remembering it only stops the card offering it again
+      callRuns(`/runs/${this._run.id}/outcomes`, {method: 'POST', body: {key: pending.key, action: pending.action}}).catch(error =>
+        log.warn({error: error.message}, 'Outcome not recorded')
+      );
     } catch (error) {
       log.error({error: error.message, action: pending.action}, 'Concierge action failed');
       this._pending = {...pending, busy: false, error: i18n.getMessage('That did not work: {0}', error.message)};
@@ -237,8 +244,8 @@ export class Concierge extends AIUXElement {
 
   _renderActions(item) {
     const key = itemKey(item);
-    if (this._outcomes[key]) {
-      return html`<p class="aiux-badge aiux-badge-success aiux-badge-soft h-auto py-1 text-sm" role="status">${this._outcomes[key]}</p>`;
+    if (ACTIONS[item.outcome]) {
+      return html`<p class="aiux-badge aiux-badge-success aiux-badge-soft h-auto py-1 text-sm" role="status">${ACTIONS[item.outcome].done()}</p>`;
     }
     if (this._pending?.key === key) return this._renderConfirm(item);
     const actions = actionsFor(item);

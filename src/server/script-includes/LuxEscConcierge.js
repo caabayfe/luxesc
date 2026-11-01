@@ -10,6 +10,7 @@ LuxEscConcierge.REQUEST_CLASSES = 'sc_req_item,incident';
 // Execution plan states after which the agent writes no more steps
 LuxEscConcierge.DONE_STATES = ['completed', 'terminated', 'failed', 'cancelled', 'canceled', 'error'];
 LuxEscConcierge.MAX_ITEMS = 6;
+LuxEscConcierge.OUTCOMES = ['approve', 'reject', 'comment', 'close', 'reopen'];
 
 LuxEscConcierge.prototype = {
     initialize: function () {},
@@ -36,7 +37,7 @@ LuxEscConcierge.prototype = {
             if (!agentId) throw new Error('The ' + agent + ' agent is not installed');
             var objective = kind === 'intake'
                 ? 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId +
-                    '. The employee wrote:  + text + '
+                    '. The employee wrote: """' + text.replace(/"""/g, '"') + '"""'
                 : 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId;
             var result = new sn_aia.AiAgentRuntimeUtil().startAiAgentConversation({
                 agentId: agentId,
@@ -169,6 +170,27 @@ LuxEscConcierge.prototype = {
         run.setValue('briefing', JSON.stringify(clean));
         run.update();
         return 'Briefing saved with ' + clean.items.length + ' items';
+    },
+
+    // Remembers what the employee did on a briefing item (approve, comment, ...), so the
+    // briefing does not offer it again after a reload. Only the run's owner can record.
+    recordOutcome: function (runId, key, action) {
+        var run = new GlideRecord(LuxEscConcierge.RUN);
+        if (!run.get(runId) || run.getValue('user') !== gs.getUserID()) return null;
+        if (LuxEscConcierge.OUTCOMES.indexOf(action) < 0) throw new Error('Unknown action ' + action);
+        var briefing = this._parse(run.getValue('briefing') || '');
+        if (!briefing || !(briefing.items instanceof Array)) return null;
+        var found = false;
+        briefing.items.forEach(function (item) {
+            if (key && (item.approvalId === key || item.sysId === key)) {
+                item.outcome = action;
+                found = true;
+            }
+        });
+        if (!found) return null;
+        run.setValue('briefing', JSON.stringify(briefing));
+        run.update();
+        return this.trace(runId);
     },
 
     // ---- Internals ------------------------------------------------------------------------
