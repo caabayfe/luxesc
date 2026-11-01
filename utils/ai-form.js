@@ -1,0 +1,111 @@
+import {FieldType} from '@servicenow/aiux/aiux-components-control';
+import {fetchRecords} from './api.js';
+
+/**
+ * Bridges the order form and the Now Assist chat: describes the variables to
+ * the assistant and applies the values it proposes, matching the loose input
+ * an LLM produces (labels, display values, "yes") to what each control takes.
+ */
+
+const TRUE_WORDS = ['true', 'yes', 'y', '1', 'on'];
+
+const normalise = text => String(text ?? '').trim().toLowerCase();
+
+/** Serializable summary of the form for setAiContext / tool results. */
+export function describeFields(fields, values) {
+  return fields.map(field => ({
+    name: field.name,
+    label: field.label,
+    type: field.type,
+    mandatory: field.mandatory,
+    readonly: field.readonly,
+    ...(field.choices && {
+      choices: field.choices.map(choice => choice.displayValue)
+    }),
+    ...(field.reference && {references: field.reference}),
+    ...(field.fieldHint && {hint: field.fieldHint}),
+    value: values[field.name] ?? ''
+  }));
+}
+
+function findField(fields, key) {
+  const wanted = normalise(key);
+  return (
+    fields.find(field => normalise(field.name) === wanted) ||
+    fields.find(field => normalise(field.label) === wanted)
+  );
+}
+
+// Reference tables almost always carry a `name` column (users, departments,
+// locations, groups); a 32-char hex value is taken as a sys_id as-is
+async function resolveReference(field, raw) {
+  const text = String(raw).trim();
+  if (/^[0-9a-f]{32}$/.test(text)) return {value: text, displayValue: text};
+  const records = await fetchRecords(field.reference, {
+    encodedQuery: `nameSTARTSWITH${text}^ORDERBYname`,
+    fields: 'sys_id,name',
+    limit: 1
+  }).catch(() => []);
+  const record = records?.[0];
+  return record
+    ? {value: record.sys_id.value, displayValue: record.name.display_value}
+    : null;
+}
+
+async function coerce(field, raw) {
+  if (field.type === FieldType.Boolean) {
+    const value = TRUE_WORDS.includes(normalise(raw));
+    return {value, displayValue: String(value)};
+  }
+  if (field.choices) {
+    const wanted = normalise(raw);
+    const choice = field.choices.find(
+      option =>
+        normalise(option.value) === wanted ||
+        normalise(option.displayValue) === wanted
+    );
+    return choice
+      ? {value: choice.value, displayValue: choice.displayValue}
+      : null;
+  }
+  if (field.reference && !field.multiSelection) {
+    return resolveReference(field, raw);
+  }
+  return {value: String(raw), displayValue: String(raw)};
+}
+
+/**
+ * Applies `{nameOrLabel: value}` to the form.
+ * @returns {Promise<{values: object, displayValues: object, applied: string[], rejected: Array<{field: string, reason: string}>}>}
+ */
+export async function applyAiValues(fields, input = {}) {
+  const values = {};
+  const displayValues = {};
+  const applied = [];
+  const rejected = [];
+  for (const [key, raw] of Object.entries(input)) {
+    const field = findField(fields, key);
+    if (!field) {
+      rejected.push({field: key, reason: 'No such field on this form'});
+      continue;
+    }
+    if (field.readonly) {
+      rejected.push({field: key, reason: 'Field is read-only'});
+      continue;
+    }
+    const result = await coerce(field, raw);
+    if (!result) {
+      rejected.push({
+        field: key,
+        reason: field.choices
+          ? `Not one of: ${field.choices.map(choice => choice.displayValue).join(', ')}`
+          : `No ${field.reference} record matches "${raw}"`
+      });
+      continue;
+    }
+    values[field.name] = result.value;
+    displayValues[field.name] = result.displayValue;
+    applied.push(field.label);
+  }
+  return {values, displayValues, applied, rejected};
+}

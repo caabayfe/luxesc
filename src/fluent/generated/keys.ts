@@ -194,6 +194,10 @@ declare global {
                         table: 'sys_module'
                         id: 'ddce630627624da395aa549152ec092c'
                     }
+                    'luxesc-chat-deployment-channel': {
+                        table: 'sys_aix_experience_properties'
+                        id: '618bcdbb0a6041fa9a1dea85666ec2c7'
+                    }
                     package_json: {
                         table: 'sys_module'
                         id: 'd8fb701e0f3541edacf6885ba5463327'

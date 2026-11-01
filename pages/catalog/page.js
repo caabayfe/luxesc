@@ -1,10 +1,11 @@
-import {html, css, nothing} from 'lit';
+import {html, css, nothing, isServer} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
 import {classMap} from 'lit/directives/class-map.js';
 import {
   AIUXElement,
   decorators,
-  getLogger
+  getLogger,
+  withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
@@ -31,7 +32,49 @@ function itemsPage({categoryId, text, offset}) {
 @customElement('x-everi-luxesc-catalog-page')
 @title('Request something')
 @acl([{roles: ['snc_internal']}])
-export default class CatalogPage extends AIUXElement {
+export default class CatalogPage extends withWidgetContext(AIUXElement) {
+  static aiContext = {
+    description: 'The service catalog: categories, a search box and the matching items',
+    bestFor:
+      'When the employee needs something (hardware, software, access, a service) and you have to find the right catalog item'
+  };
+
+  static client_tools = {
+    search_catalog: {
+      description:
+        'Search the service catalog and show the matches on the page. Returns the top items with their sys_id.',
+      arguments: [
+        {name: 'text', description: 'What the employee needs, in a few keywords', type: 'string', required: true}
+      ],
+      definition: async function ({text} = {}) {
+        const items = await fetchItems({catalogId: SERVICE_CATALOG_ID, text, limit: 5});
+        navigate('/catalog', {query: {q: text}});
+        return {
+          success: true,
+          items: (items || []).map(item => ({
+            sysId: item.sys_id,
+            name: item.name,
+            shortDescription: item.short_description,
+            category: item.category?.title
+          }))
+        };
+      }
+    },
+    open_catalog_item: {
+      description: 'Open the order form of a catalog item so it can be filled in.',
+      arguments: [
+        {name: 'sysId', description: 'Catalog item sys_id', type: 'string', required: true}
+      ],
+      definition: async function ({sysId} = {}) {
+        if (!/^[0-9a-f]{32}$/.test(String(sysId))) {
+          return {success: false, reason: 'sysId must be a catalog item sys_id'};
+        }
+        navigate(`/catalog/${sysId}`);
+        return {success: true};
+      }
+    }
+  };
+
   @state() _items = [];
   @state() _hasMore = false;
   @state() _loadingMore = false;
@@ -78,6 +121,17 @@ export default class CatalogPage extends AIUXElement {
 
   firstUpdated() {
     setDocumentTitle(i18n.getMessage('Request something'));
+  }
+
+  updated(changed) {
+    super.updated?.(changed);
+    if (isServer || !(changed.has('_items') || changed.has('loaderData'))) return;
+    const {text, categoryId, categories = []} = this.loaderData || {};
+    this.setAiContext({
+      search: text || '',
+      category: categories.find(category => category.sys_id === categoryId)?.title || '',
+      items: this._items.map(item => ({sysId: item.sys_id, name: item.name}))
+    });
   }
 
   _filter(query) {

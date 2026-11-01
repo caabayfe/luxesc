@@ -1,9 +1,10 @@
-import {html, css, nothing} from 'lit';
+import {html, css, nothing, isServer} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
 import {
   AIUXElement,
   decorators,
-  getLogger
+  getLogger,
+  withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {navigate} from '@servicenow/aiux/aiux-client';
@@ -22,6 +23,7 @@ import {
   toBlocks,
   toSubmission
 } from '../../../utils/variables.js';
+import {applyAiValues, describeFields} from '../../../utils/ai-form.js';
 import {RECORD_PRODUCER_CLASS} from '../../../constants/catalog.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import './components/luxesc-variable-form.js';
@@ -35,7 +37,46 @@ const MAX_QUANTITY = 10;
 @customElement('x-everi-luxesc-catalog-item-page')
 @title('Catalog item')
 @acl([{roles: ['snc_internal']}])
-export default class CatalogItemPage extends AIUXElement {
+export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
+  static aiContext = {
+    description:
+      'Order form for one service catalog item: its variables, current answers, price and quantity',
+    bestFor:
+      'When the employee wants help filling in or understanding this request form. Fill the form, then ask the employee to review it and press the request button themselves.'
+  };
+
+  // The assistant prepares the order; only the employee submits it
+  static client_tools = {
+    fill_order_form: {
+      description:
+        'Fill variables on the open order form. Keys are variable names or labels; values are plain text, choice labels, yes/no, or a name for reference fields. Returns what was applied, what was rejected and which mandatory fields are still empty.',
+      arguments: [
+        {
+          name: 'values',
+          description: 'Object mapping variable name or label to the value to set',
+          type: 'object',
+          required: true
+        }
+      ],
+      definition: async function ({values} = {}) {
+        return this._applyAiValues(values);
+      }
+    },
+    set_quantity: {
+      description: `Set how many of this item to order (1-${MAX_QUANTITY}).`,
+      arguments: [
+        {name: 'quantity', description: 'Number of items', type: 'number', required: true}
+      ],
+      definition: async function ({quantity} = {}) {
+        if (!this.loaderData?.item?.show_quantity || this._isProducer) {
+          return {success: false, reason: 'This item does not take a quantity'};
+        }
+        this._quantity = Math.min(MAX_QUANTITY, Math.max(1, Number(quantity) || 1));
+        return {success: true, quantity: this._quantity};
+      }
+    }
+  };
+
   @state() _values = {};
   @state() _displayValues = {};
   @state() _invalid = [];
@@ -102,6 +143,42 @@ export default class CatalogItemPage extends AIUXElement {
 
   _onQuantity(e) {
     this._quantity = Number(e.target.value) || 1;
+  }
+
+  async _applyAiValues(input) {
+    const result = await applyAiValues(this._fields, input);
+    this._values = {...this._values, ...result.values};
+    this._displayValues = {...this._displayValues, ...result.displayValues};
+    this._invalid = this._invalid.filter(name => !(name in result.values));
+    const missing = missingMandatory(this._fields, this._values).map(field => field.label);
+    return {
+      success: result.applied.length > 0,
+      applied: result.applied,
+      rejected: result.rejected,
+      missingMandatory: missing,
+      nextStep: missing.length
+        ? 'Ask the employee for the missing mandatory fields.'
+        : 'Ask the employee to review the form and press the request button.'
+    };
+  }
+
+  updated(changed) {
+    super.updated?.(changed);
+    if (isServer || !this.loaderData?.item) return;
+    if (changed.has('loaderData') || changed.has('_values') || changed.has('_quantity')) {
+      const item = this.loaderData.item;
+      this.setAiContext({
+        catalogItem: {
+          sysId: item.sys_id,
+          name: item.name,
+          shortDescription: item.short_description,
+          price: item.show_price ? item.price : undefined,
+          isRecordProducer: this._isProducer
+        },
+        quantity: this._quantity,
+        fields: describeFields(this._fields, this._values)
+      });
+    }
   }
 
   // The order lands on a request; the employee tracks the requested item

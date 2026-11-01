@@ -6,6 +6,10 @@
     "token": ""
   },
   "build": {
-    "exclude": ["**/*.test.js", "**/test/**"]
-  }
+    "exclude": [
+      "**/*.test.js",
+      "**/test/**"
+    ]
+  },
+  "chatDeploymentChannelSysId": "d92d891233045f50e4525e1ace5c7b64"
 }
