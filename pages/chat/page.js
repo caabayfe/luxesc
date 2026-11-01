@@ -10,7 +10,7 @@ const {acl, title} = decorators;
 // Full-page conversation with the assistant; the home chat hands off here
 @customElement('x-everi-luxesc-chat-page')
 @title('Assistant')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class ChatPage extends AIUXElement {
   static styles = css`
     :host {

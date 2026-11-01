@@ -55,7 +55,7 @@ const VARIABLES_VIEW = 'default';
 
 @customElement('x-everi-luxesc-ticket-page')
 @title('Request')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class TicketPage extends withWidgetContext(AIUXElement) {
   static contexts = [chatContext];
 

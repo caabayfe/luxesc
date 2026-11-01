@@ -39,7 +39,7 @@ const MAX_QUANTITY = 10;
 
 @customElement('x-everi-luxesc-catalog-item-page')
 @title('Catalog item')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
   static contexts = [chatContext];
 

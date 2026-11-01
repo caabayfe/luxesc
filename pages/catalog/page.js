@@ -33,7 +33,7 @@ function itemsPage({categoryId, text, offset}) {
 
 @customElement('x-everi-luxesc-catalog-page')
 @title('Request something')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class CatalogPage extends withWidgetContext(AIUXElement) {
   static aiContext = {
     description: 'The service catalog: categories, a search box and the matching items',

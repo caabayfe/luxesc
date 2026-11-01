@@ -28,7 +28,7 @@ const QUERIES = {
 
 @customElement('x-everi-luxesc-requests-page')
 @title('My requests')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class RequestsPage extends withWidgetContext(AIUXElement) {
   @state() _filter = 'open';
 

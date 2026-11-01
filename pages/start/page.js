@@ -33,7 +33,7 @@ const MY_OPEN_REQUESTS =
 
 @customElement('x-everi-luxesc-home-page')
 @title('Home')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class HomePage extends withWidgetContext(AIUXElement) {
   static contexts = [userContext, chatContext];
 

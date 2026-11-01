@@ -17,7 +17,7 @@ const ARTICLE_FIELDS = 'sys_id,number,short_description,text,kb_knowledge_base,s
 
 @customElement('x-everi-luxesc-knowledge-page')
 @title('Knowledge article')
-@acl([{roles: ['snc_internal']}])
+@acl([{securityAttribute: 'user_is_authenticated'}])
 export default class KnowledgePage extends withWidgetContext(AIUXElement) {
   static contexts = [chatContext];
 

@@ -5,33 +5,72 @@ declare global {
         namespace Internal {
             interface Keys extends KeysRegistry {
                 explicit: {
+                    'aiux-acl|experience:luxesc|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: '3e0702de8a9e4937a45d9084e6bc989e'
+                    }
+                    'aiux-acl|x-everi-luxesc-catalog-item-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: '0885f9a3db624977a13dfa5aa9962267'
+                    }
                     'aiux-acl|x-everi-luxesc-catalog-item-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: 'd9b2d6ba7011405eaa32a3430661244b'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-catalog-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: 'dc1feefb65884a8e9b64adca8c4833fd'
                     }
                     'aiux-acl|x-everi-luxesc-catalog-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: '030c44589be145d094803e1d235a077c'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-chat-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: '776bb575875a49cd8ec088acc162353d'
                     }
                     'aiux-acl|x-everi-luxesc-chat-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: '154fbde66a8143139e43093d1692bdf5'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-home-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: '92d57c604e6242b1b4091617b811a5e6'
                     }
                     'aiux-acl|x-everi-luxesc-home-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: 'c74eb087e75f45ad8f18f3954da628ee'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-knowledge-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: '5b84725019ea47c3aa20637c252b49d8'
                     }
                     'aiux-acl|x-everi-luxesc-knowledge-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: '3cae36b33ca94e9786dc5585b56f6ca7'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-requests-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: 'bfd976cb67ee40caa99d7487083108fb'
                     }
                     'aiux-acl|x-everi-luxesc-requests-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: '61ce522479054b659098c6c37de6660d'
+                        deleted: true
+                    }
+                    'aiux-acl|x-everi-luxesc-ticket-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: 'e2c5175c66564576afed11f425829867'
                     }
                     'aiux-acl|x-everi-luxesc-ticket-page|read|allow_if|snc_internal': {
                         table: 'sys_security_acl'
                         id: '753cb490ffd14f538b9191801234930a'
+                        deleted: true
                     }
                     'aiux-color-swatch|luxesc': {
                         table: 'sys_aix_color_swatch'
@@ -446,6 +485,7 @@ declare global {
                     'luxesc-experience-acl': {
                         table: 'sys_security_acl'
                         id: '7b8f4034f01e47ebb0aaa51fc6913b6d'
+                        deleted: true
                     }
                     'luxesc-intake-si': {
                         table: 'sys_script_include'
@@ -561,6 +601,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: '111a8f1a93a444b1853d7cc5c5234570'
+                        deleted: true
                         key: {
                             sys_security_acl: '154fbde66a8143139e43093d1692bdf5'
                             sys_user_role: {
@@ -678,6 +719,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: '2e98cb69a93b4de29ab8c414b73a1c3e'
+                        deleted: true
                         key: {
                             sys_security_acl: 'd9b2d6ba7011405eaa32a3430661244b'
                             sys_user_role: {
@@ -762,6 +804,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: '41ddd264ff8a4b4c971bbe4cc2829e4f'
+                        deleted: true
                         key: {
                             sys_security_acl: '030c44589be145d094803e1d235a077c'
                             sys_user_role: {
@@ -971,6 +1014,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: '9c8073d2d0f7498a9cdc97bfc083a5f6'
+                        deleted: true
                         key: {
                             sys_security_acl: '753cb490ffd14f538b9191801234930a'
                             sys_user_role: {
@@ -984,6 +1028,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: '9d6fddbab06d49acaa370d32a1d3d31a'
+                        deleted: true
                         key: {
                             sys_security_acl: '3cae36b33ca94e9786dc5585b56f6ca7'
                             sys_user_role: {
@@ -1080,6 +1125,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: 'b22939bcc6df4161b3d0212cf66502ea'
+                        deleted: true
                         key: {
                             sys_security_acl: 'c74eb087e75f45ad8f18f3954da628ee'
                             sys_user_role: {
@@ -1180,6 +1226,7 @@ declare global {
                     {
                         table: 'sys_security_acl_role'
                         id: 'd8d0b706d6cb45d5a7136dfb036dac72'
+                        deleted: true
                         key: {
                             sys_security_acl: '61ce522479054b659098c6c37de6660d'
                             sys_user_role: {

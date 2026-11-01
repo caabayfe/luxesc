@@ -11,5 +11,10 @@
       "**/test/**"
     ]
   },
-  "chatDeploymentChannelSysId": "d92d891233045f50e4525e1ace5c7b64"
+  "chatDeploymentChannelSysId": "d92d891233045f50e4525e1ace5c7b64",
+  "experienceAcls": [
+    {
+      "securityAttribute": "user_is_authenticated"
+    }
+  ]
 }
