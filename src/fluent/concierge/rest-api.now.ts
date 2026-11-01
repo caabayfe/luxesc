@@ -87,6 +87,14 @@ const followScript = `(function process(request, response) {
     }
 })(request, response);`
 
+const trendingScript = `(function process(request, response) {
+    response.setBody({ articles: new x_everi_luxesc.LuxEscKnowledge().trending() });
+})(request, response);`
+
+const viewScript = `(function process(request, response) {
+    response.setBody({ recorded: new x_everi_luxesc.LuxEscKnowledge().recordView(request.pathParams.article) });
+})(request, response);`
+
 const latestScript = `(function process(request, response) {
     var run = new x_everi_luxesc.LuxEscConcierge().latest() || {};
     if (run === null) {
@@ -108,7 +116,8 @@ const traceScript = `(function process(request, response) {
 })(request, response);`
 
 // URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes,
-// /runs/{run}/fixed, /intake, /plans, /known-issues, /known-issues/{issue}/follow
+// /runs/{run}/fixed, /intake, /plans, /known-issues, /known-issues/{issue}/follow,
+// /knowledge/trending, /knowledge/{article}/view
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -181,6 +190,24 @@ export const conciergeApi = RestApi({
             script: followScript,
             version: 1,
             shortDescription: "Raise the employee's incident under a major incident ({shortDescription, description})",
+        },
+        {
+            $id: Now.ID['concierge-api-trending'],
+            name: 'trending articles',
+            method: 'GET',
+            path: '/knowledge/trending',
+            script: trendingScript,
+            version: 1,
+            shortDescription: 'The most viewed knowledge articles of the last 30 days that the employee can read',
+        },
+        {
+            $id: Now.ID['concierge-api-article-view'],
+            name: 'record article view',
+            method: 'POST',
+            path: '/knowledge/{article}/view',
+            script: viewScript,
+            version: 1,
+            shortDescription: 'Record that the employee opened a knowledge article (kb.view event)',
         },
         {
             $id: Now.ID['concierge-api-latest'],

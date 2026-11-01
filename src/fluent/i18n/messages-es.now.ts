@@ -9,6 +9,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-8da8093005b6'],
+    table: 'sys_ui_message',
+    data: { key: "1 view this month", message: "1 visita este mes", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-475634ddb3bb'],
     table: 'sys_ui_message',
     data: { key: "About my request {0}:", message: "Sobre mi solicitud {0}:", language: 'es' },
@@ -1053,6 +1059,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-8a12d5626fe3'],
+    table: 'sys_ui_message',
+    data: { key: "Trending", message: "Tendencias", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-ddc04e083593'],
     table: 'sys_ui_message',
     data: { key: "Try another search or category.", message: "Pruebe otra búsqueda u otra categoría.", language: 'es' },
@@ -1272,6 +1284,12 @@ Record({
     $id: Now.ID['luxesc-es-65ca71b841bb'],
     table: 'sys_ui_message',
     data: { key: "{0} days late", message: "{0} días de retraso", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-8bfc1419dbe0'],
+    table: 'sys_ui_message',
+    data: { key: "{0} views this month", message: "{0} visitas este mes", language: 'es' },
 })
 
 Record({

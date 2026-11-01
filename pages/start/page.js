@@ -19,14 +19,14 @@ import '../../components/luxesc-concierge.js';
 import '../../components/luxesc-known-issues.js';
 import '../../components/luxesc-on-its-way.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
+import {callConcierge} from '../../utils/agent-runs.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-home');
 
 // Short lists on the home tiles; the full ones are one click away
 const CATEGORY_COUNT = 6;
-const ANSWER_COUNT = 5;
-const POPULAR_ANSWERS = 'workflow_state=published^active=true^ORDERBYDESCsys_view_count';
+
 const REQUEST_FIELDS = 'sys_id,number,short_description,state,sys_class_name,sys_updated_on';
 const MY_OPEN_REQUESTS =
   'active=true^opened_by=javascript:gs.getUserID()^sys_class_nameINsc_req_item,incident^ORDERBYDESCsys_updated_on';
@@ -82,19 +82,19 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
   `;
 
   static async loader(ctx) {
-    const [categories, answers, openRequests] = await Promise.allSettled([
+    const [categories, trending, openRequests] = await Promise.allSettled([
       fetchCategories(SERVICE_CATALOG_ID),
-      fetchRecords('kb_knowledge', {encodedQuery: POPULAR_ANSWERS, fields: 'sys_id,short_description', limit: ANSWER_COUNT}),
+      callConcierge('/knowledge/trending'),
       fetchRecords('task', {encodedQuery: MY_OPEN_REQUESTS, fields: REQUEST_FIELDS, limit: 10})
     ]);
-    [categories, answers, openRequests]
+    [categories, trending, openRequests]
       .filter(result => result.status === 'rejected')
       .forEach(result => log.warn({error: result.reason?.message}, 'Home data unavailable'));
     const value = result => (result.status === 'fulfilled' ? result.value || [] : []);
     return {
       basePath: ctx.basePath || '',
       categories: value(categories),
-      answers: value(answers),
+      trending: trending.status === 'fulfilled' ? trending.value?.articles || [] : [],
       openRequests: value(openRequests)
     };
   }
@@ -160,8 +160,9 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
         <ul class="flex flex-col">
           ${rows.map(
             row => html`<li>
-              <a class="block truncate rounded-box px-2 py-2 hover:bg-base-200 focus-visible:bg-base-200" href=${row.href} title=${row.title}>
-                ${row.title}
+              <a class="flex items-center justify-between gap-3 rounded-box px-2 py-2 hover:bg-base-200 focus-visible:bg-base-200" href=${row.href}>
+                <span class="min-w-0 truncate" title=${row.title}>${row.title}</span>
+                ${row.meta ? html`<span class="shrink-0 text-xs text-text-secondary">${row.meta}</span>` : nothing}
               </a>
             </li>`
           )}
@@ -171,7 +172,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
   }
 
   render() {
-    const {categories = [], answers = []} = this.loaderData || {};
+    const {categories = [], trending = []} = this.loaderData || {};
     const base = this._basePath;
     return html`<div class="mx-auto flex max-w-6xl flex-col gap-6 p-4 lg:p-8">
       <h1 class="break-words text-3xl font-bold">${this._renderGreeting()}</h1>
@@ -184,9 +185,18 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
         <div class="flex min-w-0 flex-col gap-6">
           <luxesc-known-issues tile></luxesc-known-issues>
           ${this._renderLinks({
-            id: 'answers-title',
-            heading: i18n.getMessage('Popular answers'),
-            rows: answers.map(a => ({href: `${base}/knowledge/${a.sys_id.value}`, title: a.short_description.display_value})),
+            id: 'trending-title',
+            heading: i18n.getMessage('Trending'),
+            rows: trending.map(a => ({
+              href: `${base}/knowledge/${a.sysId}`,
+              title: a.title,
+              // Recent views only; articles that fill the list from all-time views show none
+              meta: !a.recentViews
+                ? ''
+                : a.recentViews === 1
+                  ? i18n.getMessage('1 view this month')
+                  : i18n.getMessage('{0} views this month', a.recentViews)
+            })),
             more: {href: `${base}/knowledge`, label: i18n.getMessage('All answers')}
           })}
           ${this._renderLinks({

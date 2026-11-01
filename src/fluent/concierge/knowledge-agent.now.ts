@@ -1,5 +1,5 @@
 import '@servicenow/sdk/global'
-import { AiAgent, BusinessRule, Property } from '@servicenow/sdk/core'
+import { AiAgent, BusinessRule, CrossScopePrivilege, Property } from '@servicenow/sdk/core'
 
 // Tools go through LuxEscKnowledge; each checks the run id so they only serve the portal's article runs
 const readFixScript = `(function(inputs) {
@@ -139,4 +139,16 @@ export const knownIssuesMaxAge = Property({
     type: 'integer',
     value: 14,
     description: 'Active major incidents opened within this many days are shown to employees as known issues.',
+})
+
+// LuxEscKnowledge.recordView writes kb_use, the platform's article view log, so portal reads
+// count towards Trending; declared so the access ships with the app instead of being granted
+// at runtime on each instance
+CrossScopePrivilege({
+    $id: Now.ID['kb-use-create-privilege'],
+    operation: 'create',
+    status: 'allowed',
+    targetName: 'kb_use',
+    targetScope: 'global',
+    targetType: 'sys_db_object',
 })

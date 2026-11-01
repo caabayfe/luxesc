@@ -1,5 +1,6 @@
 {
   "\"{0}\" is not available in this portal yet. Add details in the comments after you submit.": "\"{0}\" todavía no está disponible en este portal. Añada los detalles en los comentarios después de enviar.",
+  "1 view this month": "1 visita este mes",
   "About my request {0}:": "Sobre mi solicitud {0}:",
   "Add {0} to cart": "Añadir {0} a la cesta",
   "All answers": "Todas las respuestas",
@@ -174,6 +175,7 @@
   "This item is not available": "Este artículo no está disponible",
   "This looks like a known issue: {0}": "Parece una incidencia conocida: {0}",
   "This request is not available": "Esta solicitud no está disponible",
+  "Trending": "Tendencias",
   "Try another search or category.": "Pruebe otra búsqueda u otra categoría.",
   "Try other words, or ask the assistant.": "Pruebe con otras palabras o pregunte al asistente.",
   "Try this first": "Pruebe esto primero",
@@ -211,6 +213,7 @@
   "{0} - Employee Center": "{0} - Centro para empleados",
   "{0} colleagues reported something similar in the last few hours, so the service desk is likely already on it.": "{0} compañeros han notificado algo similar en las últimas horas, así que probablemente el service desk ya esté en ello.",
   "{0} days late": "{0} días de retraso",
+  "{0} views this month": "{0} visitas este mes",
   "{0} · Opened {1} · Updated {2}": "{0} · Abierto {1} · Actualizado {2}",
   "{0} · our team has been working on it since {1}": "{0} · nuestro equipo trabaja en ello desde {1}",
   "{0} · {1} · Updated {2}": "{0} · {1} · Actualizado {2}",

@@ -4,6 +4,7 @@ import {AIUXElement, decorators, getLogger, withWidgetContext} from '@servicenow
 import {i18n} from '@servicenow/aiux/aiux-services';
 import '@servicenow/aiux/aiux-components-empty-state-content';
 import {fetchRecord} from '../../../utils/api.js';
+import {callConcierge} from '../../../utils/agent-runs.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import '../../../components/luxesc-ask.js';
@@ -61,6 +62,10 @@ export default class KnowledgePage extends withWidgetContext(AIUXElement) {
         text: plain.replace(/\s+/g, ' ').trim().slice(0, 4000)
       }
     });
+    // Counts as a view, like the platform's article viewer, so Trending reflects portal reads
+    callConcierge(`/knowledge/${article.sys_id.value}/view`, {method: 'POST'}).catch(error =>
+      log.warn({error: error.message}, 'View not recorded')
+    );
   }
 
   render() {

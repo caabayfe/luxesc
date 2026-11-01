@@ -11,6 +11,9 @@ LuxEscKnowledge.INCIDENTS_PROPERTY = 'x_everi_luxesc.kb_drafts.from_incidents';
 // Close notes shorter than this ("Fixed", "Done") hold no reusable fix
 LuxEscKnowledge.MIN_NOTES = 60;
 LuxEscKnowledge.STATES = 'published,draft,review';
+// Trending: views (kb_use) in the last days; topped up with the most viewed of all time
+LuxEscKnowledge.TRENDING_DAYS = 30;
+LuxEscKnowledge.TRENDING_LIMIT = 5;
 LuxEscKnowledge.HEADINGS = {
     en: { symptoms: 'Symptoms', cause: 'Cause', steps: 'Steps', appliesTo: 'Applies to' },
     es: { symptoms: 'Síntoma', cause: 'Causa', steps: 'Pasos', appliesTo: 'Aplica a' },
@@ -54,6 +57,75 @@ LuxEscKnowledge.prototype = {
         earlier.query();
         if (earlier.hasNext()) return null;
         return this._start(source);
+    },
+
+    // ---- Portal ---------------------------------------------------------------------------
+
+    // The articles employees read most lately, among those the signed-in employee can read.
+    // While recent views are few, the most viewed of all time fill the list (recentViews 0).
+    trending: function () {
+        var limit = LuxEscKnowledge.TRENDING_LIMIT;
+        var use = new GlideAggregate('kb_use');
+        use.addQuery('viewed', true);
+        use.addQuery('sys_created_on', '>=', gs.daysAgoStart(LuxEscKnowledge.TRENDING_DAYS));
+        use.addAggregate('COUNT');
+        use.groupBy('article');
+        use.query();
+        var recent = [];
+        while (use.next()) recent.push({ sysId: use.getValue('article'), views: parseInt(use.getAggregate('COUNT'), 10) || 0 });
+        recent.sort(function (a, b) {
+            return b.views - a.views;
+        });
+        var articles = [];
+        var seen = {};
+        for (var i = 0; i < recent.length && articles.length < limit; i++) {
+            var article = new GlideRecordSecure('kb_knowledge');
+            if (article.get(recent[i].sysId) && this._published(article)) {
+                articles.push(this._summary(article, recent[i].views));
+                seen[article.getUniqueValue()] = true;
+            }
+        }
+        if (articles.length < limit) {
+            var popular = new GlideRecordSecure('kb_knowledge');
+            popular.addQuery('workflow_state', 'published');
+            popular.addActiveQuery();
+            popular.orderByDesc('sys_view_count');
+            popular.setLimit(limit * 2);
+            popular.query();
+            while (popular.next() && articles.length < limit) {
+                if (!seen[popular.getUniqueValue()]) articles.push(this._summary(popular, 0));
+            }
+        }
+        return articles;
+    },
+
+    // Records that the employee opened an article, as the platform's article viewer does, so
+    // portal reads count as views. The viewer fires kb.view and the OOB "Knowledge View" script
+    // action writes kb_use; a scoped app may not queue that global event, so this writes the
+    // same kb_use record directly.
+    recordView: function (articleId) {
+        var article = new GlideRecordSecure('kb_knowledge');
+        if (!article.get(articleId) || !this._published(article)) return false;
+        var view = new GlideRecord('kb_use');
+        view.initialize();
+        view.setValue('viewed', true);
+        view.setValue('user', gs.getUserID());
+        view.setValue('article', article.getUniqueValue());
+        view.setValue('session_id', gs.getSessionID());
+        return !!view.insert();
+    },
+
+    _published: function (article) {
+        return article.getValue('workflow_state') === 'published' && article.getValue('active') === '1';
+    },
+
+    _summary: function (article, recentViews) {
+        return {
+            sysId: article.getUniqueValue(),
+            number: article.getValue('number'),
+            title: article.getValue('short_description'),
+            recentViews: recentViews,
+        };
     },
 
     // ---- Agent tools ----------------------------------------------------------------------
