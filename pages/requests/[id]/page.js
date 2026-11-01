@@ -18,6 +18,7 @@ import '@servicenow/aiux/aiux-components-attachment';
 import '@servicenow/aiux/aiux-components-empty-state-content';
 import {addComment, fetchRecord, fetchRecords} from '../../../utils/api.js';
 import '../../../components/luxesc-ask.js';
+import '../../../components/luxesc-journey.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
 import {lockVariables} from '../../../utils/read-only-variables.js';
@@ -119,8 +120,13 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
               return null;
             })
           : null;
+      // A requested item's short description is the catalog blurb; its item name says what was asked for
+      const itemName =
+        table === 'sc_req_item'
+          ? (await fetchRecord(table, sysId, 'cat_item').catch(() => null))?.cat_item?.display_value || ''
+          : '';
       const slas = await fetchSlas(sysId);
-      return {basePath, summary, record, variables, table, slas};
+      return {basePath, summary, record, variables, table, slas, itemName};
     } catch (error) {
       log.error({error: error.message, sysId}, 'Failed to load request');
       return {basePath, summary: null, record: null};
@@ -181,6 +187,10 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
     setDocumentTitle(number || i18n.getMessage('Request'));
   }
 
+  _title(summary) {
+    return this.loaderData?.itemName || summary.short_description?.display_value || summary.number?.display_value;
+  }
+
   _renderHeader(summary) {
     const basePath = this.loaderData?.basePath || '';
     const active = summary.active?.value === 'true';
@@ -194,7 +204,7 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
       </nav>
       <div class="flex flex-wrap items-center gap-3">
         <h1 class="max-w-full break-words text-2xl font-bold">
-          ${summary.short_description?.display_value || summary.number?.display_value}
+          ${this._title(summary)}
         </h1>
         <span
           class=${classMap({
@@ -252,6 +262,16 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
             </div>
           </section>
           <div class="flex min-w-0 flex-col gap-6">
+            <section class="aiux-card bg-base-100 shadow-sm" aria-labelledby="journey-title">
+              <div class="aiux-card-body gap-3">
+                <h2 id="journey-title" class="aiux-card-title text-base">${i18n.getMessage('Where it is')}</h2>
+                <luxesc-journey
+                  task-id=${sysId}
+                  label=${this._title(summary)}
+                  hide-update
+                ></luxesc-journey>
+              </div>
+            </section>
             <section class="aiux-card bg-base-100 shadow-sm" aria-labelledby="details-title">
               <div class="aiux-card-body gap-2">
                 <h2 id="details-title" class="aiux-card-title text-base">

@@ -17,6 +17,8 @@ LuxEscConcierge.DONE_STATES = ['completed', 'terminated', 'failed', 'cancelled',
 LuxEscConcierge.MAX_ITEMS = 12;
 // Read per class, so dozens of incidents cannot push the employee's catalog requests out
 LuxEscConcierge.PER_CLASS = 10;
+// Records per class (and approvals) on My stuff
+LuxEscConcierge.MINE_PER_CLASS = 25;
 LuxEscConcierge.OUTCOMES = ['approve', 'reject', 'comment', 'close', 'reopen'];
 
 LuxEscConcierge.prototype = {
@@ -216,6 +218,10 @@ LuxEscConcierge.prototype = {
         if (!/^[0-9a-f]{32}$/.test(String(taskId)) || !task.get(taskId)) return null;
         var record = new GlideRecordSecure(task.getRecordClassName());
         if (!record.get(taskId)) return null;
+        return this._journeyOf(record);
+    },
+
+    _journeyOf: function (record) {
         var steps = record.getRecordClassName() === 'sc_req_item' ? this._itemSteps(record) : this._taskSteps(record);
         var current = steps.filter(function (step) {
             return step.state === 'current';
@@ -229,6 +235,79 @@ LuxEscConcierge.prototype = {
             status: current ? current.label + (late ? ' · ' + late.short : '') : '',
             attention: !!(late || (current && current.tone)),
         };
+    },
+
+    // ---- My stuff ------------------------------------------------------------------------------
+
+    // The signed-in employee's open requests and incidents, each with where it is in plain words,
+    // and the approvals waiting on them. Kinds: approval, done (a fix to confirm), action (the
+    // service desk waits for their reply) and progress. Read with the employee's access.
+    mine: function () {
+        var userId = gs.getUserID();
+        var self = this;
+        var items = this._myApprovals(userId);
+        var requestedFor = this._requestedFor(userId);
+        LuxEscConcierge.REQUEST_CLASSES.split(',').forEach(function (cls) {
+            var task = new GlideRecordSecure(cls);
+            task.addActiveQuery();
+            var mine = task.addQuery('opened_by', userId);
+            if (cls === 'incident') mine.addOrCondition('caller_id', userId);
+            else mine.addOrCondition('sys_id', 'IN', requestedFor);
+            task.orderByDesc('sys_updated_on');
+            task.setLimit(LuxEscConcierge.MINE_PER_CLASS);
+            task.query();
+            while (task.next()) items.push(self._myItem(task));
+        });
+        return { items: items };
+    },
+
+    _myItem: function (task) {
+        var journey = this._journeyOf(task);
+        var current = journey.steps.filter(function (step) {
+            return step.state === 'current';
+        })[0];
+        var isItem = task.getRecordClassName() === 'sc_req_item';
+        var kind = 'progress';
+        if (task.getRecordClassName() === 'incident' && task.getValue('state') === '6') kind = 'done';
+        else if (current && current.tone === 'warning') kind = 'action';
+        return {
+            kind: kind,
+            sysId: task.getUniqueValue(),
+            number: task.getValue('number'),
+            title: isItem ? task.getDisplayValue('cat_item') || task.getValue('short_description') : task.getValue('short_description'),
+            status: journey.status,
+            attention: journey.attention,
+            updated: task.getDisplayValue('sys_updated_on'),
+        };
+    },
+
+    _myApprovals: function (userId) {
+        var approval = new GlideRecordSecure('sysapproval_approver');
+        approval.addQuery('approver', userId);
+        approval.addQuery('state', 'requested');
+        approval.orderBy('sys_created_on');
+        approval.setLimit(LuxEscConcierge.MINE_PER_CLASS);
+        approval.query();
+        var now = new GlideDateTime();
+        var items = [];
+        while (approval.next()) {
+            var target = approval.sysapproval.getRefRecord();
+            var found = target && target.isValidRecord();
+            var days = Math.floor(GlideDateTime.subtract(new GlideDateTime(approval.getValue('sys_created_on')), now).getNumericValue() / 86400000);
+            var isItem = found && target.getRecordClassName() === 'sc_req_item';
+            items.push({
+                kind: 'approval',
+                approvalId: approval.getUniqueValue(),
+                number: found ? target.getValue('number') : '',
+                title: found
+                    ? (isItem && target.getDisplayValue('cat_item')) || target.getValue('short_description')
+                    : approval.getDisplayValue('document_id'),
+                detail: found
+                    ? gs.getMessage('Requested by {0} · waiting for {1} days', [target.getDisplayValue('opened_by'), String(days)])
+                    : '',
+            });
+        }
+        return items;
     },
 
     _itemSteps: function (item) {

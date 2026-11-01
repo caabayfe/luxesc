@@ -111,7 +111,7 @@ declare global {
                     'aiux-dependency|chat.js': {
                         table: 'sys_aix_dependency'
                         id: 'd355d2f13fd7b08e739d7b33b3190b73'
-                        deleted: true
+                        deleted: false
                     }
                     'aiux-dependency|document-title.js': {
                         table: 'sys_aix_dependency'
@@ -120,6 +120,10 @@ declare global {
                     'aiux-dependency|explore.js': {
                         table: 'sys_aix_dependency'
                         id: '18ab15e5e6c860fda9af0045c6ece557'
+                    }
+                    'aiux-dependency|icon-directive.js': {
+                        table: 'sys_aix_dependency'
+                        id: '7a1bc2af64cf42ef04b80d8bce6b32c4'
                     }
                     'aiux-dependency|luxesc-ask.js': {
                         table: 'sys_aix_dependency'
@@ -134,9 +138,17 @@ declare global {
                         id: 'ec5442b8e7031e6ebe0e5440461dc70f'
                         deleted: true
                     }
+                    'aiux-dependency|luxesc-journey.js': {
+                        table: 'sys_aix_dependency'
+                        id: '3b03afdc5077391b0c8dcb6d84af1349'
+                    }
                     'aiux-dependency|luxesc-planner.js': {
                         table: 'sys_aix_dependency'
                         id: '0e3fedd729c3739b84a856dfd33d8f5a'
+                    }
+                    'aiux-dependency|luxesc-record-list.js': {
+                        table: 'sys_aix_dependency'
+                        id: 'c5556c2c5d5f37251f3499db38e0bb27'
                     }
                     'aiux-dependency|luxesc-rich-text.js': {
                         table: 'sys_aix_dependency'
@@ -219,7 +231,7 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|chat.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'b547f7eb5895fd470765d3d33b90d981'
-                        deleted: true
+                        deleted: false
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-catalog-item-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -309,6 +321,10 @@ declare global {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'faa5b0a41ec032978210565bb302fb88'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-explore-page|icon-directive.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '3b95fd95e9c8cee60ca8f528b56cda84'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-explore-page|luxesc-planner.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '5052b9892f53ecc4b78c20e49b68c9ea'
@@ -338,7 +354,7 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|chat.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '2dd20d23624da847ca99802b7f263e38'
-                        deleted: true
+                        deleted: false
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -347,6 +363,10 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|explore.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '17918a2b5f4dcb3ea35bc14ce1589e05'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|icon-directive.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '4193592d61f59f7438cc03d7fcd29710'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-ask.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -358,9 +378,17 @@ declare global {
                         id: 'baaf11f214322c221364dc1edd0391f4'
                         deleted: true
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-journey.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'f097b6af60840c61bdeff1c8bdc3f92c'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-planner.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '71249631bc3d23850a7dd303ca2f6d31'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-record-list.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '453c1ba4bca2326fc4aa611b26bf37cc'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|variables.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -373,6 +401,10 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-knowledge-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '2b51bfd6610f496450a9e89da737a1f8'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-knowledge-page|chat.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '544b817640d074f7f7ac63e6d17c9d17'
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-knowledge-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -404,6 +436,10 @@ declare global {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '3c29a47675373c48e6a1cce88f2b2db8'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|agent-runs.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '643b7f32816e56b3f0ce45d96875c80b'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '64a423ca05c09d2d4adc6a0478278fb9'
@@ -416,6 +452,26 @@ declare global {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '5f5eabf6419ca7d9f75c7b9fa9961ee6'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|icon-directive.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '08f6e1ae3f564ab0fe902a1ac62b9ac2'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|luxesc-ask.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'b41788d3b9920d1ad273bc0ce87d63a1'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|luxesc-journey.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'a247bc0cbff80f7f438d8da860ac0847'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|luxesc-record-list.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '39f8877729e3b21cc5f108aa98413fad'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|agent-runs.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '2bdaf07c2282e633b2637543036a92a4'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '5c0d3b7bcbdb5667097ca74561d17ea6'
@@ -424,15 +480,23 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|chat.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '78348e243f5ab1e2e53ce084c8026297'
-                        deleted: true
+                        deleted: false
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|document-title.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '73163e89850d6b955414e37c531394cb'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|icon-directive.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '090c6f8ba3e2f18c5ca9aff0566cbb85'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|luxesc-ask.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'ccded8cef75e85ae5f937f2b8c8784d1'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|luxesc-journey.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: 'c353492c8717ff1a69785c99b2776280'
                     }
                     'aiux-page-widget|x-everi-luxesc-catalog-item-page': {
                         table: 'sys_aix_widget'
@@ -553,6 +617,10 @@ declare global {
                     'concierge-api-latest': {
                         table: 'sys_ws_operation'
                         id: 'e8c520a5a7d6401e94a3aa853748e8f1'
+                    }
+                    'concierge-api-mine': {
+                        table: 'sys_ws_operation'
+                        id: 'f5a8e3be0486486684613388a156b715'
                     }
                     'concierge-api-outcome': {
                         table: 'sys_ws_operation'
@@ -807,6 +875,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '0891778da68043f1986aa21c918b5db9'
                     }
+                    'luxesc-es-3a93b87ed5c0': {
+                        table: 'sys_ui_message'
+                        id: 'bd233f3eb1c24907bbb54258118cd3b1'
+                    }
                     'luxesc-es-3c06d3f574ff': {
                         table: 'sys_ui_message'
                         id: '88ab9734ba6b4755b0762a2d66db2f5e'
@@ -854,6 +926,10 @@ declare global {
                     'luxesc-es-41b81eb8db1b': {
                         table: 'sys_ui_message'
                         id: 'd4db2f404ade4f4f8a0258a349e12cb9'
+                    }
+                    'luxesc-es-42c17cdd2a3a': {
+                        table: 'sys_ui_message'
+                        id: '8c52b9ba34f644d8bcc075fba91a6737'
                     }
                     'luxesc-es-42c9c9254f7c': {
                         table: 'sys_ui_message'
@@ -911,6 +987,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '85418ad452d249bc8b08505ba3f281fc'
                     }
+                    'luxesc-es-4fe5a8094284': {
+                        table: 'sys_ui_message'
+                        id: '6c6a602126f04eccb1947f1fb5b359b0'
+                    }
                     'luxesc-es-506461e97c28': {
                         table: 'sys_ui_message'
                         id: '81503e3110e647b295b9ce9e9b39ff7e'
@@ -967,6 +1047,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '0d68e4652ae24f76ab0e11980c6743d6'
                     }
+                    'luxesc-es-60daefbfef94': {
+                        table: 'sys_ui_message'
+                        id: '3e794fe718c64c87ba251d31042eb675'
+                    }
                     'luxesc-es-61852524b8f8': {
                         table: 'sys_ui_message'
                         id: '817dae234abe4cba845ff42491457639'
@@ -982,6 +1066,10 @@ declare global {
                     'luxesc-es-62bbea2a98a1': {
                         table: 'sys_ui_message'
                         id: '75d3e7918170406a9242dcaef237acad'
+                    }
+                    'luxesc-es-639ea2271fa3': {
+                        table: 'sys_ui_message'
+                        id: '34d57762c8d5487199553a1a06ed45db'
                     }
                     'luxesc-es-64fb79ca32cf': {
                         table: 'sys_ui_message'
@@ -1187,6 +1275,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '74c0600a6e734f1eb29be9b03e78870c'
                     }
+                    'luxesc-es-8eb7a0d6cb42': {
+                        table: 'sys_ui_message'
+                        id: 'b714ce3e29024d50a6feb6a02fe6105b'
+                    }
                     'luxesc-es-8fd91a15fdef': {
                         table: 'sys_ui_message'
                         id: '15a8d75274a3488fbdb67e1441f04ccc'
@@ -1254,6 +1346,7 @@ declare global {
                     'luxesc-es-9fb134d358bc': {
                         table: 'sys_ui_message'
                         id: 'd401d9c292444a08b2c99f5d5e1c9492'
+                        deleted: true
                     }
                     'luxesc-es-9fe520d8c094': {
                         table: 'sys_ui_message'
@@ -1302,6 +1395,10 @@ declare global {
                     'luxesc-es-a95df16310eb': {
                         table: 'sys_ui_message'
                         id: 'b4aeb3832daf4580843124b0254a6e22'
+                    }
+                    'luxesc-es-aac60ed684e0': {
+                        table: 'sys_ui_message'
+                        id: '5ba813022d1a4795ba7b77d5c6f3e30d'
                     }
                     'luxesc-es-ab4eef003af3': {
                         table: 'sys_ui_message'
@@ -1390,6 +1487,10 @@ declare global {
                     'luxesc-es-b5c793c7bd1e': {
                         table: 'sys_ui_message'
                         id: '84fbbc349b5f40baa702c4dffcd8e2f0'
+                    }
+                    'luxesc-es-b6bdf21cceb5': {
+                        table: 'sys_ui_message'
+                        id: '22588401327241b9b9505a541cafc4b8'
                     }
                     'luxesc-es-b6e370fd9a7a': {
                         table: 'sys_ui_message'
@@ -1494,6 +1595,10 @@ declare global {
                     'luxesc-es-c94981fe7503': {
                         table: 'sys_ui_message'
                         id: '0bfbd8ad144045dc85c2c2e7ad5b326d'
+                    }
+                    'luxesc-es-cd3bb6eb0f84': {
+                        table: 'sys_ui_message'
+                        id: '02413b0a8e8b412ca1f2ff668d85b431'
                     }
                     'luxesc-es-cd994a9a04cf': {
                         table: 'sys_ui_message'
@@ -1638,6 +1743,10 @@ declare global {
                     'luxesc-es-ee2dbd5d6d82': {
                         table: 'sys_ui_message'
                         id: '822fead8a6d04ec0b135bd3d0119c420'
+                    }
+                    'luxesc-es-f03c4fa7473e': {
+                        table: 'sys_ui_message'
+                        id: 'af4b11da64ee479199aa455417c16969'
                     }
                     'luxesc-es-f12822c277b2': {
                         table: 'sys_ui_message'

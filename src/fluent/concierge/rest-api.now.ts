@@ -105,6 +105,10 @@ const journeyScript = `(function process(request, response) {
     response.setBody({ journey: journey });
 })(request, response);`
 
+const mineScript = `(function process(request, response) {
+    response.setBody(new x_everi_luxesc.LuxEscConcierge().mine());
+})(request, response);`
+
 const latestScript = `(function process(request, response) {
     var run = new x_everi_luxesc.LuxEscConcierge().latest() || {};
     if (run === null) {
@@ -227,6 +231,15 @@ export const conciergeApi = RestApi({
             script: journeyScript,
             version: 1,
             shortDescription: 'What happened to a request or incident, where it is now and what comes next',
+        },
+        {
+            $id: Now.ID['concierge-api-mine'],
+            name: 'my stuff',
+            method: 'GET',
+            path: '/mine',
+            script: mineScript,
+            version: 1,
+            shortDescription: "The employee's open requests and incidents with where each one is, and the approvals waiting on them",
         },
         {
             $id: Now.ID['concierge-api-latest'],

@@ -32,7 +32,7 @@ const MY_OPEN_REQUESTS =
   'active=true^opened_by=javascript:gs.getUserID()^sys_class_nameINsc_req_item,incident^ORDERBYDESCsys_updated_on';
 
 @customElement('x-everi-luxesc-home-page')
-@title('Home')
+@title('For you')
 @acl([{securityAttribute: 'user_is_authenticated'}])
 export default class HomePage extends withWidgetContext(AIUXElement) {
   static contexts = [userContext, chatContext];
@@ -104,7 +104,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
   }
 
   firstUpdated() {
-    setDocumentTitle(i18n.getMessage('Home'));
+    setDocumentTitle(i18n.getMessage('For you'));
     const hour = new Date().getHours();
     this._greeting = hour < 12 ? 'morning' : hour < 19 ? 'afternoon' : 'evening';
   }
