@@ -14,7 +14,9 @@ LuxEscConcierge.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscConcierge.REQUEST_CLASSES = 'sc_req_item,incident';
 // Execution plan states after which the agent writes no more steps
 LuxEscConcierge.DONE_STATES = ['completed', 'terminated', 'failed', 'cancelled', 'canceled', 'error'];
-LuxEscConcierge.MAX_ITEMS = 6;
+LuxEscConcierge.MAX_ITEMS = 12;
+// Read per class, so dozens of incidents cannot push the employee's catalog requests out
+LuxEscConcierge.PER_CLASS = 10;
 LuxEscConcierge.OUTCOMES = ['approve', 'reject', 'comment', 'close', 'reopen'];
 
 LuxEscConcierge.prototype = {
@@ -102,32 +104,38 @@ LuxEscConcierge.prototype = {
     openRequests: function (runId) {
         var userId = this._runUser(runId);
         if (!userId) return { error: 'Unknown concierge run' };
-        var task = new GlideRecord('task');
-        task.addActiveQuery();
-        task.addQuery('sys_class_name', 'IN', LuxEscConcierge.REQUEST_CLASSES);
-        var mine = task.addQuery('opened_by', userId);
-        mine.addOrCondition('sys_id', 'IN', this._requestedFor(userId));
-        task.orderByDesc('sys_updated_on');
-        task.setLimit(15);
-        task.query();
-        var now = new GlideDateTime();
+        var requestedFor = this._requestedFor(userId);
+        var self = this;
         var requests = [];
-        while (task.next()) {
-            var updated = new GlideDateTime(task.getValue('sys_updated_on'));
-            requests.push({
-                sysId: task.getUniqueValue(),
-                number: task.getValue('number'),
-                type: task.getDisplayValue('sys_class_name'),
-                summary: task.getValue('short_description'),
-                state: task.getDisplayValue('state'),
-                approval: task.getDisplayValue('approval'),
-                assignedGroup: task.getDisplayValue('assignment_group'),
-                openedOn: task.getDisplayValue('opened_at'),
-                daysSinceUpdate: Math.floor(GlideDateTime.subtract(updated, now).getNumericValue() / 86400000),
-                lastComment: this._lastComment(task),
-            });
-        }
+        LuxEscConcierge.REQUEST_CLASSES.split(',').forEach(function (cls) {
+            var task = new GlideRecord(cls);
+            task.addActiveQuery();
+            var mine = task.addQuery('opened_by', userId);
+            mine.addOrCondition('sys_id', 'IN', requestedFor);
+            task.orderByDesc('sys_updated_on');
+            task.setLimit(LuxEscConcierge.PER_CLASS);
+            task.query();
+            while (task.next()) requests.push(self._request(task));
+        });
         return { requests: requests };
+    },
+
+    _request: function (task) {
+        var updated = new GlideDateTime(task.getValue('sys_updated_on'));
+        var isItem = task.getRecordClassName() === 'sc_req_item';
+        return {
+            sysId: task.getUniqueValue(),
+            number: task.getValue('number'),
+            type: task.getDisplayValue('sys_class_name'),
+            // A requested item's short description is the catalog blurb; its item name says what was asked for
+            summary: isItem ? task.getDisplayValue('cat_item') || task.getValue('short_description') : task.getValue('short_description'),
+            state: task.getDisplayValue('state'),
+            approval: task.getDisplayValue('approval'),
+            assignedGroup: task.getDisplayValue('assignment_group'),
+            openedOn: task.getDisplayValue('opened_at'),
+            daysSinceUpdate: Math.floor(GlideDateTime.subtract(updated, new GlideDateTime()).getNumericValue() / 86400000),
+            lastComment: this._lastComment(task),
+        };
     },
 
     pendingApprovals: function (runId) {
@@ -179,9 +187,32 @@ LuxEscConcierge.prototype = {
                 };
             }),
         };
+        this._addMissingRequests(runId, clean.items);
         run.setValue('briefing', JSON.stringify(clean));
         run.update();
         return 'Briefing saved with ' + clean.items.length + ' items';
+    },
+
+    // Every open catalog request belongs in the briefing; the ones the agent left out are
+    // added as "progress" items built from the record itself
+    _addMissingRequests: function (runId, items) {
+        var listed = {};
+        items.forEach(function (item) {
+            if (item.sysId) listed[item.sysId] = true;
+        });
+        (this.openRequests(runId).requests || []).forEach(function (request) {
+            if (request.number.indexOf('RITM') !== 0 || listed[request.sysId]) return;
+            items.push({
+                kind: request.daysSinceUpdate >= 5 ? 'stale' : 'progress',
+                number: request.number,
+                sysId: request.sysId,
+                approvalId: '',
+                draft: '',
+                title: String(request.summary || '').trim().substring(0, 100),
+                detail: [request.state, request.assignedGroup].filter(Boolean).join(' · '),
+                question: '',
+            });
+        });
     },
 
     // Remembers what the employee did on a briefing item (approve, comment, ...), so the

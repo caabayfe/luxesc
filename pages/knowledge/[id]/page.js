@@ -78,6 +78,7 @@ export default class KnowledgePage extends withWidgetContext(AIUXElement) {
       <nav class="aiux-breadcrumbs text-sm" aria-label=${i18n.getMessage('Breadcrumb')}>
         <ul>
           <li><a href="${basePath}/start">${i18n.getMessage('Home')}</a></li>
+          <li><a href="${basePath}/knowledge">${i18n.getMessage('Knowledge')}</a></li>
           <li aria-current="page">${number}</li>
         </ul>
       </nav>

@@ -22,10 +22,15 @@ export default {
         icon: 'list',
         title: i18n.getMessage('My requests'),
         action: {type: 'navigate', path: '/requests'}
+      },
+      {
+        icon: 'lightbulb',
+        title: i18n.getMessage('Knowledge'),
+        action: {type: 'navigate', path: '/knowledge'}
       }
     ];
 
-    // Child routes (/catalog/<item>, /requests/<id>) keep their section highlighted
+    // Child routes (/catalog/<item>, /requests/<id>, /knowledge/<id>) keep their section highlighted
     const activeRoute = ctx.app?.routes?.find(r => r.active)?.route || '';
     const itemsWithActive = items.map(item => ({
       ...item,

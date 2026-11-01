@@ -381,6 +381,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-dec1fccaba73'],
+    table: 'sys_ui_message',
+    data: { key: "Knowledge", message: "Conocimiento", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-e40bf1316dc3'],
     table: 'sys_ui_message',
     data: { key: "Known issues right now", message: "Incidencias conocidas ahora mismo", language: 'es' },
@@ -411,6 +417,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-d7033d30b52d'],
+    table: 'sys_ui_message',
+    data: { key: "Most read articles", message: "Artículos más leídos", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-c5573c053079'],
     table: 'sys_ui_message',
     data: { key: "My laptop is slow", message: "Mi portátil va lento", language: 'es' },
@@ -438,6 +450,12 @@ Record({
     $id: Now.ID['luxesc-es-7b842a5746a4'],
     table: 'sys_ui_message',
     data: { key: "Needs your approval", message: "Requiere su aprobación", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-3e96a394ef52'],
+    table: 'sys_ui_message',
+    data: { key: "No articles available", message: "No hay artículos disponibles", language: 'es' },
 })
 
 Record({
@@ -633,6 +651,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-b7f1e618e2aa'],
+    table: 'sys_ui_message',
+    data: { key: "Results for \"{0}\"", message: "Resultados para \"{0}\"", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-43d1352a402f'],
     table: 'sys_ui_message',
     data: { key: "Say what you need in your own words and the assistant fills in the form. You review it and submit.", message: "Diga lo que necesita con sus propias palabras y el asistente rellena el formulario. Usted lo revisa y lo envía.", language: 'es' },
@@ -642,6 +666,18 @@ Record({
     $id: Now.ID['luxesc-es-ff33c9d4e363'],
     table: 'sys_ui_message',
     data: { key: "Search for services, devices and help", message: "Busque servicios, dispositivos y ayuda", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-bb68d573203e'],
+    table: 'sys_ui_message',
+    data: { key: "Search how-to guides and answers", message: "Busque guías y respuestas", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-42cfc4170a2c'],
+    table: 'sys_ui_message',
+    data: { key: "Search knowledge", message: "Buscar en la base de conocimiento", language: 'es' },
 })
 
 Record({
@@ -783,6 +819,12 @@ Record({
 })
 
 Record({
+    $id: Now.ID['luxesc-es-9d8538301825'],
+    table: 'sys_ui_message',
+    data: { key: "The knowledge base could not be loaded. Try again later.", message: "No se pudo cargar la base de conocimiento. Inténtelo más tarde.", language: 'es' },
+})
+
+Record({
     $id: Now.ID['luxesc-es-02334cd8f361'],
     table: 'sys_ui_message',
     data: { key: "The planner could not finish. Try again, or describe what you need differently.", message: "El planificador no pudo terminar. Inténtelo de nuevo o describa lo que necesita de otra forma.", language: 'es' },
@@ -834,6 +876,12 @@ Record({
     $id: Now.ID['luxesc-es-ddc04e083593'],
     table: 'sys_ui_message',
     data: { key: "Try another search or category.", message: "Pruebe otra búsqueda u otra categoría.", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-0c79a891ce72'],
+    table: 'sys_ui_message',
+    data: { key: "Try other words, or ask the assistant.", message: "Pruebe con otras palabras o pregunte al asistente.", language: 'es' },
 })
 
 Record({

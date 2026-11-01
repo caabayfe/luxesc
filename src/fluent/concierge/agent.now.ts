@@ -43,11 +43,11 @@ export const employeeConcierge = AiAgent({
 - Use the Get my open requests tool with the run id, then the Get my pending approvals tool with the run id.
 - If a tool returns an error, explain it in one sentence and stop. DO NOT PROCEED.
 
-Step 2: Decide what deserves attention, most urgent first, at most 6 items:
+Step 2: Decide what deserves attention, most urgent first, at most 12 items:
 - "approval": an approval waiting on the employee. Older is more urgent.
 - "action": the employee must act, e.g. the last comment asks them a question or the state says it is awaiting the caller or user.
 - "stale": open with no update for 5 or more days. Suggest chasing it up.
-- "progress": moving normally; include only the most important one or two.
+- "progress": moving normally. Include every open requested item (catalog request); for incidents moving normally include only the most important one or two.
 - "done": resolved and waiting for the employee to confirm, if any.
 If there is nothing open, save a single "progress" item saying everything is up to date.
 

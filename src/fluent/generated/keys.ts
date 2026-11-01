@@ -54,6 +54,10 @@ declare global {
                         id: '3cae36b33ca94e9786dc5585b56f6ca7'
                         deleted: true
                     }
+                    'aiux-acl|x-everi-luxesc-knowledge-search-page|read|allow_if||user_is_authenticated': {
+                        table: 'sys_security_acl'
+                        id: 'fd7c6d7f40084c24a04863a9dc5b15e6'
+                    }
                     'aiux-acl|x-everi-luxesc-requests-page|read|allow_if||user_is_authenticated': {
                         table: 'sys_security_acl'
                         id: 'bfd976cb67ee40caa99d7487083108fb'
@@ -140,6 +144,10 @@ declare global {
                     'aiux-experience-page-rel|x-everi-luxesc-knowledge-page': {
                         table: 'sys_aix_experience_page_rel'
                         id: '9f4ca197c1f47c6db4d67ec424cf9232'
+                    }
+                    'aiux-experience-page-rel|x-everi-luxesc-knowledge-search-page': {
+                        table: 'sys_aix_experience_page_rel'
+                        id: '78ae29b1a1328a62624578980a7e7434'
                     }
                     'aiux-experience-page-rel|x-everi-luxesc-requests-page': {
                         table: 'sys_aix_experience_page_rel'
@@ -287,6 +295,14 @@ declare global {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'ba7bbee3127d471b7f265bf50d3d3d14'
                     }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-knowledge-search-page|api.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '6827647b37f144438d5b4d4f0ba1ba25'
+                    }
+                    'aiux-m2m-widget-dep|x-everi-luxesc-knowledge-search-page|document-title.js': {
+                        table: 'sys_aix_m2m_widget_dependency'
+                        id: '804606c64684a53489073748559f3a74'
+                    }
                     'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|api.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: '64a423ca05c09d2d4adc6a0478278fb9'
@@ -337,6 +353,10 @@ declare global {
                         table: 'sys_aix_widget'
                         id: '77722aaad1dd2540f814ef4fcff96690'
                     }
+                    'aiux-page-widget|x-everi-luxesc-knowledge-search-page': {
+                        table: 'sys_aix_widget'
+                        id: 'f6d9559ecbebac10b5a359a5f53219aa'
+                    }
                     'aiux-page-widget|x-everi-luxesc-requests-page': {
                         table: 'sys_aix_widget'
                         id: 'ba887ed608e9428307c6a731d6993bc2'
@@ -364,6 +384,10 @@ declare global {
                     'aiux-page|x-everi-luxesc-knowledge-page': {
                         table: 'sys_aix_page'
                         id: '324ea4ee68b3c83c8036f85187fc0ddd'
+                    }
+                    'aiux-page|x-everi-luxesc-knowledge-search-page': {
+                        table: 'sys_aix_page'
+                        id: '3b55b0edd411909f267a1c01c1354109'
                     }
                     'aiux-page|x-everi-luxesc-requests-page': {
                         table: 'sys_aix_page'
@@ -518,6 +542,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'cc8ba071729d41d2879c622b257c8a41'
                     }
+                    'luxesc-es-0c79a891ce72': {
+                        table: 'sys_ui_message'
+                        id: 'db305a91a7814ca98b8c3b9c8ca45e48'
+                    }
                     'luxesc-es-0c7d6f7493ea': {
                         table: 'sys_ui_message'
                         id: '3fe72c6fff1449c2a5e117ff202343c9'
@@ -606,6 +634,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'c0a58ee5aaf8486b83a218058fdc45b4'
                     }
+                    'luxesc-es-3e96a394ef52': {
+                        table: 'sys_ui_message'
+                        id: '1ded670f061e45c7969fc33c5ce40f27'
+                    }
                     'luxesc-es-40d45a3a8517': {
                         table: 'sys_ui_message'
                         id: 'a80878c49c0c41aab984e163667c7c2e'
@@ -617,6 +649,10 @@ declare global {
                     'luxesc-es-42c9c9254f7c': {
                         table: 'sys_ui_message'
                         id: '795da635401f49aca13ca2d24d8ed051'
+                    }
+                    'luxesc-es-42cfc4170a2c': {
+                        table: 'sys_ui_message'
+                        id: 'e76c0d66957f411995569df53ad896a5'
                     }
                     'luxesc-es-435e423ae5d9': {
                         table: 'sys_ui_message'
@@ -866,6 +902,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: 'f1fc724319894ce8bfbbe135e03711e1'
                     }
+                    'luxesc-es-9d8538301825': {
+                        table: 'sys_ui_message'
+                        id: '01e3272bdc154228bf44759baf4fa109'
+                    }
                     'luxesc-es-9e364458b646': {
                         table: 'sys_ui_message'
                         id: 'c28bc652e71a4676ae3b971369e3618c'
@@ -1002,6 +1042,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '0b3318307b6649e09f50892772a9cb55'
                     }
+                    'luxesc-es-b7f1e618e2aa': {
+                        table: 'sys_ui_message'
+                        id: 'caa6f4b08fff4ede9c91258834c778ef'
+                    }
                     'luxesc-es-b914ad56a34a': {
                         table: 'sys_ui_message'
                         id: '95a8a354eec34636a8d7310395647e37'
@@ -1009,6 +1053,10 @@ declare global {
                     'luxesc-es-baa6826b2233': {
                         table: 'sys_ui_message'
                         id: 'cdad67549391479fb1aa72c38a2d3db0'
+                    }
+                    'luxesc-es-bb68d573203e': {
+                        table: 'sys_ui_message'
+                        id: 'e73f6d4685084bf9ac813f259a9621e9'
                     }
                     'luxesc-es-bba0686f8a64': {
                         table: 'sys_ui_message'
@@ -1078,6 +1126,10 @@ declare global {
                         table: 'sys_ui_message'
                         id: '01221fcfc78b44e494c5711a6068056d'
                     }
+                    'luxesc-es-d7033d30b52d': {
+                        table: 'sys_ui_message'
+                        id: 'e02a502002cf4002afc3f4721b64a1ab'
+                    }
                     'luxesc-es-d7ca0b8cda88': {
                         table: 'sys_ui_message'
                         id: '11cdc6b2874e4c2aa0f632d1001a611b'
@@ -1101,6 +1153,10 @@ declare global {
                     'luxesc-es-deba442c1cda': {
                         table: 'sys_ui_message'
                         id: '62514ea062504a6dbe5b3d93a0e2d6e1'
+                    }
+                    'luxesc-es-dec1fccaba73': {
+                        table: 'sys_ui_message'
+                        id: '1acbf44f8e604a82b14d604d3452c0f1'
                     }
                     'luxesc-es-e097019b3d3b': {
                         table: 'sys_ui_message'
