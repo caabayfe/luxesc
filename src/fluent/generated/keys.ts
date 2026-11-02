@@ -734,6 +734,7 @@ declare global {
                     'luxesc-es-0a0292d0097f': {
                         table: 'sys_ui_message'
                         id: 'e6351ad783f44ce4823fe423f645bee5'
+                        deleted: true
                     }
                     'luxesc-es-0a1ea5282f05': {
                         table: 'sys_ui_message'
@@ -1006,6 +1007,10 @@ declare global {
                     'luxesc-es-5529f49254a6': {
                         table: 'sys_ui_message'
                         id: 'd736109c17df4b4a964974400c0cd265'
+                    }
+                    'luxesc-es-56e3badc4e6c': {
+                        table: 'sys_ui_message'
+                        id: '70f06bb17198428d910cb8da3eb737df'
                     }
                     'luxesc-es-5782ca61c395': {
                         table: 'sys_ui_message'

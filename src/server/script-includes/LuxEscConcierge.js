@@ -489,6 +489,10 @@ LuxEscConcierge.prototype = {
             state: run.getValue('state'),
             startedOn: run.getDisplayValue('sys_created_on'),
             finishedOn: run.getDisplayValue('finished_on'),
+            // How old the briefing is, so the page can refresh a stale one by itself
+            ageMinutes: Math.floor(
+                GlideDateTime.subtract(new GlideDateTime(run.getValue('sys_created_on')), new GlideDateTime()).getNumericValue() / 60000
+            ),
             output: run.getValue('output') || '',
             error: run.getValue('error') || '',
             ms: parseInt(run.getValue('execution_ms'), 10) || 0,

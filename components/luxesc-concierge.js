@@ -17,6 +17,8 @@ const GROUPS = [
   {id: 'progress', label: count => i18n.getMessage('In progress ({0})', count)}
 ];
 const groupOf = item => (needsYou(item) ? 'need' : 'progress');
+// A briefing older than this is prepared again when the page opens
+const STALE_MINUTES = 60;
 
 /**
  * The Employee Concierge: runs the custom AI agent that reviews the
@@ -25,6 +27,11 @@ const groupOf = item => (needsYou(item) ? 'need' : 'progress');
  * prepared · 2 days late") with its main action; opening it shows the record's
  * journey (the milestones it actually went through, where it is now and what
  * comes next), the latest update, the agent's explanation and other actions.
+ *
+ * The briefing prepares itself: opening the page shows today's briefing and
+ * starts a new one when there is none, the last one failed or it is older than
+ * an hour (the old one stays on screen meanwhile). The refresh button runs it
+ * again on demand.
  */
 @customElement('luxesc-concierge')
 export class Concierge extends AIUXElement {
@@ -63,13 +70,25 @@ export class Concierge extends AIUXElement {
     try {
       const run = await callRuns('/runs/latest');
       this._run = run?.id ? run : null;
-      if (this._run?.state === 'running') this._poll();
     } catch (error) {
       log.warn({error: error.message}, 'Concierge unavailable');
       this._error = i18n.getMessage('The concierge is not available right now.');
-    } finally {
+      this._loading = false;
+      return;
+    }
+    if (this._run?.state === 'running') {
+      this._loading = false;
+      this._poll();
+    } else if (this._isStale(this._run)) {
+      this._start();
+    } else {
       this._loading = false;
     }
+  }
+
+  // No briefing today, a failed one or one older than STALE_MINUTES
+  _isStale(run) {
+    return !run || run.state === 'failed' || !run.briefing || (run.ageMinutes ?? 0) >= STALE_MINUTES;
   }
 
   async _start() {
@@ -78,6 +97,7 @@ export class Concierge extends AIUXElement {
     this._loading = true;
     try {
       if (this._run?.briefing) this._previous = this._run;
+      this._finished = false;
       this._run = await callRuns('/runs', {method: 'POST'});
       this._tab = '';
       this._startedAt = Date.now();
@@ -174,18 +194,15 @@ export class Concierge extends AIUXElement {
   }
 
   _renderBody(run, shown) {
-    if (!run) {
-      return html`<button type="button" class="aiux-btn aiux-btn-primary aiux-btn-sm self-start" ?disabled=${this._loading} @click=${this._start}>
-        ${i18n.getMessage('Brief me')}
-      </button>`;
-    }
+    // The briefing starts by itself; until the run exists there is only its placeholder
+    const placeholder = html`<div class="flex flex-col gap-2" aria-hidden="true">
+      <div class="aiux-skeleton h-8 w-1/2"></div>
+      <div class="aiux-skeleton h-12 w-full"></div>
+      <div class="aiux-skeleton h-12 w-full"></div>
+    </div>`;
+    if (!run) return this._error ? nothing : placeholder;
     if (run.state === 'running' && !this._previous) {
-      return html`${this._renderProgress(run)}
-        <div class="flex flex-col gap-2" aria-hidden="true">
-          <div class="aiux-skeleton h-8 w-1/2"></div>
-          <div class="aiux-skeleton h-12 w-full"></div>
-          <div class="aiux-skeleton h-12 w-full"></div>
-        </div>`;
+      return html`${this._renderProgress(run)} ${placeholder}`;
     }
     return html`${run.state === 'running' ? this._renderProgress(run) : nothing} ${this._renderResult(shown)}`;
   }
@@ -206,20 +223,18 @@ export class Concierge extends AIUXElement {
           </div>
           <div class="flex shrink-0 items-center gap-2">
             <a class="aiux-link aiux-link-primary text-sm" href="${this.basePath}/requests">${i18n.getMessage('View all')}</a>
-            ${run
-              ? html`<button
-                  type="button"
-                  class="aiux-btn aiux-btn-sm aiux-btn-ghost aiux-btn-square"
-                  aria-label=${i18n.getMessage('Refresh my briefing')}
-                  title=${i18n.getMessage('Refresh my briefing')}
-                  ?disabled=${this._loading || running}
-                  @click=${this._start}
-                >
-                  ${running || this._loading
-                    ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs"></span>`
-                    : icon({name: 'rotate-clockwise', size: 'sm'})}
-                </button>`
-              : nothing}
+            <button
+              type="button"
+              class="aiux-btn aiux-btn-sm aiux-btn-ghost"
+              title=${i18n.getMessage('Refresh my briefing')}
+              ?disabled=${this._loading || running}
+              @click=${this._start}
+            >
+              ${running || this._loading
+                ? html`<span class="aiux-loading aiux-loading-spinner aiux-loading-xs" aria-hidden="true"></span>`
+                : icon({name: 'rotate-clockwise', size: 'sm'})}
+              ${i18n.getMessage('Refresh')}
+            </button>
           </div>
         </div>
         <p class="sr-only" role="status">${this._announcement(running)}</p>

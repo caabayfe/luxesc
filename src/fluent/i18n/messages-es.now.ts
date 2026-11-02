@@ -213,12 +213,6 @@ Record({
 })
 
 Record({
-    $id: Now.ID['luxesc-es-0a0292d0097f'],
-    table: 'sys_ui_message',
-    data: { key: "Brief me", message: "Ponerme al día", language: 'es' },
-})
-
-Record({
     $id: Now.ID['luxesc-es-59fb06366caa'],
     table: 'sys_ui_message',
     data: { key: "Briefing groups", message: "Grupos del resumen", language: 'es' },
@@ -1026,6 +1020,12 @@ Record({
     $id: Now.ID['luxesc-es-5f0500ccf919'],
     table: 'sys_ui_message',
     data: { key: "Recently updated", message: "Actualizados recientemente", language: 'es' },
+})
+
+Record({
+    $id: Now.ID['luxesc-es-56e3badc4e6c'],
+    table: 'sys_ui_message',
+    data: { key: "Refresh", message: "Actualizar", language: 'es' },
 })
 
 Record({
