@@ -7,7 +7,7 @@ import {
   withWidgetContext
 } from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
-import {navigate} from '@servicenow/aiux/aiux-client';
+import {clearPrefetchCache, clearRouteDataCache, navigate} from '@servicenow/aiux/aiux-client';
 import {triggerTransientToast} from '@servicenow/aiux/aiux-components-toast';
 import '@servicenow/aiux/aiux-components-empty-state-content';
 import {
@@ -255,6 +255,8 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
       let target;
       if (this._isProducer) {
         const result = await submitProducer(item.sys_id, {variables});
+        clearPrefetchCache();
+        clearRouteDataCache();
         target = result?.sys_id;
         triggerTransientToast(
           i18n.getMessage('{0} submitted', result?.number || item.name)
@@ -264,6 +266,8 @@ export default class CatalogItemPage extends withWidgetContext(AIUXElement) {
           quantity: this._quantity,
           variables
         });
+        clearPrefetchCache();
+        clearRouteDataCache();
         target = await this._requestedItemFor(result?.request_id || result?.sys_id);
         triggerTransientToast(
           i18n.getMessage('Request {0} submitted', result?.request_number || result?.number || '')

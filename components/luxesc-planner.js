@@ -2,7 +2,7 @@ import {html, css, nothing, isServer} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {AIUXElement, getLogger} from '@servicenow/aiux/aiux-components-core';
 import {i18n} from '@servicenow/aiux/aiux-services';
-import {navigate} from '@servicenow/aiux/aiux-client';
+import {clearPrefetchCache, clearRouteDataCache, navigate} from '@servicenow/aiux/aiux-client';
 import {GIVE_UP_MS, POLL_MS, callRuns} from '../utils/agent-runs.js';
 import {addToCart, fetchCart, removeCartItem, submitCart} from '../utils/api.js';
 import {stashPrefill} from '../utils/ai-handoff.js';
@@ -160,6 +160,8 @@ export class Planner extends AIUXElement {
     this._error = '';
     try {
       this._order = await submitCart();
+      clearPrefetchCache();
+      clearRouteDataCache();
       this._cart = null;
     } catch (error) {
       log.error({error: error.message}, 'Order not submitted');

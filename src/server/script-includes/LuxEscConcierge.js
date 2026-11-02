@@ -106,14 +106,13 @@ LuxEscConcierge.prototype = {
     openRequests: function (runId) {
         var userId = this._runUser(runId);
         if (!userId) return { error: 'Unknown concierge run' };
-        var requestedFor = this._requestedFor(userId);
         var self = this;
         var requests = [];
         LuxEscConcierge.REQUEST_CLASSES.split(',').forEach(function (cls) {
             var task = new GlideRecord(cls);
             task.addActiveQuery();
             var mine = task.addQuery('opened_by', userId);
-            mine.addOrCondition('sys_id', 'IN', requestedFor);
+            if (cls === 'sc_req_item') mine.addOrCondition('request.requested_for', userId);
             task.orderByDesc('sys_updated_on');
             task.setLimit(LuxEscConcierge.PER_CLASS);
             task.query();
@@ -246,13 +245,12 @@ LuxEscConcierge.prototype = {
         var userId = gs.getUserID();
         var self = this;
         var items = this._myApprovals(userId);
-        var requestedFor = this._requestedFor(userId);
         LuxEscConcierge.REQUEST_CLASSES.split(',').forEach(function (cls) {
             var task = new GlideRecordSecure(cls);
             task.addActiveQuery();
             var mine = task.addQuery('opened_by', userId);
             if (cls === 'incident') mine.addOrCondition('caller_id', userId);
-            else mine.addOrCondition('sys_id', 'IN', requestedFor);
+            else if (cls === 'sc_req_item') mine.addOrCondition('request.requested_for', userId);
             task.orderByDesc('sys_updated_on');
             task.setLimit(LuxEscConcierge.MINE_PER_CLASS);
             task.query();
@@ -450,18 +448,6 @@ LuxEscConcierge.prototype = {
     _runUser: function (runId) {
         var run = new GlideRecord(LuxEscConcierge.RUN);
         return run.get(runId) ? run.getValue('user') : '';
-    },
-
-    // Requested items raised on the employee's behalf by someone else
-    _requestedFor: function (userId) {
-        var ids = [];
-        var item = new GlideRecord('sc_req_item');
-        item.addActiveQuery();
-        item.addQuery('request.requested_for', userId);
-        item.setLimit(15);
-        item.query();
-        while (item.next()) ids.push(item.getUniqueValue());
-        return ids.join(',');
     },
 
     _lastComment: function (task) {

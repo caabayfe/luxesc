@@ -41,6 +41,8 @@ const byAttention = (a, b) => Number(!!b.attention) - Number(!!a.attention);
 export default class MyStuffPage extends withWidgetContext(AIUXElement) {
   @state() _tab = '';
 
+  static cachePolicy = 'no-store';
+
   static aiContext = {
     description: "The employee's requests, incidents and approvals: what needs them, what is open (with where each one is) and what is done",
     bestFor: 'When the employee wants to review, find, follow up or act on their requests, incidents or approvals'
