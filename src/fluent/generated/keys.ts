@@ -877,6 +877,16 @@ declare global {
                         table: 'sys_ws_version'
                         id: '5052a559e8fc4b049018d94c4dad8cf0'
                     }
+                    'cs-conversation-read-privilege': {
+                        table: 'sys_scope_privilege'
+                        id: '6ffc8034c6bc4cb9888945621c2c4406'
+                        deleted: true
+                    }
+                    'cs-conversation-write-privilege': {
+                        table: 'sys_scope_privilege'
+                        id: 'b931d342636b4668b39a07d7f2fef48b'
+                        deleted: true
+                    }
                     employee_concierge_agent: {
                         table: 'sn_aia_agent'
                         id: '3780b12426954c8f8d21c23671523963'

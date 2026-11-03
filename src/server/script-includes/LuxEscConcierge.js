@@ -18,6 +18,10 @@ LuxEscConcierge.MAX_ITEMS = 12;
 LuxEscConcierge.PER_CLASS = 10;
 // Records per class (and approvals) on My stuff
 LuxEscConcierge.MINE_PER_CLASS = 25;
+// sys_cs_channel "AI Agent Background". Without it the runtime records a run as an open Otto
+// panel conversation of the employee holding only the agent's output; the panel resumes it, and
+// its New chat button stays disabled until the employee types there
+LuxEscConcierge.BACKGROUND_CHANNEL = 'c81f0f9137b922109a618a6c24924b7f';
 LuxEscConcierge.OUTCOMES = ['approve', 'reject', 'comment', 'close', 'reopen'];
 
 LuxEscConcierge.prototype = {
@@ -55,6 +59,7 @@ LuxEscConcierge.prototype = {
                 conversationLabel: 'Lux Employee Center ' + kind,
                 // Unattended: the agent must finish without asking the employee anything
                 canInteractWithUser: false,
+                conversationChannel: LuxEscConcierge.BACKGROUND_CHANNEL,
             });
             if (!result) throw new Error('AI Agents are not available on this instance');
             if (result.status !== 'success' || !result.data || !result.data.executionPlanId) {
