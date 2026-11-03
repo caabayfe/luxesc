@@ -6,8 +6,8 @@ import './luxesc-command-box.js';
 
 /**
  * The one box from any page (⌘K / Ctrl+K): the same "What do you need?" box
- * as on For you, in a modal. Following a match closes it; an agent's answer
- * opens inside it.
+ * as on For you, in a modal. Following a match or handing the text to the
+ * assistant closes it (the modal would keep the focus away from the chat).
  */
 @customElement('luxesc-command-palette')
 export class CommandPalette extends AIUXElement {
@@ -31,6 +31,16 @@ export class CommandPalette extends AIUXElement {
     this._open = false;
   }
 
+  // The palette lives on <body>, outside the app layout that opens the chat, so the hand-off
+  // is passed on from the layout
+  _onOpenChat(e) {
+    this._close();
+    const layout = document.querySelector('aiux-nav-layout');
+    if (!layout || layout.contains(this)) return;
+    e.stopPropagation();
+    layout.dispatchEvent(new CustomEvent(e.type, {bubbles: true, composed: true, detail: e.detail}));
+  }
+
   // A click on a match (a link inside the box) leaves the page, so the palette closes
   _onClick(e) {
     if (e.composedPath().some(node => node.tagName === 'A' && node.href)) this._close();
@@ -52,6 +62,7 @@ export class CommandPalette extends AIUXElement {
             bare
             .basePath=${this.basePath}
             @click=${this._onClick}
+            @aiux:open-chat=${this._onOpenChat}
           ></luxesc-command-box>`
         : nothing}
     </aiux-modal>`;

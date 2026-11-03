@@ -1,15 +1,16 @@
 import {navLayoutContext} from '@servicenow/aiux/aiux-components-nav';
 import {i18n} from '@servicenow/aiux/aiux-services';
 import {AppTheme} from './theme.js';
+import './components/luxesc-command-palette.js';
 
-// ⌘K / Ctrl+K opens the one box from any page; the palette loads on first use
+// ⌘K / Ctrl+K opens the one box from any page. The palette is imported up front: a chunk
+// imported only from here is linked to the layout widget, and the instance does not serve it.
 function installCommandPalette(basePath) {
   if (typeof window === 'undefined' || window.__luxescPalette) return;
   window.__luxescPalette = true;
-  window.addEventListener('keydown', async e => {
+  window.addEventListener('keydown', e => {
     if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'k') return;
     e.preventDefault();
-    await import('./components/luxesc-command-palette.js');
     let palette = document.querySelector('luxesc-command-palette');
     if (!palette) {
       palette = document.createElement('luxesc-command-palette');

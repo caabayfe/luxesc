@@ -43,7 +43,7 @@ export default class HomePage extends withWidgetContext(AIUXElement) {
   static aiContext = {
     description: "Employee Center home (For you): one box to ask for anything, what needs the employee, their requests on the way, known issues and popular answers",
     bestFor:
-      'When the employee asks what they have open, wants to follow up a request, or needs something new. To order, use find_catalog_items, describe_catalog_item and open_catalog_item: they open a pre-filled form for the employee to submit.'
+      'When the employee asks what they have open, wants to follow up a request, or needs something new. Something broken or not working (VPN, email, laptop, an app): the Fix something broken skill, never a catalog item. Several items at once (onboarding, a move): the Order several items at once skill. To order one thing they ask for, use prepare_catalog_order: it opens a pre-filled form for the employee to submit.'
   };
 
   static client_tools = {

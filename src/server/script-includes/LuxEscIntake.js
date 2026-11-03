@@ -1,25 +1,21 @@
-// Employee Intake: the tools of the intake AI agent, which turns an employee's description of a
-// problem into self-help from the knowledge base and similar fixed incidents, and a drafted
-// incident or catalog request. The employee reviews and submits the draft in the portal.
+// Employee Intake: the tools of the intake AI agent, which Otto calls when an employee reports
+// that something is broken: self-help from the knowledge base and similar fixed incidents, and
+// the incident it raises once the employee confirms. Tools run as the employee in the chat.
 // Classic script, like LuxEscConcierge, because the sn_aia runtime rejects module code.
 var LuxEscIntake = Class.create();
 
-LuxEscIntake.RUN = 'x_everi_luxesc_concierge_run';
 LuxEscIntake.LIMIT = 5;
-LuxEscIntake.TYPES = ['incident', 'catalog', 'none'];
-// The request planner shares the catalog search, the knowledge drafter the knowledge search
-LuxEscIntake.KINDS = ['intake', 'plan', 'article'];
-LuxEscIntake.MAX_OTHERS = 50;
 // Items that go in the cart (no record producers, order guides or content items)
 LuxEscIntake.ORDERABLE = 'sc_cat_item,pc_hardware_cat_item,pc_software_cat_item,sc_cat_item_service';
 LuxEscIntake.URGENCIES = ['1', '2', '3'];
+// Where an employee follows one of their incidents or requested items in the portal
+LuxEscIntake.REQUEST_PAGE = '/aiux/luxesc/requests/';
 
 LuxEscIntake.prototype = {
     initialize: function () {},
 
     // Published articles matching the words, best match first (platform text search)
-    searchKnowledge: function (runId, query) {
-        if (!this._run(runId)) return { error: 'Unknown intake run' };
+    searchKnowledge: function (query) {
         var self = this;
         var articles = this._search(query, function (words) {
             var article = new GlideRecord('kb_knowledge');
@@ -40,8 +36,7 @@ LuxEscIntake.prototype = {
 
     // Resolved incidents about the same thing and how they were fixed; numbers are not shown to
     // the employee because the incidents belong to other people
-    similarIncidents: function (runId, query) {
-        if (!this._run(runId)) return { error: 'Unknown intake run' };
+    similarIncidents: function (query) {
         var self = this;
         var incidents = this._search(query, function (words) {
             var incident = new GlideRecord('incident');
@@ -70,8 +65,7 @@ LuxEscIntake.prototype = {
 
     // Catalog items (requests for hardware, software, access); orderableOnly keeps the ones that
     // can go in the cart, for the request planner
-    searchCatalog: function (runId, query, orderableOnly) {
-        if (!this._run(runId)) return { error: 'Unknown intake run' };
+    searchCatalog: function (query, orderableOnly) {
         var self = this;
         var items = this._search(query, function (words) {
             var item = new GlideRecord('sc_cat_item');
@@ -89,56 +83,31 @@ LuxEscIntake.prototype = {
         return { items: items };
     },
 
-    saveTriage: function (runId, triageJson) {
-        var run = this._run(runId);
-        if (!run) throw new Error('Unknown intake run ' + runId);
-        var triage = typeof triageJson === 'string' ? JSON.parse(triageJson) : triageJson;
-        if (!triage || typeof triage.summary !== 'string' || !triage.recommendation) {
-            throw new Error('The triage must be {"summary": "...", "selfHelp": {...} or null, "recommendation": {...}}');
+    // The employee confirmed the draft in the chat. With a known issue, the incident is raised
+    // under it (LuxEscOutages.follow) so it is updated and closed with the major incident.
+    raiseIncident: function (shortDescription, description, category, urgency, knownIssueId) {
+        shortDescription = String(shortDescription || '').trim().substring(0, 160);
+        if (!shortDescription) throw new Error('A short description is needed');
+        description = String(description || '').substring(0, 4000);
+        if (/^[0-9a-f]{32}$/.test(String(knownIssueId || ''))) {
+            var linked = new x_everi_luxesc.LuxEscOutages().follow(knownIssueId, shortDescription, description);
+            return { number: linked.number, sysId: linked.sysId, link: LuxEscIntake.REQUEST_PAGE + linked.sysId, linkedToKnownIssue: true };
         }
-        var recommendation = triage.recommendation;
-        var type = LuxEscIntake.TYPES.indexOf(recommendation.type) >= 0 ? recommendation.type : 'incident';
-        var clean = {
-            summary: triage.summary.substring(0, 300),
-            selfHelp: this._cleanSelfHelp(triage.selfHelp),
-            recommendation: {
-                type: type,
-                reason: String(recommendation.reason || '').substring(0, 400),
-            },
-        };
-        // Only an issue that is still current, described by the platform rather than the agent
-        var knownIssue = triage.knownIssue && new x_everi_luxesc.LuxEscOutages().find(triage.knownIssue.sysId);
-        if (knownIssue) clean.knownIssue = knownIssue;
-        clean.othersReporting = Math.min(LuxEscIntake.MAX_OTHERS, Math.max(0, parseInt(triage.othersReporting, 10) || 0));
-        if (type === 'catalog') {
-            var item = recommendation.catalogItem || {};
-            if (!/^[0-9a-f]{32}$/.test(item.sysId) || !new GlideRecord('sc_cat_item').get(item.sysId)) {
-                throw new Error('catalogItem.sysId must be a sysId returned by the Search catalog tool');
-            }
-            clean.recommendation.catalogItem = { sysId: item.sysId, name: String(item.name || '').substring(0, 200) };
-            clean.recommendation.details = String(recommendation.details || '').substring(0, 1000);
-        }
-        if (type === 'incident') {
-            var draft = recommendation.incident || {};
-            clean.recommendation.incident = {
-                shortDescription: String(draft.shortDescription || triage.summary).substring(0, 160),
-                description: String(draft.description || '').substring(0, 4000),
-                category: this._isChoice('incident', 'category', draft.category) ? draft.category : 'inquiry',
-                urgency: LuxEscIntake.URGENCIES.indexOf(String(draft.urgency)) >= 0 ? String(draft.urgency) : '3',
-            };
-        }
-        run.setValue('briefing', JSON.stringify(clean));
-        run.update();
-        return 'Triage saved: ' + type;
+        var incident = new GlideRecordSecure('incident');
+        incident.initialize();
+        incident.setValue('caller_id', gs.getUserID());
+        incident.setValue('short_description', shortDescription);
+        incident.setValue('description', description);
+        incident.setValue('category', this._isChoice('incident', 'category', category) ? category : 'inquiry');
+        incident.setValue('urgency', LuxEscIntake.URGENCIES.indexOf(String(urgency)) >= 0 ? String(urgency) : '3');
+        incident.setValue('contact_type', 'self-service');
+        if (!incident.insert()) throw new Error('The incident could not be raised');
+        return { number: incident.getValue('number'), sysId: incident.getUniqueValue(), link: LuxEscIntake.REQUEST_PAGE + incident.getUniqueValue(), linkedToKnownIssue: false };
     },
 
     // ---- Internals ------------------------------------------------------------------------
 
-    _run: function (runId) {
-        var run = new GlideRecord(LuxEscIntake.RUN);
-        return run.get(runId) && LuxEscIntake.KINDS.indexOf(run.getValue('kind')) >= 0 ? run : null;
-    },
-
+    // Self-help as the knowledge drafter reads it: at most 6 steps and the articles they came from
     _cleanSelfHelp: function (selfHelp) {
         if (!selfHelp || !(selfHelp.steps instanceof Array) || !selfHelp.steps.length) return null;
         return {

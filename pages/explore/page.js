@@ -12,7 +12,8 @@ import {setDocumentTitle} from '../../utils/document-title.js';
 import {catalogTools} from '../../utils/catalog-tools.js';
 import {exploreQuery} from '../../utils/explore.js';
 import '../../components/luxesc-item-gallery.js';
-import '../../components/luxesc-planner.js';
+import {chatContext, isChatEnabled} from '../../utils/chat.js';
+import '../../components/luxesc-ask.js';
 
 const {acl, title} = decorators;
 const log = getLogger('luxesc-explore');
@@ -40,13 +41,16 @@ function itemsPage({categoryId, text, offset, limit}) {
 /**
  * Explore: everything the employee can get or read, in one search. Tabs for
  * All, Services (catalog items, filtered by category) and Answers (knowledge
- * articles), and the Request Planner for several items at once. Replaces the
+ * articles), and a hand-off to the Request Planner agent (in the assistant) for
+ * several items at once. Replaces the
  * separate catalog and knowledge list pages, which now forward here.
  */
 @customElement('x-everi-luxesc-explore-page')
 @title('Explore')
 @acl([{securityAttribute: 'user_is_authenticated'}])
 export default class ExplorePage extends withWidgetContext(AIUXElement) {
+  static contexts = [chatContext];
+
   static aiContext = {
     description: 'Explore: one search over the service catalog (things to request) and the knowledge base (answers to read)',
     bestFor:
@@ -70,22 +74,6 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
         navigate('/explore', {query: exploreQuery({text: String(text || '').trim(), tab: 'answers'})});
         return {success: true};
       }
-    },
-    // Several items at once go to the Request Planner agent, shown in the planner card on this page
-    plan_request: {
-      description:
-        'Plan a request with several catalog items at once (for example onboarding new hires) with the Request Planner agent. The plan appears on this page for the employee to review and add to the cart; nothing is ordered.',
-      arguments: [
-        {name: 'description', description: 'Everything the employee needs, in their words: what, how many, for whom, where, by when', type: 'string', required: true}
-      ],
-      definition: async function ({description} = {}) {
-        this._planning = true;
-        await this.updateComplete;
-        const run = await this.renderRoot.querySelector('luxesc-planner')?.plan(description);
-        return run
-          ? {success: true, nextStep: 'Tell the employee the planner is working and the plan will appear on this page.'}
-          : {success: false, error: 'The planner could not start'};
-      }
     }
   };
 
@@ -94,8 +82,6 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
   @state() _hasMore = false;
   @state() _loadingMore = false;
   @state() _moreError = '';
-  // The planner card is open
-  @state() _planning = false;
 
   _prevLoaderData = null;
 
@@ -288,16 +274,20 @@ export default class ExplorePage extends withWidgetContext(AIUXElement) {
         : nothing}`;
   }
 
+  // Several items at once: the assistant hands the description to the Request Planner agent
   _renderPlanner() {
-    if (this._planning) return html`<luxesc-planner></luxesc-planner>`;
-    return html`<div class="flex flex-wrap items-center gap-3 rounded-box border border-base-300 bg-base-100 p-4">
-      <span class="text-primary">${icon({name: 'ai-sparkle', size: 'sm'})}</span>
-      <p class="min-w-0 flex-1 basis-64 text-sm">
+    if (!isChatEnabled()) return nothing;
+    return html`<div class="flex flex-col gap-3 rounded-box border border-base-300 bg-base-100 p-4">
+      <p class="flex items-center gap-2 text-sm">
+        <span class="text-primary">${icon({name: 'ai-sparkle', size: 'sm'})}</span>
         ${i18n.getMessage('Need several things at once, like everything for a new hire? Describe it and an agent plans the whole request.')}
       </p>
-      <button type="button" class="aiux-btn aiux-btn-sm aiux-btn-outline" @click=${() => (this._planning = true)}>
-        ${i18n.getMessage('Plan a bigger request')}
-      </button>
+      <luxesc-ask
+        label=${i18n.getMessage('Plan a bigger request')}
+        placeholder=${i18n.getMessage('For example: everything for 3 new hires in Madrid next Monday')}
+        action=${i18n.getMessage('Plan it')}
+        prefix=${i18n.getMessage('I need several catalog items at once:')}
+      ></luxesc-ask>
     </div>`;
   }
 

@@ -1,0 +1,40 @@
+{
+  "profiles": {
+    "panel": "e93cab98c7c03110b65579a988c260c4",
+    "va": "e13840cf77d53110569156391e5a99ba"
+  },
+  "skills": [
+    {
+      "key": "fix-something-broken",
+      "name": "Fix something broken",
+      "agent": "employee_intake_agent",
+      "agentName": "Employee Intake",
+      "useWhen": "an employee says something is broken, failing, slow or not working (VPN, email, Teams, laptop, printer, Wi-Fi, an application or website, an error message), asks how to fix it, or wants to report a problem or raise an incident",
+      "examples": [
+        "My VPN won't connect from home",
+        "Outlook keeps crashing",
+        "I get an error when I log in to SAP",
+        "No me funciona la VPN",
+        "Quiero reportar una incidencia"
+      ],
+      "does": "Checks known outages, gives self-help steps from the knowledge base and similar fixed incidents, asks whether they worked, and raises or links an incident when they did not.",
+      "notFor": "ordering new hardware, software or access: one item is the catalog, several items is 'Order several items at once'",
+      "conversation": "it asks what it needs, gives self-help steps, asks whether they fixed the problem, and raises or links an incident"
+    },
+    {
+      "key": "order-several-items",
+      "name": "Order several items at once",
+      "agent": "request_planner_agent",
+      "agentName": "Request Planner",
+      "useWhen": "an employee needs several catalog items at once or for several people: everything for new hires, a team move, a new office or project",
+      "examples": [
+        "Laptops and Office for 3 new hires in Madrid next Monday",
+        "Everything my team needs for the move to building 4",
+        "Necesito portátil, móvil y acceso a SAP para un nuevo empleado"
+      ],
+      "does": "Finds the items, asks the missing answers, adds them to the cart and submits the order once the employee confirms.",
+      "notFor": "a single item, which is the catalog, or something that is broken, which is 'Fix something broken'",
+      "conversation": "it asks the missing answers, confirms the plan and the cart, and submits the order only when the employee agrees"
+    }
+  ]
+}

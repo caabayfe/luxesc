@@ -25,7 +25,7 @@ function bestMatch(items, name) {
 export const catalogTools = {
   prepare_catalog_order: {
     description:
-      'One step from a need to a pre-filled order form: searches the catalog (only items this employee may order), picks the best match, and opens its form pre-filled. Use this first whenever the employee wants to request or order something; prefer it over desktop or web actions. Never submits.',
+      'One step from a need to a pre-filled order form: searches the catalog (only items this employee may order), picks the best match, and opens its form pre-filled. Use it only when the employee asks to request or order one thing; prefer it over desktop or web actions. Never use it when something is broken or not working (the Fix something broken skill) or for several items at once (the Order several items at once skill). Never submits.',
     arguments: [
       {name: 'search', description: 'Keywords for the item, e.g. "standard laptop"', type: 'string', required: true},
       {name: 'itemName', description: 'Exact item name if the employee named one', type: 'string', required: false},

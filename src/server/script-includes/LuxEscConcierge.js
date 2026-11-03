@@ -1,13 +1,12 @@
-// Employee Concierge: starts the portal's AI agents for the signed-in employee (the concierge
-// briefing, or the problem intake served by LuxEscIntake), serves the concierge's tools (the
-// employee's requests and approvals, saving the briefing) and reports progress.
+// Employee Concierge: starts the portal's background AI agents for the signed-in employee (the
+// concierge briefing and the knowledge drafter), serves the concierge's tools (the employee's
+// requests and approvals, saving the briefing) and reports progress. The intake and the request
+// planner are conversational: Otto runs them in the chat.
 // Classic script on purpose: the sn_aia runtime rejects calls made from module code.
 var LuxEscConcierge = Class.create();
 
 LuxEscConcierge.AGENTS = {
     concierge: 'Employee Concierge',
-    intake: 'Employee Intake',
-    plan: 'Request Planner',
     article: 'Knowledge Drafter',
 };
 LuxEscConcierge.RUN = 'x_everi_luxesc_concierge_run';
@@ -26,12 +25,11 @@ LuxEscConcierge.prototype = {
 
     // ---- REST: start, latest, trace -------------------------------------------------------
 
-    // kind: 'concierge' (default), or 'intake' and 'plan', which need the employee's own words in
-    // text, or 'article', whose text names the confirmed fix (see LuxEscKnowledge)
+    // kind: 'concierge' (default), or 'article', whose text names the confirmed fix (see LuxEscKnowledge)
     start: function (kind, text) {
-        kind = LuxEscConcierge.AGENTS.hasOwnProperty(kind) ? kind : 'concierge';
+        kind = kind || 'concierge';
+        if (!LuxEscConcierge.AGENTS.hasOwnProperty(kind)) throw new Error('Ask the assistant: this agent works in the chat');
         text = String(text || '').trim().substring(0, 2000);
-        if (kind !== 'concierge' && !text) throw new Error('Describe what you need first');
 
         var run = new GlideRecord(LuxEscConcierge.RUN);
         run.initialize();
@@ -45,14 +43,10 @@ LuxEscConcierge.prototype = {
             var agent = LuxEscConcierge.AGENTS[kind];
             var agentId = this._agentId(agent);
             if (!agentId) throw new Error('The ' + agent + ' agent is not installed');
-            var words = '. The employee wrote: """' + text.replace(/"""/g, '"') + '"""';
             var objective = {
                 // The briefing has no words of the employee to follow, so it takes their UI language
                 concierge: 'Prepare the concierge briefing for ' + gs.getUserDisplayName() + '. Run id: ' + runId +
                     '. Write it in the language with code "' + (gs.getSession().getLanguage() || 'en') + '"',
-                intake: 'Help ' + gs.getUserDisplayName() + ' with this problem. Run id: ' + runId + words,
-                plan: 'Plan the catalog requests for ' + gs.getUserDisplayName() + '. Today is ' +
-                    new GlideDate().getValue() + '. Run id: ' + runId + words,
                 article: 'Draft a knowledge article from a confirmed fix. Run id: ' + runId,
             }[kind];
             var result = new sn_aia.AiAgentRuntimeUtil().startAiAgentConversation({
