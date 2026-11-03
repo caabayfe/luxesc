@@ -45,3 +45,12 @@ export const LuxEscKnowledge = ScriptInclude({
     script: Now.include('../../server/script-includes/LuxEscKnowledge.js'),
     description: 'Starts the Knowledge Drafter agent on confirmed fixes and serves its tools: read the fix, search articles, save the draft.',
 })
+
+export const LuxEscTicket = ScriptInclude({
+    $id: Now.ID['luxesc-ticket-si'],
+    name: 'LuxEscTicket',
+    apiName: 'x_everi_luxesc.LuxEscTicket',
+    accessibleFrom: 'package_private',
+    script: Now.include('../../server/script-includes/LuxEscTicket.js'),
+    description: "The employee's view of a request or incident: facts, answers, files and customer-visible comments (never work notes).",
+})

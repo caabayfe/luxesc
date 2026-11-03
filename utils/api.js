@@ -139,6 +139,19 @@ export function updateRecord(table, sysId, body) {
   });
 }
 
+// A file on a record, as the employee; the Attachment API applies the attachment ACLs
+export async function uploadAttachment(table, sysId, file) {
+  const response = await aiuxFetch(
+    `/api/now/attachment/file?${query({table_name: table, table_sys_id: sysId, file_name: file.name})}`,
+    {method: 'POST', headers: {Accept: 'application/json', 'Content-Type': file.type || 'application/octet-stream'}, body: file}
+  );
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(json.error?.message || `HTTP error ${response.status}`);
+  return json.result;
+}
+
+export const attachmentUrl = sysId => `/sys_attachment.do?sys_id=${sysId}`;
+
 export function imageUrl(path) {
   if (!path) return '';
   return path.startsWith('/') || path.startsWith('http') ? path : `/${path}`;

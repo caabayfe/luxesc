@@ -70,6 +70,16 @@ const journeyScript = `(function process(request, response) {
     response.setBody({ journey: journey });
 })(request, response);`
 
+const ticketScript = `(function process(request, response) {
+    var ticket = new x_everi_luxesc.LuxEscTicket().get(request.pathParams.task);
+    if (!ticket) {
+        response.setStatus(404);
+        response.setBody({ error: { message: 'Not found' } });
+        return;
+    }
+    response.setBody({ ticket: ticket });
+})(request, response);`
+
 const mineScript = `(function process(request, response) {
     response.setBody(new x_everi_luxesc.LuxEscConcierge().mine());
 })(request, response);`
@@ -96,7 +106,7 @@ const traceScript = `(function process(request, response) {
 
 // URIs: /api/x_everi_luxesc/v1/concierge/runs, /runs/latest, /runs/{run}, /runs/{run}/outcomes,
 // /known-issues, /known-issues/{issue}/follow,
-// /knowledge/trending, /knowledge/{article}/view, /journey/{task}
+// /knowledge/trending, /knowledge/{article}/view, /journey/{task}, /tickets/{task}
 export const conciergeApi = RestApi({
     $id: Now.ID['concierge-api'],
     name: 'Lux Employee Center Concierge',
@@ -169,6 +179,15 @@ export const conciergeApi = RestApi({
             script: journeyScript,
             version: 1,
             shortDescription: 'What happened to a request or incident, where it is now and what comes next',
+        },
+        {
+            $id: Now.ID['concierge-api-ticket'],
+            name: 'ticket',
+            method: 'GET',
+            path: '/tickets/{task}',
+            script: ticketScript,
+            version: 1,
+            shortDescription: "A request or incident as the employee sees it: facts, answers, files and comments (never work notes)",
         },
         {
             $id: Now.ID['concierge-api-mine'],

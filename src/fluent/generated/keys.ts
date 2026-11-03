@@ -161,6 +161,7 @@ declare global {
                     'aiux-dependency|luxesc-journey.js': {
                         table: 'sys_aix_dependency'
                         id: '3b03afdc5077391b0c8dcb6d84af1349'
+                        deleted: true
                     }
                     'aiux-dependency|luxesc-planner.js': {
                         table: 'sys_aix_dependency'
@@ -495,6 +496,7 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-journey.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'f097b6af60840c61bdeff1c8bdc3f92c'
+                        deleted: true
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-home-page|luxesc-planner.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -640,6 +642,7 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|luxesc-journey.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'a247bc0cbff80f7f438d8da860ac0847'
+                        deleted: true
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-requests-page|luxesc-planner.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -704,6 +707,7 @@ declare global {
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|luxesc-journey.js': {
                         table: 'sys_aix_m2m_widget_dependency'
                         id: 'c353492c8717ff1a69785c99b2776280'
+                        deleted: true
                     }
                     'aiux-m2m-widget-dep|x-everi-luxesc-ticket-page|luxesc-planner.js': {
                         table: 'sys_aix_m2m_widget_dependency'
@@ -856,6 +860,10 @@ declare global {
                     'concierge-api-start': {
                         table: 'sys_ws_operation'
                         id: '4173ce8e7bba40ea999bb0ace5371403'
+                    }
+                    'concierge-api-ticket': {
+                        table: 'sys_ws_operation'
+                        id: '72517872feec49efa487e8ee019e93ec'
                     }
                     'concierge-api-trace': {
                         table: 'sys_ws_operation'
@@ -2123,6 +2131,10 @@ declare global {
                         id: '6e589823168b4f0b825649e6a1979799'
                         deleted: true
                     }
+                    'luxesc-ticket-si': {
+                        table: 'sys_script_include'
+                        id: 'd432111e79204005b967e2ea045d7bb1'
+                    }
                     'luxesc-wf-fix-something-broken': {
                         table: 'sn_aia_usecase'
                         id: '9a7afcae25284d08944bbd8d28a43af3'
@@ -2174,6 +2186,10 @@ declare global {
                     'src_server_script-includes_LuxEscPlanner_js': {
                         table: 'sys_module'
                         id: '05daa101b67442f897f5a3a9e1e08405'
+                    }
+                    'src_server_script-includes_LuxEscTicket_js': {
+                        table: 'sys_module'
+                        id: 'e940d0c1660a41dfa2d887807a67b5d6'
                     }
                 }
                 composite: [
