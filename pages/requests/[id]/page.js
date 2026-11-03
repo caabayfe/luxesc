@@ -16,8 +16,9 @@ import {
 import '@servicenow/aiux/aiux-components-catalog';
 import '@servicenow/aiux/aiux-components-attachment';
 import '@servicenow/aiux/aiux-components-empty-state-content';
-import {addComment, fetchRecord, fetchRecords} from '../../../utils/api.js';
+import {fetchRecord, fetchRecords} from '../../../utils/api.js';
 import '../../../components/luxesc-ask.js';
+import '../../../components/luxesc-comment-draft.js';
 import '../../../components/luxesc-journey.js';
 import {setDocumentTitle} from '../../../utils/document-title.js';
 import {chatContext, isChatEnabled} from '../../../utils/chat.js';
@@ -51,8 +52,22 @@ const SUMMARY_FIELDS =
 
 // Self-service view; the platform falls back to the default view when a table has none
 const ESS_VIEW = 'ess';
-// The variable editor formatter lives on the default view of sc_req_item
+// The variable editor formatter lives on the default view of sc_req_item, and so do its
+// comments and activity: its self-service view has neither
 const VARIABLES_VIEW = 'default';
+const ACTIVITY_VIEW = {sc_req_item: 'default'};
+// Enough of the comment history for the assistant to summarise it
+const COMMENTS_CHARS = 3000;
+
+// The comments' display value is the history the requester can read, with some HTML and [code] markup
+function plainComments(value = '') {
+  return value
+    .replace(/\[\/?code\]/g, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+    .slice(0, COMMENTS_CHARS);
+}
 
 @customElement('x-everi-luxesc-ticket-page')
 @title('Request')
@@ -61,29 +76,26 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
   static contexts = [chatContext];
 
   static aiContext = {
-    description: "One of the employee's requests or incidents: number, state, dates, assignment, approval and service levels (SLAs: stage, due by, time left, breached)",
-    bestFor: 'When the employee asks about the status of this request, what happens next, or wants to add information or chase it up'
+    description:
+      "One of the employee's requests or incidents: what was asked for, number, state and stage, dates, assignment, approval, service levels (SLAs: stage, due by, time left, breached) and the comment history the employee can read",
+    bestFor:
+      'When the employee asks about the status of this request, when it will be done, what has happened, or wants to add information or chase it up. Answer with a short heading per part (for example Status, Timeline, Next step) and bullet points, never one long paragraph. When a message to the people working on it would help (chasing up, answering their question, adding details), draft it and use propose_comment, then tell the employee it is waiting in the comment box for them to send.'
   };
 
-  // Posts in the employee's name, so only on their explicit request
+  // Never posts: the employee sends the draft from the comment box
   static client_tools = {
-    add_comment: {
+    propose_comment: {
       description:
-        'Add a comment to this request, visible to the people working on it. Only use when the employee explicitly asks to add information or chase it up; show them the exact text first.',
+        "Put a comment you drafted for this request into the comment box on the page (a chase-up, an answer to the people working on it, or details the employee wants to add). The employee reviews it and sends it themselves. Write it as the employee, in their language.",
       arguments: [
         {name: 'text', description: 'The comment, written as the employee', type: 'string', required: true}
       ],
       definition: async function ({text} = {}) {
         const comment = String(text || '').trim();
-        const {summary, table} = this.loaderData || {};
-        if (!comment || !summary) return {success: false, reason: 'Nothing to post'};
-        try {
-          await addComment(table, summary.sys_id.value, comment);
-          return {success: true, posted: comment};
-        } catch (error) {
-          log.error({error: error.message}, 'Comment failed');
-          return {success: false, reason: 'You cannot comment on this request'};
-        }
+        if (!comment) return {success: false, reason: 'Nothing to propose'};
+        const draft = this.renderRoot.querySelector('luxesc-comment-draft');
+        if (!draft?.propose(comment)) return {success: false, reason: 'You cannot comment on this request'};
+        return {success: true};
       }
     }
   };
@@ -110,6 +122,15 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
         log.error({error: error.message, table, sysId}, 'Failed to load record');
         return null;
       });
+      const activity = ACTIVITY_VIEW[table]
+        ? await RecordDataManager.fetchRecord(
+            {table, sysId, view: ACTIVITY_VIEW[table], ignoreUserViewPreference: true, isCoreUI: false},
+            [RecordAPIKey.Form, RecordAPIKey.Activity]
+          ).catch(error => {
+            log.error({error: error.message, table, sysId}, 'Failed to load activity');
+            return null;
+          })
+        : record;
       const variables =
         table === 'sc_req_item'
           ? await RecordDataManager.fetchRecord(
@@ -121,12 +142,22 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
             })
           : null;
       // A requested item's short description is the catalog blurb; its item name says what was asked for
-      const itemName =
-        table === 'sc_req_item'
-          ? (await fetchRecord(table, sysId, 'cat_item').catch(() => null))?.cat_item?.display_value || ''
-          : '';
+      const item =
+        table === 'sc_req_item' ? await fetchRecord(table, sysId, 'cat_item,stage').catch(() => null) : null;
+      const comments = (await fetchRecord(table, sysId, 'comments').catch(() => null))?.comments?.display_value;
       const slas = await fetchSlas(sysId);
-      return {basePath, summary, record, variables, table, slas, itemName};
+      return {
+        basePath,
+        summary,
+        record,
+        activity,
+        variables,
+        table,
+        slas,
+        itemName: item?.cat_item?.display_value || '',
+        stage: item?.stage?.display_value || '',
+        comments: plainComments(comments)
+      };
     } catch (error) {
       log.error({error: error.message, sysId}, 'Failed to load request');
       return {basePath, summary: null, record: null};
@@ -142,11 +173,13 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
     const value = name => summary[name]?.display_value || '';
     this.setAiContext({
       request: {
+        askedFor: this.loaderData.itemName || value('short_description'),
         number: value('number'),
         type: value('sys_class_name'),
         summary: value('short_description'),
         description: value('description').slice(0, 1000),
         state: value('state'),
+        stage: this.loaderData.stage,
         open: summary.active?.value === 'true',
         openedAt: value('opened_at'),
         updatedAt: value('sys_updated_on'),
@@ -154,7 +187,8 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
         dueDate: value('due_date'),
         approval: value('approval')
       },
-      slas: this.loaderData.slas || []
+      slas: this.loaderData.slas || [],
+      commentHistory: this.loaderData.comments || 'No comments yet'
     });
   }
 
@@ -162,11 +196,11 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
     if (!isChatEnabled()) return nothing;
     const number = summary.number?.display_value;
     const suggestions = [
-      {label: i18n.getMessage('Where is it now?'), question: i18n.getMessage('What is the status of my request {0} and what happens next?', number)},
-      {label: i18n.getMessage('When will it be done?'), question: i18n.getMessage('When can I expect {0} to be completed? Explain any SLA or due date.', number)},
-      {label: i18n.getMessage('Summarize the activity'), question: i18n.getMessage('Summarize what has happened so far on {0}.', number)},
+      {label: i18n.getMessage('Where is it now?'), question: i18n.getMessage('Where is {0} now: its stage, who is handling it and what happens next?', number)},
+      {label: i18n.getMessage('When will it be done?'), question: i18n.getMessage('When will {0} be done? Use its due date and service levels, and say whether it is on track.', number)},
+      {label: i18n.getMessage('Summarize the activity'), question: i18n.getMessage('Summarize the activity on {0}: its status, a short timeline of the updates and comments, and what happens next.', number)},
       ...(summary.active?.value === 'true'
-        ? [{label: i18n.getMessage('Chase it up'), question: i18n.getMessage('Draft a short, polite comment asking for an update on {0}. Show it to me and post it on this request only after I confirm.', number)}]
+        ? [{label: i18n.getMessage('Chase it up'), question: i18n.getMessage('Draft a short, polite comment asking for an update on {0} and put it in the comment box for me to send.', number)}]
         : [])
     ];
     return html`<section class="aiux-card border border-base-300 bg-base-100 shadow-sm" aria-labelledby="assist-title">
@@ -229,7 +263,7 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
   }
 
   render() {
-    const {summary, record, variables, table} = this.loaderData || {};
+    const {summary, record, activity, variables, table} = this.loaderData || {};
     if (!summary || !record) {
       return html`<div class="mx-auto max-w-3xl p-4 lg:p-8">
         <aiux-empty-state-content
@@ -242,25 +276,30 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
     const sysId = summary.sys_id.value;
     return html`<div class="mx-auto flex max-w-7xl flex-col gap-6 p-4 lg:p-8">
       ${this._renderHeader(summary)} ${this._renderAssist(summary)}
-      <aiux-record-provider .data=${record} disable-presence>
-        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_24rem]">
-          <section
-            class="aiux-card min-w-0 bg-base-100 shadow-sm"
-            aria-labelledby="activity-title"
-          >
-            <div class="aiux-card-body gap-4">
-              <h2 id="activity-title" class="aiux-card-title text-base">
-                ${i18n.getMessage('Activity')}
-              </h2>
-              <aiux-record-activity-layout force-stacked disable-preserve-layout>
-                <aiux-record-activity-compose main></aiux-record-activity-compose>
-                <aiux-record-activity-stream
-                  sortdirection="newest"
-                  hideconfigurefields
-                ></aiux-record-activity-stream>
-              </aiux-record-activity-layout>
-            </div>
-          </section>
+      <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_24rem]">
+        <section
+          class="aiux-card min-w-0 bg-base-100 shadow-sm"
+          aria-labelledby="activity-title"
+        >
+          <div class="aiux-card-body gap-4">
+            <h2 id="activity-title" class="aiux-card-title text-base">
+              ${i18n.getMessage('Activity')}
+            </h2>
+            ${activity
+              ? html`<aiux-record-provider .data=${activity} disable-presence>
+                  <luxesc-comment-draft></luxesc-comment-draft>
+                  <aiux-record-activity-layout force-stacked disable-preserve-layout>
+                    <aiux-record-activity-compose main></aiux-record-activity-compose>
+                    <aiux-record-activity-stream
+                      sortdirection="newest"
+                      hideconfigurefields
+                    ></aiux-record-activity-stream>
+                  </aiux-record-activity-layout>
+                </aiux-record-provider>`
+              : html`<p class="text-sm text-text-secondary">${i18n.getMessage('The activity is not available right now.')}</p>`}
+          </div>
+        </section>
+        <aiux-record-provider .data=${record} disable-presence>
           <div class="flex min-w-0 flex-col gap-6">
             <section class="aiux-card bg-base-100 shadow-sm" aria-labelledby="journey-title">
               <div class="aiux-card-body gap-3">
@@ -310,8 +349,8 @@ export default class TicketPage extends withWidgetContext(AIUXElement) {
               </div>
             </section>
           </div>
-        </div>
-      </aiux-record-provider>
+        </aiux-record-provider>
+      </div>
     </div>`;
   }
 }

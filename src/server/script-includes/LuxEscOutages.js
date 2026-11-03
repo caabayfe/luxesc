@@ -60,9 +60,8 @@ LuxEscOutages.prototype = {
 
     // All current issues (there are few, and matching "Outlook does not sync" to "Exchange is
     // down" is the agent's job), plus how many colleagues reported something similar lately
-    knownIssues: function (runId, query) {
-        if (!new x_everi_luxesc.LuxEscIntake()._run(runId)) return { error: 'Unknown intake run' };
-        return { issues: this._issues(), othersReporting: this._othersReporting(runId, query) };
+    knownIssues: function (query) {
+        return { issues: this._issues(), othersReporting: this._othersReporting(gs.getUserID(), query) };
     },
 
     // The issue with this sys_id if it is still current; the triage only keeps real ones
@@ -162,11 +161,9 @@ LuxEscOutages.prototype = {
     },
 
     // Callers other than the employee who raised a matching incident in the last hours
-    _othersReporting: function (runId, query) {
+    _othersReporting: function (userId, query) {
         var words = new x_everi_luxesc.LuxEscIntake()._words(query);
         if (!words) return 0;
-        var run = new GlideRecord('x_everi_luxesc_concierge_run');
-        var userId = run.get(runId) ? run.getValue('user') : '';
         var since = new GlideDateTime();
         since.addSeconds(-3600 * LuxEscOutages.BURST_HOURS);
         var incident = new GlideAggregate('incident');

@@ -11,6 +11,8 @@
     "deploy:reinstall": "now-sdk install --reinstall",
     "lint": "eslint .",
     "agent:skills": "node scripts/setup-agent-skills.mjs",
+    "otto:skills": "node scripts/generate-otto-skills.mjs && now-sdk build && node scripts/generate-otto-skills.mjs",
+    "otto:push": "now-sdk exec --scope global --reason \"Push AI metadata to Mosaic so Otto sees new or changed skills\" \"sn_one_extend.GenerativeAIUtility.pushMetadataToMosaic()\"",
     "postinstall": "node scripts/setup-agent-skills.mjs"
   },
   "dependencies": {

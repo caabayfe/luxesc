@@ -1,13 +1,11 @@
-// Request Planner: the tools of the planner AI agent, which turns one sentence ("onboard 3 new
-// hires in Madrid next Monday") into a plan of catalog items with their variables filled in.
-// Values the agent proposes as names are resolved here to what the catalog API takes (sys_ids,
-// choice values), so the portal can add the plan to the cart. Nothing is ordered until the
-// employee reviews the plan and submits the cart.
-// Classic script, like LuxEscConcierge, because the sn_aia runtime rejects module code.
+// Request Planner: the tools of the planner AI agent, which Otto calls when an employee needs
+// several catalog items at once ("onboard 3 new hires in Madrid next Monday"). Values the agent
+// proposes as names are resolved here to what the catalog takes (sys_ids, choice values) before
+// an item goes in the employee's cart; the order is submitted only after they confirm in the chat.
+// Tools run as the employee. Classic script, like LuxEscConcierge, because the sn_aia runtime
+// rejects module code.
 var LuxEscPlanner = Class.create();
 
-LuxEscPlanner.RUN = 'x_everi_luxesc_concierge_run';
-LuxEscPlanner.MAX_STEPS = 8;
 LuxEscPlanner.MAX_QUANTITY = 20;
 // item_option_new types that hold no answer (labels, containers, macros, UI pages, breaks)
 LuxEscPlanner.LAYOUT_TYPES = ['11', '12', '14', '15', '17', '19', '20', '24', '25', '32'];
@@ -26,17 +24,16 @@ LuxEscPlanner.TRUE_WORDS = ['true', 'yes', 'y', '1', 'on', 'si', 'sí'];
 LuxEscPlanner.prototype = {
     initialize: function () {},
 
-    searchCatalog: function (runId, query) {
-        if (!this._run(runId)) return { error: 'Unknown plan run' };
-        return new x_everi_luxesc.LuxEscIntake().searchCatalog(runId, query, true);
+    searchCatalog: function (query) {
+        return new x_everi_luxesc.LuxEscIntake().searchCatalog(query, true);
     },
 
-    // The questions of an item, so the agent can propose answers
-    describeItem: function (runId, itemId) {
-        if (!this._run(runId)) return { error: 'Unknown plan run' };
+    // The questions of an item, so the agent can propose answers; today's date resolves "next Monday"
+    describeItem: function (itemId) {
         var item = this._item(itemId);
         if (!item) return { error: 'No orderable catalog item with sysId ' + itemId };
         return {
+            today: new GlideDate().getValue(),
             sysId: item.getUniqueValue(),
             name: item.getValue('name'),
             description: String(item.getValue('short_description') || '').substring(0, 300),
@@ -57,40 +54,45 @@ LuxEscPlanner.prototype = {
         };
     },
 
-    savePlan: function (runId, planJson) {
-        var run = this._run(runId);
-        if (!run) throw new Error('Unknown plan run ' + runId);
-        var plan = typeof planJson === 'string' ? JSON.parse(planJson) : planJson;
-        if (!plan || typeof plan.summary !== 'string' || !(plan.steps instanceof Array) || !plan.steps.length) {
-            throw new Error('The plan must be {"summary": "...", "steps": [{"itemSysId": "...", ...}]}');
+    // Adds one item with its answers to the employee's cart, unless mandatory questions are still
+    // unanswered; returns what is in the cart now, including items that were already there
+    addToCart: function (itemId, quantity, valuesJson) {
+        var values = typeof valuesJson === 'string' ? (valuesJson.trim() ? JSON.parse(valuesJson) : {}) : valuesJson;
+        var step = this._resolveStep({ itemSysId: itemId, quantity: quantity, values: values || {} }, 0);
+        if (step.missing.length || step.unresolved.length) {
+            return { added: false, item: step.itemName, missing: step.missing, unresolved: step.unresolved };
         }
-        var self = this;
-        var clean = {
-            summary: plan.summary.substring(0, 300),
-            steps: plan.steps.slice(0, LuxEscPlanner.MAX_STEPS).map(function (step, index) {
-                return self._resolveStep(step, index);
-            }),
-            notes: (plan.notes instanceof Array ? plan.notes : []).slice(0, 5).map(function (note) {
-                return String(note).substring(0, 300);
-            }),
-        };
-        run.setValue('briefing', JSON.stringify(clean));
-        run.update();
-        var unresolved = [];
-        clean.steps.forEach(function (step) {
-            step.unresolved.forEach(function (problem) {
-                unresolved.push(step.itemName + ' / ' + problem.field + ': ' + problem.reason);
-            });
-        });
-        return 'Plan saved with ' + clean.steps.length + ' steps' +
-            (unresolved.length ? '. Could not use: ' + unresolved.join('; ') : '');
+        var cart = new sn_sc.CartJS();
+        cart.addToCart({ sysparm_id: step.itemSysId, sysparm_quantity: String(step.quantity), variables: step.values });
+        return { added: true, item: step.itemName, quantity: step.quantity, answers: step.display, cart: this._cartItems(cart) };
+    },
+
+    // Orders everything in the employee's cart
+    submitOrder: function () {
+        var cart = new sn_sc.CartJS();
+        if (!this._cartItems(cart).length) throw new Error('The cart is empty');
+        var result = cart.checkoutCart();
+        var order = typeof result === 'string' ? JSON.parse(result) : result;
+        if (!order || !order.request_number) throw new Error('The order could not be submitted');
+        // The employee follows each requested item, not the request that groups them
+        var items = [];
+        var line = new GlideRecord('sc_req_item');
+        line.addQuery('request', order.request_id);
+        line.orderBy('number');
+        line.query();
+        while (line.next()) {
+            items.push({ number: line.getValue('number'), item: line.getDisplayValue('cat_item'), link: x_everi_luxesc.LuxEscIntake.REQUEST_PAGE + line.getUniqueValue() });
+        }
+        return { requestNumber: order.request_number, requestSysId: order.request_id, items: items };
     },
 
     // ---- Internals ------------------------------------------------------------------------
 
-    _run: function (runId) {
-        var run = new GlideRecord(LuxEscPlanner.RUN);
-        return run.get(runId) && run.getValue('kind') === 'plan' ? run : null;
+    _cartItems: function (cart) {
+        var line = cart.getCartItems();
+        var items = [];
+        while (line.next()) items.push({ item: line.getDisplayValue('cat_item'), quantity: parseInt(line.getValue('quantity'), 10) || 1 });
+        return items;
     },
 
     _item: function (itemId) {
@@ -148,7 +150,7 @@ LuxEscPlanner.prototype = {
 
     _resolveStep: function (step, index) {
         var item = this._item(step && step.itemSysId);
-        if (!item) throw new Error('Step ' + (index + 1) + ': itemSysId must be a sysId from the Search orderable items tool');
+        if (!item) throw new Error('item_sys_id must be a sysId from the Search orderable items tool');
         var variables = this._variables(item.getUniqueValue());
         var values = {};
         var display = [];

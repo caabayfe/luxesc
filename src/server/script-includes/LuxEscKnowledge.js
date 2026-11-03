@@ -41,6 +41,28 @@ LuxEscKnowledge.prototype = {
         return run;
     },
 
+    // The employee told the intake agent in the chat that its self-help fixed the problem. The fix
+    // is kept as a completed intake run, so the drafter reads it like a portal one and it still
+    // counts as a problem solved without a ticket.
+    fromChat: function (problem, summary, steps, articleIds) {
+        var intakeTools = new x_everi_luxesc.LuxEscIntake();
+        var selfHelp = intakeTools._cleanSelfHelp({ steps: this._list(steps), articles: this._articles(articleIds) });
+        if (!selfHelp) throw new Error('The steps that fixed the problem are needed');
+        var intake = new GlideRecord(LuxEscKnowledge.RUN);
+        intake.initialize();
+        intake.setValue('user', gs.getUserID());
+        intake.setValue('kind', 'intake');
+        intake.setValue('prompt', String(problem || summary || '').substring(0, 2000));
+        intake.setValue('state', 'completed');
+        intake.setValue('finished_on', new GlideDateTime());
+        intake.setValue('briefing', JSON.stringify({
+            summary: String(summary || problem || '').substring(0, 300),
+            selfHelp: selfHelp,
+            recommendation: { type: 'none', reason: 'Fixed with self-help in the chat' },
+        }));
+        return this.fromIntake(intake.insert());
+    },
+
     // An incident was resolved (business rule); skipped when off, when the notes are too thin,
     // when the resolver asked for the platform's own knowledge article, or when already drafted
     fromIncident: function (incidentId) {
@@ -268,6 +290,27 @@ LuxEscKnowledge.prototype = {
             section(headings.cause, paragraph(draft.cause)) +
             section(headings.steps, steps) +
             section(headings.appliesTo, paragraph(draft.appliesTo));
+    },
+
+    // Tool inputs arrive as strings: a JSON array, or one item per line
+    _list: function (value) {
+        if (value instanceof Array) return value;
+        var parsed = this._parse(value);
+        if (parsed instanceof Array) return parsed;
+        return String(value || '').split(/\n+/).map(function (line) {
+            return line.replace(/^\s*\d+[.)]\s*/, '').trim();
+        }).filter(Boolean);
+    },
+
+    // The published articles the steps came from, as the drafter cites them
+    _articles: function (articleIds) {
+        var parsed = this._parse(articleIds);
+        var ids = parsed instanceof Array ? parsed : String(articleIds || '').split(/[\s,]+/);
+        return ids.map(function (id) {
+            var article = new GlideRecordSecure('kb_knowledge');
+            return /^[0-9a-f]{32}$/.test(String(id).trim()) && article.get(String(id).trim()) ?
+                { sysId: article.getUniqueValue(), number: article.getValue('number'), title: article.getValue('short_description') } : null;
+        }).filter(Boolean);
     },
 
     _parse: function (text) {
