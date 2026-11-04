@@ -9,6 +9,7 @@
       "name": "Fix something broken",
       "agent": "employee_intake_agent",
       "agentName": "Employee Intake",
+      "first": "If the team has an agent other than 'Employee Intake' that answers whether a service has a known outage, use it first with the employee's message word for word. If it says there is a known outage, let it hold the conversation and finish: do not use 'Employee Intake'. If it says there is none, or it cannot help, continue with the next step without telling the employee.",
       "useWhen": "an employee says something is broken, failing, slow or not working (VPN, email, Teams, laptop, printer, Wi-Fi, an application or website, an error message), asks how to fix it, or wants to report a problem or raise an incident",
       "examples": [
         "My VPN won't connect from home",

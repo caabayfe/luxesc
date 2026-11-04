@@ -56,10 +56,18 @@ function check() {
 const describe = skill =>
   `Use when ${skill.useWhen}. For example: ${skill.examples.map(example => `"${example}"`).join(', ')}. ${skill.does} Not for ${skill.notFor}. Pass the employee's message word for word, in the language they wrote it, so the agent answers in that language.`;
 
-const plan = skill => `1. Use the '${skill.agentName}' agent with the employee's message word for word, in their language (never translated). Call it right away; do not ask for confirmation first.
-2. Let the agent hold the conversation: ${skill.conversation}.
-3. When the agent finishes, the task is complete: do not call it again or repeat its answer.
-4. Answer in the language the employee wrote in.`;
+// An optional first step hands the message to another member of the team (added by another app,
+// never named here) before the skill's own agent.
+const plan = skill => {
+  const steps = [
+    `Use the '${skill.agentName}' agent with the employee's message word for word, in their language (never translated). Call it right away; do not ask for confirmation first.`,
+    `Let the agent hold the conversation: ${skill.conversation}.`,
+    'When the agent finishes, the task is complete: do not call it again or repeat its answer.',
+    'Answer in the language the employee wrote in.',
+  ];
+  if (skill.first) steps.unshift(skill.first);
+  return steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
+};
 
 const js = value => JSON.stringify(value);
 
